@@ -1,0 +1,41 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+    -   id: trailing-whitespace #This hook trims all whitespace from the end of each line
+    -   id: end-of-file-fixer #This hooks ensures that all files end in a newline and only a newline.
+    -   id: mixed-line-ending # This hook replaces or checks mixed line ending.
+    -   id: check-yaml #This hook will attempt to load all yaml files and verify their syntax
+    -   id: check-added-large-files # this hook will prevent  extremellarge files from being committed.
+        args: [--maxkb=20000]
+-   repo: https://github.com/psf/black
+    rev: 23.3.0
+    hooks:
+    -   id: black
+- repo: https://github.com/charliermarsh/ruff-pre-commit
+  # Ruff version.
+  rev: "v0.0.263"
+  hooks:
+    - id: ruff
+
+-   repo: https://github.com/PyCQA/isort
+    rev: 5.12.0
+    hooks:
+    -   id: isort
+        args: ["--profile", "black", "--filter-files"]
+-   repo: https://github.com/econchick/interrogate
+    rev: 1.5.0
+    hooks:
+    -   id: interrogate
+        args: [-vv, -i, --fail-under=95]
+#-   repo: https://github.com/PyCQA/autoflake # replaced by ruff
+#    rev: "1.4"
+#    hooks:
+#    -   id: autoflake
+#        args: [--in-place, --remove-unused-variables]
+#-   repo: https://gitlab.com/pycqa/flake8
+  #    rev: 4.0.1
+  #    hooks:
+    #    -   id: flake8
