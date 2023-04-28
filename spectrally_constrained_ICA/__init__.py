@@ -1,5 +1,5 @@
 """Explain yourself! Interrogate a codebase for docstring coverage."""
-__author__ = "Ryan Blashaw"
+__author__ = "Ryan Balshaw"
 __version__ = "0.1.0"
 __email__ = "ryanbalshaw81@gmail.com"
 __description__ = ""

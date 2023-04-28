@@ -5,20 +5,9 @@ description = "An algorithmic implementation of FastICA with a spectral constrai
 authors = ["RyanBalshaw <ryanbalshaw81@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/johnfraney/flake8-markdown"
-repository = "https://github.com/johnfraney/flake8-markdown"
-keywords = ["flake8", "markdown", "lint"]
-classifiers = [
-    "Environment :: Console",
-    "Framework :: Flake8",
-    "Operating System :: OS Independent",
-    "Topic :: Software Development :: Documentation",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: Software Development :: Quality Assurance",
-]
-include = [
-    "LICENSE",
-]
+homepage = ""
+repository = "https://github.com/RyanBalshaw/scICA"
+keywords = ["Independent component analysis", "spectral constraints", "ICA", "single channel"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -33,9 +22,12 @@ pre-commit = "^3.2.2"
 black = "^23.3.0"
 isort = "^5.12.0"
 interrogate = "^1.5.0"
-pytest = "^7.1.3"
+pytest = "^7.3.1"
 ruff = "^0.0.263"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.urls]
+issues = "https://github.com/RyanBalshaw/scICA/issues"
