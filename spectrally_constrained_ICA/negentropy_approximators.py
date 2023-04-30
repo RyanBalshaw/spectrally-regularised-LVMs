@@ -226,3 +226,107 @@ class logcosh_object(object):
     #     deriv = numerator / denominator
     #
     #     return np.array([-1, 1]) * deriv.reshape(-1, 1)
+
+
+class exp_object(object):
+    """
+    An object that implements the first derivative, second derivative and
+    gamma functions of the exp function. These functions are used in the
+    negentropy approximation calculation for FastICA.
+
+    Methods
+    -------
+    function(u = float)
+        Return the function form of G(u) for the exp function
+
+    first_derivative(u = float)
+        Return the function form of the first derivative g(u) for the exp function
+
+    second_derivative(u = float)
+        Return the function form of the second derivativeg'(u) for the exp function
+
+    gamma(u = float)
+        Return the function form of ratio g'(u)/g(u) for the exp function
+    """
+
+    def __init__(self, a2=None):
+        """
+        Parameters
+        ----------
+        a2: float - default: 1
+            The a2 parameter for the exp function.
+
+        Raises
+        ------
+        ValueError
+            If the a2 value is outside the recommended domain of [0, 2]
+        """
+        if a2 is None:
+            self.a2 = [1]  # [a2 = 1]
+
+        else:
+            if a2 < 0 or a2 > 2:
+                print(
+                    f"a2 parameter ({a2}) in exp object "
+                    f"is outside [0, 2] bounds (a2 should be 1)."
+                )
+                raise ValueError
+
+            self.a2 = a2  # [a2]
+
+    def function(self, u):
+        """
+        This method implements the functional form of G(u)
+
+        Parameters
+        ----------
+        u: (float): The input value to be fed through G(u)
+
+        Returns
+        -------
+            float: The computation of G(u)
+        """
+        return -1 / self.a2 * np.exp(-self.a2 / 2 * u**2)
+
+    def first_derivative(self, u):
+        """
+        This method implements the first derivative of G(.) for g(u)
+
+        Parameters
+        ----------
+        u: (float): The input value to be fed through g(u)
+
+        Returns
+        -------
+            float: The computation of g(u)
+        """
+        return u * np.exp(-self.a2 * u * u / 2)
+
+    def second_derivative(self, u):
+        """
+        This method implements the second derivative of G(.) for g'(u)
+
+        Parameters
+        ----------
+        u: (float): The input value to be fed through g'(u)
+
+        Returns
+        -------
+            float: The computation of g'(u)
+        """
+        return np.exp(-self.a2 * u * u / 2) * (1 - self.a2 * u * u)
+
+    def gamma(self, u):
+        """
+        This method implements the ratio of the second derivative to
+        the first derivative (gamm(u) = g'(u) / g(u))
+
+        Parameters
+        ----------
+        u: (float): The input value to be fed through gamma(u)
+
+        Returns
+        -------
+            float: The computation of gamma(u)
+        """
+        return (1 - self.a2 * u * u) / u
