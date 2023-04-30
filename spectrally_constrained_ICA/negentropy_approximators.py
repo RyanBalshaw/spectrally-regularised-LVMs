@@ -19,7 +19,7 @@ class general_object(object):
         Return the function form of the first derivative g(u) for the XXXX function
 
     second_derivative(u = float)
-        Return the function form of the second derivativeg'(u) for the XXXX function
+        Return the function form of the second derivative g'(u) for the XXXX function
 
     gamma(u = float)
         Return the function form of ratio g'(u)/g(u) for the XXXX function
@@ -73,7 +73,7 @@ class general_object(object):
     def gamma(self, u):
         """
         This method implements the ratio of the second derivative to
-        the first derivative (gamm(u) = g'(u) / g(u))
+        the first derivative (gamma(u) = g'(u) / g(u))
 
         Parameters
         ----------
@@ -95,14 +95,14 @@ class logcosh_object(object):
 
     Methods
     -------
-    function(u = float)
+    function(u = float) -> 1/a1 * log((exp(a1 * u) + exp(-a1 * u)) / 2)
         Return the function form of G(u) for the logcosh function
 
-    first_derivative(u = float)
+    first_derivative(u = float) -> tanh
         Return the function form of the first derivative g(u) for the logcosh function
 
-    second_derivative(u = float)
-        Return the function form of the second derivativeg'(u) for the logcosh function
+    second_derivative(u = float) -> 1 - tanh^2(u)
+        Return the function form of the second derivative g'(u) for the logcosh function
 
     gamma(u = float)
         Return the function form of ratio g'(u)/g(u) for the logcosh function
@@ -144,6 +144,7 @@ class logcosh_object(object):
         Returns
         -------
             float: The computation of G(u)
+
         """
 
         return (
@@ -191,7 +192,7 @@ class logcosh_object(object):
     def gamma(self, u):
         """
         This method implements the ratio of the second derivative to
-        the first derivative (gamm(u) = g'(u) / g(u))
+        the first derivative (gamma(u) = g'(u) / g(u))
 
         Parameters
         ----------
@@ -236,16 +237,16 @@ class exp_object(object):
 
     Methods
     -------
-    function(u = float)
+    function(u = float) -> -1/a2 * exp(-a2/2 * u^2)
         Return the function form of G(u) for the exp function
 
-    first_derivative(u = float)
+    first_derivative(u = float) -> u * exp(-a2/2 * u^2)
         Return the function form of the first derivative g(u) for the exp function
 
-    second_derivative(u = float)
-        Return the function form of the second derivativeg'(u) for the exp function
+    second_derivative(u = float) -> (1 - a2 * u^*2) * exp(-a2 / 2 * u^2)
+        Return the function form of the second derivative g'(u) for the exp function
 
-    gamma(u = float)
+    gamma(u = float) -> (1 - a2 * u^2) / u
         Return the function form of ratio g'(u)/g(u) for the exp function
     """
 
@@ -319,7 +320,7 @@ class exp_object(object):
     def gamma(self, u):
         """
         This method implements the ratio of the second derivative to
-        the first derivative (gamm(u) = g'(u) / g(u))
+        the first derivative (gamma(u) = g'(u) / g(u))
 
         Parameters
         ----------
@@ -330,3 +331,82 @@ class exp_object(object):
             float: The computation of gamma(u)
         """
         return (1 - self.a2 * u * u) / u
+
+
+class quad_object(object):
+    """
+    An object that implements the first derivative, second derivative and
+    gamma functions of the quad (u**4) function. These functions are used in the
+    negentropy approximation calculation for FastICA.
+
+    Methods
+    -------
+    function(u = float) -> 1/4 u^4
+        Return the function form of G(u) for the quartic function
+
+    first_derivative(u = float) -> u^3
+        Return the function form of the first derivative g(u) for the quartic function
+
+    second_derivative(u = float) -> 3 u ^2
+        Return the function form of the second derivative g'(u) for the quartic function
+
+    gamma(u = float) -> 3 / u
+        Return the function form of ratio g'(u)/g(u) for the quartic function
+    """
+
+    def function(self, u):
+        """
+        This method implements the functional form of G(u)
+
+        Parameters
+        ----------
+        u: (float): The input value to be fed through G(u)
+
+        Returns
+        -------
+            float: The computation of G(u)
+        """
+        return 1 / 4 * u**4
+
+    def first_derivative(self, u):
+        """
+        This method implements the first derivative of G(.) for g(u)
+
+        Parameters
+        ----------
+        u: (float): The input value to be fed through g(u)
+
+        Returns
+        -------
+            float: The computation of g(u)
+        """
+        return u**3
+
+    def second_derivative(self, u):
+        """
+        This method implements the second derivative of G(.) for g'(u)
+
+        Parameters
+        ----------
+        u: (float): The input value to be fed through g'(u)
+
+        Returns
+        -------
+            float: The computation of g'(u)
+        """
+        return 3 * u**2
+
+    def gamma(self, u):
+        """
+        This method implements the ratio of the second derivative to
+        the first derivative (gamma(u) = g'(u) / g(u))
+
+        Parameters
+        ----------
+        u: (float): The input value to be fed through gamma(u)
+
+        Returns
+        -------
+            float: The computation of gamma(u)
+        """
+        return 3 / u
