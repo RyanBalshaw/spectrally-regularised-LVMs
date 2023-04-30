@@ -5,9 +5,13 @@ description = "An algorithmic implementation of FastICA with a spectral constrai
 authors = ["RyanBalshaw <ryanbalshaw81@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = ""
+homepage = "https://github.com/RyanBalshaw/scICA"
 repository = "https://github.com/RyanBalshaw/scICA"
 keywords = ["Independent component analysis", "spectral constraints", "ICA", "single channel"]
+
+include = [
+    "LICENSE",
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"
