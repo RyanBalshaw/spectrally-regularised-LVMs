@@ -410,3 +410,82 @@ class quad_object(object):
             float: The computation of gamma(u)
         """
         return 3 / u
+
+
+class cube_object(object):
+    """
+    An object that implements the first derivative, second derivative and
+    gamma functions of the quad (u**4) function. These functions are used in the
+    negentropy approximation calculation for FastICA.
+
+    Methods
+    -------
+    function(u = float) -> u^3
+        Return the function form of G(u) for the quartic function
+
+    first_derivative(u = float) -> 3 u^2
+        Return the function form of the first derivative g(u) for the quartic function
+
+    second_derivative(u = float) -> 6 u
+        Return the function form of the second derivative g'(u) for the quartic function
+
+    gamma(u = float) -> 2 / u
+        Return the function form of ratio g'(u)/g(u) for the quartic function
+    """
+
+    def function(self, u):
+        """
+        This method implements the functional form of G(u)
+
+        Parameters
+        ----------
+        u: (float): The input value to be fed through G(u)
+
+        Returns
+        -------
+            float: The computation of G(u)
+        """
+        return u**3
+
+    def first_derivative(self, u):
+        """
+        This method implements the first derivative of G(.) for g(u)
+
+        Parameters
+        ----------
+        u: (float): The input value to be fed through g(u)
+
+        Returns
+        -------
+            float: The computation of g(u)
+        """
+        return 3 * u**2
+
+    def second_derivative(self, u):
+        """
+        This method implements the second derivative of G(.) for g'(u)
+
+        Parameters
+        ----------
+        u: (float): The input value to be fed through g'(u)
+
+        Returns
+        -------
+            float: The computation of g'(u)
+        """
+        return 6 * u
+
+    def gamma(self, u):
+        """
+        This method implements the ratio of the second derivative to
+        the first derivative (gamma(u) = g'(u) / g(u))
+
+        Parameters
+        ----------
+        u: (float): The input value to be fed through gamma(u)
+
+        Returns
+        -------
+            float: The computation of gamma(u)
+        """
+        return 2 / u
