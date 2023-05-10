@@ -8,19 +8,179 @@ Method 2: quasi_Newton
     This is a method that implements different Hessian approximation strategies.
 """
 
+import copy
+
 import numpy as np
 
 
-class ica_batch_sampler(object):
+class data_processor(object):
+    """
+    A method that processes the data matrices.
+
+    Methods
+    -------
+    initialise_preprocessing(X)
+        A method that initialises all of the processing attributes
+        for the pre-processing (standardising with whitening). Solves
+        for the whitening transform parameters.
+
+    standardise_data(X)
+        Standardises the columns of X to be zero-mean and unit-variance.
+
+    preprocess_data(X)
+        Transforms the X matrix to the whitened space (if required).
+
+    unprocess_data(X)
+        Transforms a X matrix from the whitened space to the data space.
+
+    """
+
+    def __init__(self, whiten: bool = True, var_PCA: float | None = None):
+        """
+        Parameters
+        ----------
+        whiten: bool
+            A flag to control whether the processing should whiten the data.
+
+        var_PCA: float | None (default None)
+            A value that is in [0, 1] that specifies how much of the variance
+            you wish to keep. Allows one to remove some of the non-dominant sources
+            in the data.
+        """
+        self.whiten = whiten
+        self.var_PCA = var_PCA
+
+    def initialise_preprocessing(self, X):
+        """
+        A method that initialises the aspects of the data pre-processing stage.
+
+        Parameters
+        ----------
+        X: ndarray
+            The initialisation matrix from which the pre-processing parameters are
+            obtained.
+
+        Returns
+        -------
+        self
+        """
+
+        # Extract Nsamples and Nfeatures
+        Ns, Nf = X.shape
+
+        # Get the mean and standard deviation (always automatically z-score)
+        self.mean_ = np.mean(X, axis=0, keepdims=True)
+        self.std_ = np.std(X, axis=0, keepdims=True)
+
+        if self.whiten:
+            # Decompose X
+            # rows of Vh are the eigenvectors of A^H A (i.e., Vh = U^T)
+            # Columns of U are eigenvectors of A A^H
+            U, s, Vh = np.linalg.svd(
+                (copy.deepcopy(X) - self.mean_) / self.std_, full_matrices=False
+            )
+
+            eigenvalues = s**2 / (Ns - 1)
+
+            if self.var_PCA is not None:
+                # TODO improve var_PCA option
+
+                cumsum = np.cumsum(eigenvalues / np.sum(eigenvalues))
+
+                n_comp = np.argmin(np.abs(cumsum - self.var_PCA))
+
+                self.Vh = Vh[:n_comp, :]
+                self.eigenvalues = eigenvalues[:n_comp]
+
+            else:
+                self.Vh = Vh
+                self.eigenvalues = eigenvalues
+
+            # Whiten the data
+            L_inv_sqrt = np.diag(1 / np.sqrt(self.eigenvalues))
+            L_sqrt = np.diag(np.sqrt(self.eigenvalues))
+
+            self.latent_transform = np.dot(L_inv_sqrt, self.Vh)
+            self.recover_transform = np.dot(L_sqrt, self.Vh)
+
+        else:
+            self.Vh = np.eye(Nf)
+            self.latent_transform = np.eye(Nf)
+            self.recover_transform = np.eye(Nf)
+
+        return self
+
+    def standardise_data(self, X):
+        """
+        A method that standardises the row of the data matrix X
+
+        Parameters
+        ----------
+        X: ndarray
+            original feature matrix
+
+        Returns
+        -------
+        X_standardised: ndarray
+            Zero-mean, unit variance feature matrix.
+        """
+
+        X_standardised = (X - self.mean_) / self.std_
+
+        return X_standardised
+
+    def preprocess_data(self, X):
+        """
+        A method that pre-processes the data matrix X
+
+        Parameters
+        ----------
+        X: ndarray
+            original feature matrix
+
+        Returns
+        -------
+        X_whitened: ndarray
+            The whitened feature matrix
+        """
+        X_standardised = self.standardise_data(X)
+
+        X_whitened = (X_standardised @ self.latent_transform.T) @ self.Vh
+        # X_whitened = np.dot(X_standardised, self.latent_transform.T)
+
+        return X_whitened
+
+    def unprocess_data(self, X):
+        """
+        A method that unwhitens the whitened data matrix X
+
+        Parameters
+        ----------
+        X: ndarray
+            The whitened feature matrix
+
+        Returns
+        -------
+        X_unwhitened: ndarray
+            The unwhitened feature matrix
+        """
+        X_unwhitened = np.dot(np.dot(X, self.recover_transform.T), self.Vh)
+        # X_unwhitened = np.dot(X, self.recover_transform.T)
+
+        return X_unwhitened
+
+
+class batch_sampler(object):
     """
     This is a simple iterator instance that can be called during runtime using:
 
-    batch_sampler = ica_batch_sampler(batch_size, include_end=True)
-    data_sampler = iter(batch_sampler(X_preprocess, iter_idx=0))
+    batch_sampler_inst = batch_sampler(batch_size, include_end=True)
+    data_sampler = iter(batch_sampler_inst(X_preprocess, iter_idx=0))
 
-    and then sampling in a loop or something like that
+    and then sampling in a loop or something like that:
 
-    Xi = next(data_sampler)
+    for i in range(10):
+        Xi = next(data_sampler)
     """
 
     def __init__(self, batch_size, random_sampler=True, include_end=False):
@@ -408,3 +568,159 @@ class quasi_Newton(object):
 
         self.jacobian_mat_iter += update_term
         self.iter_index += 1
+
+
+class deflation_orthogonalisation(object):
+    """
+    This method implements the Gram-Schmidt orthogonalisation
+    process and some helper methods.
+
+    Methods
+    -------
+    projection_operator(u, v)
+        words
+
+    gram_schmidt_orthogonalisation(w, W, idx)
+        words
+
+    global_gso(W)
+        words
+
+    """
+
+    @staticmethod
+    def projection_operator(u, v):
+        """
+        Calculates projection of v onto u (equivalent to outer product map).
+
+        Parameters
+        ----------
+        u: ndarray
+            A Nx1 array that we wish to orthogalise against (remains unchanged)
+        v: ndarray
+            A Nx1 array that we wish to orthogonalise (changes)
+
+        Returns
+        -------
+
+        """
+
+        return u.T @ v / (u.T @ u) * u
+
+    def gram_schmidt_orthogonalisation(self, w, W, idx):  # Important to FastICA
+        """
+
+        Parameters
+        ----------
+        w: ndarray
+            A Nx1 array that contains the vector we want to orthogonalise.
+
+        W: ndarray
+            A MxN array that contains the vectors we want to orthogonalise w against.
+
+        idx: int
+            The upper index (cannot be zero) for the rows of W that
+            we want to orthogonalise against.
+
+        Returns
+        -------
+        w_orth: ndarray
+            A Nx1 array that contains the orthogonalised w vector using the first
+            idx + 1 vectors in W.
+
+        Note: I have played around with vectorised versions of this, but
+        it did not offer significant computational improvements.
+        """
+        # W is a matrix (w_1, ..., w_N)^T of already orthogonalised vectors.
+        # idx is the index of the vectors in
+        # W (w_1, ..., w_idx) that we wish to orthogonalise w against
+        # Note: idx cannot be zero
+
+        w_orth = w.copy()
+
+        if idx == 0:
+            print("GSO index cannot be zero.")
+            raise SystemExit
+
+        if idx > W.shape[0]:
+            print(
+                "GSO index exceeds the number of vectors you want to compare against."
+            )
+            raise SystemExit
+
+        # Perform Gram-Schmidt Orthogonalisation
+        for i in range(0, idx, 1):
+            w_orth = w_orth - self.projection_operator(W[[i], :].T, w_orth)
+
+        # Normalise w_gorth
+        w_orth /= np.linalg.norm(w_orth)
+
+        return w_orth
+
+    def global_gso(self, W):  # Important to FastICA
+        """
+        A method that orthogonalises a set of Nx1 vectors
+        stores in some W matrix of shape MxN.
+
+        Parameters
+        ----------
+        W: ndarray
+            A MxN array that contains the vectors we want to orthogonalise
+            in the rows (i.e. assumes that W = [w_1, w_N]^T).
+
+        Returns
+        -------
+        W_orth: ndarray
+            A MxN array of orthogonalised vectors.
+        """
+
+        W_orth = np.zeros_like(W, dtype="f")
+
+        # Make the first vector unit (do not change)
+        W_orth[0, :] = W[0, :] / np.linalg.norm(W[0, :])
+
+        # Iterate over the other vectors and orthogonalise against them
+        for i in range(1, W.shape[0], 1):
+            W_orth[i, :] = self.gram_schmidt_orthogonalisation(W[[i], :].T, W, i)[:, 0]
+
+        return W_orth
+
+
+def Hankel_matrix(signal, Lw=512, Lsft=1):
+    """
+    A method that performs hankelisation for the user.
+
+    Parameters
+    ----------
+    signal: ndarray
+        A (n,) shaped array that contains a time series of measurement values
+
+    Lw: int
+        The window length/signal segment length
+
+    Lsft: int
+        The shift parameter for the sliding window
+
+    Returns
+    -------
+    Hmat: ndarray
+        A no_of_samples x Lw array of sliding window segments.
+
+    """
+    signal = signal.flatten()
+    N = len(signal)
+
+    # Pre-allocate the size of Hmat
+    no_of_samples = int(np.floor((N - Lw) / Lsft) + 1)
+
+    # Initialise
+    Hmat = np.zeros((no_of_samples, Lw))
+
+    # Store the segments
+    for i in range(no_of_samples):
+        start = int(i * Lsft)
+        end = int(Lw + i * Lsft)
+
+        Hmat[i, :] = signal[start:end]
+
+    return Hmat

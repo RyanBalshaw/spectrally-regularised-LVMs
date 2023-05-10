@@ -489,3 +489,50 @@ class cube_object(object):
             float: The computation of gamma(u)
         """
         return 2 / u
+
+
+def initialise_sources(
+    source_name: str = "logcosh",
+    source_params: dict = {"source_name": "logcosh", "alpha": 1},
+):
+    """
+    A function that takes in the source name and its associated parameters
+    and returns the source instance and the E{G(nu)} value
+    for a set number of samples (100 000 samples).
+
+    Parameters
+    ----------
+    source_name: str
+        The name of the source that is to be used.
+
+    source_params: dict (default {"source_name":"logcosh", 'alpha':1})
+        The dictionary of parameters for the associated approximator.
+
+    Returns
+    -------
+
+    """
+
+    if source_name.lower() == "logcosh":
+        source_instance = logcosh_object(source_params["alpha"])
+
+    elif source_name.lower() == "exp":
+        source_instance = exp_object(source_params["alpha"])
+
+    elif source_name.lower() == "quad":
+        source_instance = quad_object()
+
+    elif source_name.lower() == "cube":
+        source_instance = cube_object()
+
+    else:
+        print("Source name ({}) is unknown. Exiting the function.".format(source_name))
+        raise SystemExit
+
+    # Initialise expected value for G(nu) (for the FastICA objective)
+
+    source_expectation = np.mean(
+        source_instance.function(np.random.randn(100000))
+    )  # 1 hundred thousand samples... hot damn
+
+    return source_instance, source_expectation
