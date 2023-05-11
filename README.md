@@ -1,4 +1,4 @@
-# Spectrally constrained ICA
+# Spectrally constrained linear transformations
 
 ![GitHub](https://img.shields.io/github/license/RyanBalshaw/scICA)
 ![GitHub issues](https://img.shields.io/github/issues-raw/RyanBalshaw/scICA)
