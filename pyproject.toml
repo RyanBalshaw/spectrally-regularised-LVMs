@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "spectrally constrained linear transforms"
+name = "spectrally-constrained-LVMs"
 version = "0.1.0"
 description = "An optimisation implementation of linear transforms with a spectral constraint."
 authors = ["Ryan Balshaw <ryanbalshaw81@gmail.com>"]
