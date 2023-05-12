@@ -16,7 +16,7 @@ how to :ref:`installation` the project.
 Contents
 --------
 
-..  toctree::
+.. toctree::
     :caption: Contents
     getting_started
     tutorials
