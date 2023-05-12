@@ -2,7 +2,7 @@
 
 ![GitHub](https://img.shields.io/github/license/RyanBalshaw/spectrally-constrained-LVMs)
 ![GitHub issues](https://img.shields.io/github/issues-raw/RyanBalshaw/spectrally-constrained-LVMs)
-![PyPI](https://img.shields.io/pypi/v/spectrally-constrained-lvms)g
+![PyPI](https://img.shields.io/pypi/v/spectrally-constrained-lvms)
 
 A repository for all code for sICA. This is the first setup of this project.
 
