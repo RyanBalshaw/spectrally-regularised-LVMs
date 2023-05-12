@@ -18,7 +18,6 @@ classifiers = [
     "Programming Language :: Python :: Implementation",
     "Topic :: Scientific/Engineering",
 ]
-
 [tool.poetry.dependencies]
 python = "^3.8"
 numpy = "^1.23.1"
@@ -28,6 +27,9 @@ scikit-learn = "^1.1.2"
 tqdm = "^4.64.1"
 sympy = "^1.11.1"
 
+[tool.poetry.group.dev]
+optional = true
+
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"
 black = "^23.3.0"
@@ -36,6 +38,15 @@ interrogate = {extras = ["png"], version = "^1.5.0"}
 pytest = "^7.3.1"
 ruff = "^0.0.263"
 cairosvg = "^2.7.0"
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+myst-parser = ">=0.16"
+sphinx = ">=4.0"
+sphinx-autobuild = ">=2021.0"
+sphinx-rtd-theme = ">=1.0"
 
 [build-system]
 requires = ["poetry-core"]
