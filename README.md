@@ -1,8 +1,8 @@
 # Spectrally constrained linear transformations
 
-![GitHub](https://img.shields.io/github/license/RyanBalshaw/scICA)
-![GitHub issues](https://img.shields.io/github/issues-raw/RyanBalshaw/scICA)
-![PyPI](https://img.shields.io/pypi/v/scICA)
+![GitHub](https://img.shields.io/github/license/RyanBalshaw/spectrally-constrained-LVMs)
+![GitHub issues](https://img.shields.io/github/issues-raw/RyanBalshaw/spectrally-constrained-LVMs)
+![PyPI](https://img.shields.io/pypi/v/spectrally-constrained-lvms)g
 
 A repository for all code for sICA. This is the first setup of this project.
 
