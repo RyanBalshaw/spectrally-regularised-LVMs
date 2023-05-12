@@ -6,5 +6,5 @@ API
 
    spectrally-constrained-LVMs
 
-.. automodule:: package_name.module
+.. automodule:: spectrally-constraint-lvms.constraint
    :members:
