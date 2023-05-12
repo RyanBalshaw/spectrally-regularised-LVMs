@@ -1,10 +1,12 @@
-# Configuration file for the Sphinx documentation builder.
+"""
+Configuration file for the Sphinx documentation builder.
+"""
 
 # -- Project information
 
-project = "Lumache"
-copyright = "2021, Graziella"
-author = "Graziella"
+project = "spectrally-constrained-LVMs"
+copyright = "2023, Balshaw"
+author = "Ryan Balshaw"
 
 release = "0.1"
 version = "0.1.0"
