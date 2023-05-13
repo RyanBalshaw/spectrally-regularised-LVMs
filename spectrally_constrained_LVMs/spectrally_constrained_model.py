@@ -22,6 +22,7 @@ from .spectral_constraint import spectral_objective
 
 
 def initialise_W(n_sources, m, init_type):
+    """initialise_W docstring"""
     if init_type == "broadband":
         W = np.zeros((n_sources, m))
 
@@ -42,12 +43,15 @@ def initialise_W(n_sources, m, init_type):
 
 
 def initialise_lambda(n_sources):
+    """initialise_lambda docstring"""
     Lambda = np.ones((n_sources, 1))  # np.zeros((n_sources, 1)) #
 
     return Lambda
 
 
 class linear_model(object):
+    """Linear model docstring"""
+
     def __init__(
         self,
         n_sources: int,  # keep

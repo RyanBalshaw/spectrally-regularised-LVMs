@@ -11,7 +11,7 @@ from .helper_methods import (
 )
 from .negen_approx import cube_object, exp_object, logcosh_object, quad_object
 from .spectral_constraint import spectral_objective
-from .spectrally_constrained_LVMs import linear_model
+from .spectrally_constrained_model import linear_model
 
 __author__ = "Ryan Balshaw"
 __version__ = "0.1.0.1"

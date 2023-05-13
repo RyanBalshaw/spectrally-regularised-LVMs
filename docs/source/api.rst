@@ -4,7 +4,7 @@ API
 .. autosummary::
    :toctree: generated
 
-   spectrally-constrained-LVMs
+   spectrally_constrained_LVMs
 
-.. automodule:: spectrally-constraint-lvms.constraint
+.. automodule:: spectrally_constrained_LVMs
    :members:
