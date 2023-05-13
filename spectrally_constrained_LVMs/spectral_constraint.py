@@ -1,5 +1,6 @@
+# Copyright 2023-present Ryan Balshaw
 """
-The spectral constraint method to be added to FastICA.
+The spectral constraint method to be added to negentropy-based ICA approach.
 """
 import numpy as np
 

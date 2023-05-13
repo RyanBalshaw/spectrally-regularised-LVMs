@@ -5,7 +5,7 @@ Docstring
 import os
 
 import numpy as np
-from matplotlib import pyplot as plt
+import sympy as sp
 
 from spectrally_constrained_LVMs import (
     Hankel_matrix,
@@ -13,10 +13,14 @@ from spectrally_constrained_LVMs import (
     negentropy_cost,
     sympy_cost,
     user_cost,
+    variance_cost,
 )
 
+# from matplotlib import pyplot as plt
+
+
 if __name__ == "__main__":
-    Lw = 256
+    Lw = 64
     Lsft = 1
     source_name = "exp"
 
@@ -27,7 +31,7 @@ if __name__ == "__main__":
         os.environ["DATA_DIR"],
         "singleFiles",
         # "cs2_imp_files",
-        "ica_pheno_const_bd.npy",  # "ica_pheno_const_A3_1.npy",  # "ica_pheno_const_analysis.npy"
+        "ica_pheno_const_bd.npy",
     )
     Fs = 25e3
     data_dict = np.load(data_dir, allow_pickle=True).item()
@@ -43,8 +47,7 @@ if __name__ == "__main__":
 
     # IMS dataset
     # data_dir = os.path.join(
-    #     os.environ["DATA_DIR"], "Datasets", "IMS", "IMS_Dataset2")#, "2004.02.17.16.02.39" # "2004.02.16.05.12.39" # "2004.02.16.03.32.39" #
-    #     #"2004.02.12.10.32.39" # "2004.02.17.17.52.39" #
+    #     os.environ["DATA_DIR"], "Datasets", "IMS", "IMS_Dataset2")
     # #)
     # Fs = 20480
     # files = sorted(os.listdir(data_dir))
@@ -53,44 +56,76 @@ if __name__ == "__main__":
 
     #######################################
     X = Hankel_matrix(x_signal, Lw, Lsft)
+    X = X[: X.shape[0] // 12, :]
+    # print(X.shape)
 
-    # cost_inst = negentropy_cost(source_name = source_name,
-    #                             source_params = {"alpha": 1})
+    # Method 1
+    n_samples = X.shape[0]
+    n_features = Lw
 
-    cost_inst = user_cost(use_hessian=True)
+    test_inst = sympy_cost(n_samples, n_features, use_hessian=False)
 
+    X_sp, w_sp, iter_params = test_inst.get_model_parameters()
+    i, j = iter_params
+
+    loss_i = sp.Sum(w_sp[j, 0] * X_sp[i, j], (j, 0, n_features - 1))
+    loss = -1 / n_samples * sp.Sum((loss_i) ** 2, (i, 0, n_samples - 1))
+
+    test_inst.set_cost(loss)
+    test_inst.implement_methods()
+
+    # Method 2
+    test_inst = user_cost(use_hessian=False)
+
+    def loss(X, w, y):
+        return -1 * np.mean((X @ w) ** 2, axis=0)
+
+    def grad(X, w, y):
+        return -2 * np.mean(y * X, axis=0, keepdims=True).T
+
+    def hess(X, w, y):
+        return -2 * np.cov(X, rowvar=False)
+
+    test_inst.set_cost(loss)
+    test_inst.set_gradient(grad)
+    test_inst.set_hessian(hess)
+
+    # Method 3
+    test_inst = negentropy_cost(source_name="exp", source_params={"alpha": 1})
+
+    # Method 4
+    test_inst = variance_cost(use_hessian=False, verbose=True)
+
+    # Alternative PCA cost function.
     # linear_model = lambda X, w: X @ w
-    loss = (
-        lambda X, w, y: -1 * np.mean(y**2, axis=0) / (w.T @ w)[0, 0]
-    )  # -1 * np.mean(y ** 2, axis=0)
-    grad = lambda X, w, y: -2 * (
-        (np.cov(X, rowvar=False) @ w) / (w.T @ w)
-        - np.mean(y**2, axis=0) / ((w.T @ w) ** 2) * w
-    )  # -2 * np.mean(y * X, axis=0, keepdims=True).T
-    hess = lambda X, w, y: -2 * (
-        (np.cov(X, rowvar=False) / (w.T @ w))
-        + (-2 / ((w.T @ w) ** 2) * (np.cov(X, rowvar=False) @ w) @ w.T)
-        - 1
-        * (
-            (np.mean(y**2, axis=0) / (w.T @ w) * np.eye(w.shape[0]))
-            + (
-                w
-                @ np.transpose(
-                    2 * (np.cov(X, rowvar=False) @ w) / ((w.T @ w) ** 2)
-                    - 4 * np.mean(y**2, axis=0) / ((w.T @ w) ** 3) * w
-                )
-            )
-        )
-    )
-    # -2 * np.cov(X, rowvar=False) # (X.T @ X) / X.shape[0]
-
-    cost_inst.set_cost(loss)
-    cost_inst.set_gradient(grad)
-    cost_inst.set_hessian(hess)
+    # loss = (
+    #     lambda X, w, y: -1 * np.mean(y**2, axis=0) / (w.T @ w)[0, 0]
+    # )  #
+    #
+    # grad = lambda X, w, y: -2 * (
+    #     (np.cov(X, rowvar=False) @ w) / (w.T @ w)
+    #     - np.mean(y**2, axis=0) / ((w.T @ w) ** 2) * w
+    # )
+    # hess = lambda X, w, y: -2 * (
+    #     (np.cov(X, rowvar=False) / (w.T @ w))
+    #     + (-2 / ((w.T @ w) ** 2) * (np.cov(X, rowvar=False) @ w) @ w.T)
+    #     - 1
+    #     * (
+    #         (np.mean(y**2, axis=0) / (w.T @ w) * np.eye(w.shape[0]))
+    #         + (
+    #             w
+    #             @ np.transpose(
+    #                 2 * (np.cov(X, rowvar=False) @ w) / ((w.T @ w) ** 2)
+    #                 - 4 * np.mean(y**2, axis=0) / ((w.T @ w) ** 3) * w
+    #             )
+    #         )
+    #     )
+    # )
+    #
 
     sICA_inst = linear_model(
-        n_sources=256,
-        cost_instance=cost_inst,
+        n_sources=512,
+        cost_instance=test_inst,
         whiten=False,
         init_type="broadband",
         organise_by_kurtosis=False,
@@ -107,7 +142,7 @@ if __name__ == "__main__":
         },
         jacobian_update_type="full",
         use_ls=True,
-        use_hessian=True,
+        use_hessian=False,
         save_dir=tmp_dir_path,
         verbose=True,
     )

@@ -1,5 +1,6 @@
+# Copyright 2023-present Ryan Balshaw
 """
-The negentropy approximation functions for the FastICA methods.
+The negentropy approximation functions for the negentropy-based ICA methods.
 """
 import numpy as np
 
@@ -8,7 +9,7 @@ class general_object(object):
     """
     An object that implements the first derivative, second derivative and
     gamma functions of the XXXX (fill in here) function. These functions are used in the
-    negentropy calculation for FastICA.
+    negentropy calculation for negentropy-based ICA.
 
     Methods
     -------
@@ -91,7 +92,7 @@ class logcosh_object(object):
     """
     An object that implements the first derivative, second derivative and
     gamma functions of the logcosh function. These functions are used in the
-    negentropy approximation calculation for FastICA.
+    negentropy approximation calculation for negentropy-based ICA.
 
     Methods
     -------
@@ -233,7 +234,7 @@ class exp_object(object):
     """
     An object that implements the first derivative, second derivative and
     gamma functions of the exp function. These functions are used in the
-    negentropy approximation calculation for FastICA.
+    negentropy approximation calculation for negentropy-based ICA.
 
     Methods
     -------
@@ -337,7 +338,7 @@ class quad_object(object):
     """
     An object that implements the first derivative, second derivative and
     gamma functions of the quad (u**4) function. These functions are used in the
-    negentropy approximation calculation for FastICA.
+    negentropy approximation calculation for negentropy-based ICA.
 
     Methods
     -------
@@ -416,7 +417,7 @@ class cube_object(object):
     """
     An object that implements the first derivative, second derivative and
     gamma functions of the quad (u**4) function. These functions are used in the
-    negentropy approximation calculation for FastICA.
+    negentropy approximation calculation for negentropy-based ICA.
 
     Methods
     -------
@@ -529,7 +530,7 @@ def initialise_sources(
         print("Source name ({}) is unknown. Exiting the function.".format(source_name))
         raise SystemExit
 
-    # Initialise expected value for G(nu) (for the FastICA objective)
+    # Initialise expected value for G(nu) (for the negentropy-based ICA objective)
 
     source_expectation = np.mean(
         source_instance.function(np.random.randn(100000))

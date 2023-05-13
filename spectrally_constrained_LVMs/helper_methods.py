@@ -1,11 +1,22 @@
+# Copyright 2023-present Ryan Balshaw
 """
-The helper methods for the spectrally constrained FastICA solver.
+The helper methods for the solver.
 
-Method 1: ica_batch_sampler
+Method 1: data_processor
+    This method implements the pre-processing steps applied to X (standardisation
+    and/or whitening).
+
+Method 2: batch_sampler
     This is a simple batch sampler method for quicker solving.
 
-Method 2: quasi_Newton
+Method 3: quasi_Newton
     This is a method that implements different Hessian approximation strategies.
+
+Method 5: deflation_orthogonalisation
+    This method implements the Gram-Schmidt orthogonalisation process.
+
+Method 5: Hankel_matrix
+    This method implements the data hankelisation step.
 """
 
 import copy
@@ -607,7 +618,9 @@ class deflation_orthogonalisation(object):
 
         return u.T @ v / (u.T @ u) * u
 
-    def gram_schmidt_orthogonalisation(self, w, W, idx):  # Important to FastICA
+    def gram_schmidt_orthogonalisation(
+        self, w, W, idx
+    ):  # Important to negentropy-based ICA
         """
 
         Parameters
@@ -657,7 +670,7 @@ class deflation_orthogonalisation(object):
 
         return w_orth
 
-    def global_gso(self, W):  # Important to FastICA
+    def global_gso(self, W):  # Important to negentropy-based ICA
         """
         A method that orthogonalises a set of Nx1 vectors
         stores in some W matrix of shape MxN.

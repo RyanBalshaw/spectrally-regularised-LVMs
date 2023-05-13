@@ -1,3 +1,4 @@
+# Copyright 2023-present Ryan Balshaw
 """
 A complete implementation of the scICA method.
 """
@@ -11,13 +12,13 @@ import scipy.stats as scistats
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 
-from .constraint import spectral_objective
-from .helper import (
+from .helper_methods import (
     batch_sampler,
     data_processor,
     deflation_orthogonalisation,
     quasi_Newton,
 )
+from .spectral_constraint import spectral_objective
 
 
 def initialise_W(n_sources, m, init_type):
@@ -59,16 +60,16 @@ class linear_model(object):
         var_PCA: bool = None,  # keep
         alpha_reg: float = 1,  # keep
         sumt_flag: bool = False,  # keep
-        sumt_parameters: dict = {
+        sumt_parameters: dict = {  # keep
             "alpha_init": 0.1,
             "alpha_end": 10,
             "alpha_multiplier": 10,
         },
         jacobian_update_type: str = "full",  # full, SR1, DFP, BFGS
-        use_ls: bool = False,
-        use_hessian: bool = True,
-        save_dir: str | None = None,
-        verbose: bool = False,
+        use_ls: bool = False,  # keep
+        use_hessian: bool = True,  # Controls whether SGD or Newton
+        save_dir: str | None = None,  # Not sure
+        verbose: bool = False,  # keep
     ):
         # Initialise instances
         self.n_sources = n_sources
@@ -131,57 +132,6 @@ class linear_model(object):
 
         if not self.whiten:
             print("Non-whitened version is chosen.")
-
-    def check_gradient(self, step_size, X, w, y, W, idx, lambda_vector):
-        # Finite difference gradient approximation (central difference)
-
-        x0 = np.vstack((w, lambda_vector))
-
-        grad_current = self._gradient(x0, self, W, X, idx).reshape(-1, 1)
-        grad_check = np.zeros_like(grad_current)
-
-        for i in range(grad_check.shape[0]):
-            e_i = np.zeros_like(x0)
-            e_i[i, 0] = step_size
-
-            f_f = self._function(x0 + e_i, self, W, X, idx)
-            f_b = self._function(x0 - e_i, self, W, X, idx)
-
-            grad_check[i, 0] = (f_f - f_b) / (2 * step_size)
-
-        norm = np.linalg.norm(grad_current - grad_check)
-
-        return grad_current, grad_check, norm
-
-    def check_hessian(self, step_size, X, w, y, W, idx, lambda_vector):
-        # Finite difference Hessian approximation (central difference)
-
-        x0 = np.vstack((w.copy(), lambda_vector.copy()))
-        hess_current = self._hessian(x0, self, W, X, idx)
-        hess_check = np.zeros_like(hess_current)
-
-        r, c = hess_check.shape
-
-        for i in range(r):
-            e_i = np.zeros_like(x0)
-            e_i[i, 0] = step_size
-
-            for j in range(c):
-                x0 = np.vstack((w.copy(), lambda_vector.copy()))
-
-                e_j = np.zeros_like(x0)
-                e_j[j, 0] = step_size
-
-                f1 = self._function(x0 + e_i + e_j, self, W, X, idx)
-                f2 = self._function(x0 + e_i - e_j, self, W, X, idx)
-                f3 = self._function(x0 - e_i + e_j, self, W, X, idx)
-                f4 = self._function(x0 - e_i - e_j, self, W, X, idx)
-
-                hess_check[i, j] = (f1 - f2 - f3 + f4) / (4 * step_size**2)
-
-        norm = np.mean(np.linalg.norm(hess_current - hess_check, axis=1))
-
-        return hess_current, hess_check, norm
 
     def kurtosis(self, y):  # Important to FastICA
         if self.whiten:  # y is zero-mean unit-variance
@@ -379,28 +329,6 @@ class linear_model(object):
     def Newton_update(self, X, w, y, W, idx, lambda_vector):
         if self.gradient_store is None:
             # t0 = time.time()
-
-            # if self.cnt_iter == 0:
-            #     grad_orig, grad_check, grad_norm = self.check_gradient(1e-3,
-            #                                               X,
-            #                                               w,
-            #                                               y,
-            #                                               W,
-            #                                               idx,
-            #                                               lambda_vector)
-            #     print(f"\nGradient norm: {grad_norm}")
-            #
-            #     hess_orig, hess_check, hess_norm = self.check_hessian(1e-3,
-            #                                                   X,
-            #                                                   w,
-            #                                                   y,
-            #                                                   W,
-            #                                                   idx,
-            #                                                   lambda_vector)
-            #     print(f"\nHessian norm: {hess_norm}")
-            #
-            #     print("Nothing")
-
             gradient = self.lagrange_gradient(X, w, y, W, idx, lambda_vector)
             # t1 = time.time()
             # print(f"Calculate derivative: {t1 - t0} seconds")
@@ -515,6 +443,7 @@ class linear_model(object):
     def spectral_trainer(self, X, W, n_iters, learning_rate, tol, Lambda, Fs):
         # Initialise training metrics
         self.kurtosis_ = []
+        self.variance_ = []
         self.grad_norm_ = []
         self.cost_ = []
         self.lagrange_cost_ = []
@@ -537,6 +466,7 @@ class linear_model(object):
 
             grad_norm = np.zeros(n_iters)
             kurtosis = np.zeros(n_iters)
+            variance = np.zeros(n_iters)
             obj_cost = np.zeros(n_iters)
             lagrange_loss = np.zeros(n_iters)
             w_similarity = np.zeros(n_iters)
@@ -592,20 +522,17 @@ class linear_model(object):
                     w_new, lambda_new, delta_w, delta_lambda, W_, idx
                 )
 
-                # t1 = time.time()
-                # print(f"\nCalculate update: {t1 - t0} seconds")
-
-                # # Store metrics
-                # t0 = time.time()
-
+                # Generate stored metrics
                 y_new = np.dot(X, w_new)
                 grad_norm[self.cnt_iter] = np.linalg.norm(gradient)
                 kurtosis[self.cnt_iter] = self.kurtosis(y_new)
+                variance[self.cnt_iter] = np.std(y_new)
                 obj_cost[self.cnt_iter] = self.cost_instance.cost(X, w_new, y_new)
                 lagrange_loss[self.cnt_iter] = self.lagrange_function(
                     X, w_new, y_new, W_, idx, lambda_new
                 )
                 w_similarity[self.cnt_iter] = np.abs(w_new.T @ w_prev - 1)[0, 0]
+
                 # Compute spectral loss term
                 if idx > 0:
                     idx_grid = np.ix_(np.arange(0, idx, 1), np.arange(W_.shape[1]))
@@ -652,23 +579,23 @@ class linear_model(object):
                 ax[1].set_title(r"$\Delta x$ norm")
                 ax[1].semilogy(grad_norm[: self.cnt_iter], color="#444e86")
 
-                ax[2].set_title("Latent kurtosis")
-                ax[2].plot(kurtosis[: self.cnt_iter], color="#955196")
+                ax[2].set_title("Latent variance")
+                ax[2].plot(variance[: self.cnt_iter], color="#955196")
 
-                ax[3].set_title("Original loss")
-                ax[3].plot(obj_cost[: self.cnt_iter], color="#dd5182")
+                ax[3].set_title("Latent kurtosis")
+                ax[3].plot(kurtosis[: self.cnt_iter], color="#955196")
 
-                ax[4].set_title("Lagrange function loss")
-                ax[4].plot(lagrange_loss[: self.cnt_iter], color="#ff6e54")
+                ax[4].set_title("Original loss")
+                ax[4].plot(obj_cost[: self.cnt_iter], color="#dd5182")
 
-                ax[5].set_title("Update similarity")
-                ax[5].plot(w_similarity[: self.cnt_iter], color="#ffa600")
+                ax[5].set_title("Lagrange function loss")
+                ax[5].plot(lagrange_loss[: self.cnt_iter], color="#ff6e54")
 
-                ax[6].set_title("Spectral constraint")
-                ax[6].plot(spectral_loss[: self.cnt_iter], color="b")
+                ax[6].set_title("Update similarity")
+                ax[6].plot(w_similarity[: self.cnt_iter], color="#ffa600")
 
-                # ax[7].set_title("R term")
-                # ax[7].plot(self.r, color="b")
+                ax[7].set_title("Spectral constraint")
+                ax[7].plot(spectral_loss[: self.cnt_iter], color="b")
 
                 for axs in ax:
                     axs.grid()
@@ -691,10 +618,6 @@ class linear_model(object):
 
             # Close the iterator
             if self.verbose:
-                pbar.set_description(
-                    f"\nCompleted solving for component {idx + 1} "
-                    f"in {self.cnt_iter} iterations."
-                )
                 pbar.close()
 
             # Store W and lambda
@@ -704,6 +627,7 @@ class linear_model(object):
 
             # t0 = time.time()
             self.kurtosis_.append(kurtosis[: self.cnt_iter])
+            self.variance_.append(variance[: self.cnt_iter])
             self.grad_norm_.append(grad_norm[: self.cnt_iter])
             self.cost_.append(obj_cost[: self.cnt_iter])
             self.lagrange_cost_.append(lagrange_loss[: self.cnt_iter])
@@ -865,6 +789,7 @@ class linear_model(object):
                 param_iters.append(
                     (
                         self.kurtosis_,
+                        self.variance_,
                         self.grad_norm_,
                         self.cost_,
                         self.lagrange_cost_,
@@ -910,6 +835,7 @@ class linear_model(object):
             self.solution_error = solution_error
             (
                 self.kurtosis_,
+                self.variance_,
                 self.grad_norm_,
                 self.cost_,
                 self.lagrange_cost_,
