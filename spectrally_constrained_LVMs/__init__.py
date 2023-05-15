@@ -20,7 +20,7 @@ __description__ = (
     "Train linear LVMs with the addition "
     "of a spectral constraint with minimal effort."
 )
-__uri__ = "http://spectrally-constrained-lvms.readthedocs.io/"
+# __uri__ = "http://spectrally-constrained-lvms.readthedocs.io/"
 __all__ = [
     "spectral_objective",
     "negentropy_cost",

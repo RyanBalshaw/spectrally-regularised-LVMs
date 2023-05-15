@@ -553,7 +553,7 @@ class linear_model(object):
                 # print(f"Calculate metrics: {t1 - t0} seconds")
                 # t0 = time.time()
 
-                if self.cnt_iter > 1:
+                if self.cnt_iter > 5:
                     error = w_similarity[self.cnt_iter]
 
                 # Update the iterator
@@ -680,7 +680,6 @@ class linear_model(object):
         n_iters=1,
         learning_rate=0.1,
         tol=1e-3,
-        approx_flag=False,
         Lambda=None,
         Fs: float | int = 25e3,
     ):
@@ -736,10 +735,9 @@ class linear_model(object):
     def fit(
         self,
         X,
-        n_iters=1,
-        learning_rate=0.1,
-        tol=1e-3,
-        approx_flag=False,
+        n_iters=100,
+        learning_rate=1,
+        tol=1e-4,
         Fs: int | float = 25e3,
     ):
         # Initialise pre-processing
@@ -786,7 +784,6 @@ class linear_model(object):
                     n_iters,
                     learning_rate,
                     tol,
-                    approx_flag,
                     lambda_iters[-1],
                     Fs,
                 )
@@ -873,7 +870,6 @@ class linear_model(object):
                 n_iters,
                 learning_rate,
                 tol,
-                approx_flag,
                 Lambda,
                 Fs,
             )

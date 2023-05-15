@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "spectrally-constrained-LVMs"
-version = "0.1.0.1"
+version = "0.1.0.2"
 description = "An optimisation implementation of linear transforms with a spectral constraint."
 authors = ["Ryan Balshaw <ryanbalshaw81@gmail.com>"]
 maintainers = ["Ryan Balshaw <ryanbalshaw81@gmail.com>"]
@@ -37,7 +37,7 @@ isort = "^5.12.0"
 interrogate = {extras = ["png"], version = "^1.5.0"}
 pytest = "^7.3.1"
 ruff = "^0.0.263"
-cairosvg = "^2.7.0"
+jupyterlab = "^3.6.3"
 
 [tool.poetry.group.docs]
 optional = true

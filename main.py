@@ -20,7 +20,7 @@ from spectrally_constrained_LVMs import (
 
 
 if __name__ == "__main__":
-    Lw = 64
+    Lw = 512
     Lsft = 1
     source_name = "exp"
 
@@ -56,45 +56,45 @@ if __name__ == "__main__":
 
     #######################################
     X = Hankel_matrix(x_signal, Lw, Lsft)
-    X = X[: X.shape[0] // 12, :]
+    # X = X[: X.shape[0] // 12, :]
     # print(X.shape)
 
     # Method 1
-    n_samples = X.shape[0]
-    n_features = Lw
-
-    test_inst = sympy_cost(n_samples, n_features, use_hessian=False)
-
-    X_sp, w_sp, iter_params = test_inst.get_model_parameters()
-    i, j = iter_params
-
-    loss_i = sp.Sum(w_sp[j, 0] * X_sp[i, j], (j, 0, n_features - 1))
-    loss = -1 / n_samples * sp.Sum((loss_i) ** 2, (i, 0, n_samples - 1))
-
-    test_inst.set_cost(loss)
-    test_inst.implement_methods()
+    # n_samples = X.shape[0]
+    # n_features = Lw
+    #
+    # test_inst = sympy_cost(n_samples, n_features, use_hessian=False)
+    #
+    # X_sp, w_sp, iter_params = test_inst.get_model_parameters()
+    # i, j = iter_params
+    #
+    # loss_i = sp.Sum(w_sp[j, 0] * X_sp[i, j], (j, 0, n_features - 1))
+    # loss = -1 / n_samples * sp.Sum((loss_i) ** 2, (i, 0, n_samples - 1))
+    #
+    # test_inst.set_cost(loss)
+    # test_inst.implement_methods()
 
     # Method 2
-    test_inst = user_cost(use_hessian=False)
-
-    def loss(X, w, y):
-        return -1 * np.mean((X @ w) ** 2, axis=0)
-
-    def grad(X, w, y):
-        return -2 * np.mean(y * X, axis=0, keepdims=True).T
-
-    def hess(X, w, y):
-        return -2 * np.cov(X, rowvar=False)
-
-    test_inst.set_cost(loss)
-    test_inst.set_gradient(grad)
-    test_inst.set_hessian(hess)
+    # test_inst = user_cost(use_hessian=False)
+    #
+    # def loss(X, w, y):
+    #     return -1 * np.mean((X @ w) ** 2, axis=0)
+    #
+    # def grad(X, w, y):
+    #     return -2 * np.mean(y * X, axis=0, keepdims=True).T
+    #
+    # def hess(X, w, y):
+    #     return -2 * np.cov(X, rowvar=False)
+    #
+    # test_inst.set_cost(loss)
+    # test_inst.set_gradient(grad)
+    # test_inst.set_hessian(hess)
 
     # Method 3
     test_inst = negentropy_cost(source_name="exp", source_params={"alpha": 1})
 
     # Method 4
-    test_inst = variance_cost(use_hessian=False, verbose=True)
+    # test_inst = variance_cost(use_hessian=False, verbose=True)
 
     # Alternative PCA cost function.
     # linear_model = lambda X, w: X @ w
@@ -124,29 +124,29 @@ if __name__ == "__main__":
     #
 
     sICA_inst = linear_model(
-        n_sources=512,
+        n_sources=5,
         cost_instance=test_inst,
-        whiten=False,
+        whiten=True,
         init_type="broadband",
-        organise_by_kurtosis=False,
+        organise_by_kurt=True,
         perform_gso=True,
         batch_size=None,
         var_PCA=None,
-        alpha_reg=0,  # 0.0005,
-        sumt_flag=False,
+        alpha_reg=10,  # 0.0005,
+        sumt_flag=True,
         sumt_parameters={
             "eps_1": 1e-4,
             "alpha_init": 1,
             "alpha_end": 100,
             "alpha_multiplier": 10,
         },
-        jacobian_update_type="full",
+        hessian_update_type="full",
         use_ls=True,
-        use_hessian=False,
+        use_hessian=True,
         save_dir=tmp_dir_path,
         verbose=True,
     )
 
     print("Fitting the model...")
 
-    sICA_inst.fit(X, n_iters=500, learning_rate=1, tol=1e-4, approx_flag=True, Fs=Fs)
+    sICA_inst.fit(X, n_iters=500, learning_rate=1, tol=1e-4, Fs=Fs)
