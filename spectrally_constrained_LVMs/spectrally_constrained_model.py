@@ -5,6 +5,7 @@ A complete implementation of the scICA method.
 
 import os
 import time
+from typing import TypeVar
 
 import numpy as np
 import scipy.optimize as sciopt
@@ -12,6 +13,7 @@ import scipy.stats as scistats
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 
+from .cost_functions import costClass
 from .helper_methods import (
     batch_sampler,
     data_processor,
@@ -55,24 +57,24 @@ class linear_model(object):
     def __init__(
         self,
         n_sources: int,  # keep
-        cost_instance,  # keep
+        cost_instance: TypeVar("cost_inst", bound=costClass),  # keep
         whiten: bool = True,  # keep
         init_type: str = "broadband",  # broadband or random - keep
-        organise_by_kurtosis: bool = False,  # keep
+        organise_by_kurt: bool = False,  # keep
         perform_gso: bool = True,  # keep
-        batch_size: bool = None,  # keep
-        var_PCA: bool = None,  # keep
-        alpha_reg: float = 1,  # keep
+        batch_size: int | None = None,  # keep
+        var_PCA: bool | None = None,  # keep
+        alpha_reg: float = 1.0,  # keep
         sumt_flag: bool = False,  # keep
-        sumt_parameters: dict = {  # keep
+        sumt_parameters: dict[str, float] = {  # keep
             "alpha_init": 0.1,
             "alpha_end": 10,
             "alpha_multiplier": 10,
         },
-        jacobian_update_type: str = "full",  # full, SR1, DFP, BFGS
-        use_ls: bool = False,  # keep
+        hessian_update_type: str = "full",  # full, SR1, DFP, BFGS
+        use_ls: bool = True,  # keep
         use_hessian: bool = True,  # Controls whether SGD or Newton
-        save_dir: str | None = None,  # Not sure
+        save_dir: bool | None = None,  # Not sure
         verbose: bool = False,  # keep
     ):
         # Initialise instances
@@ -81,16 +83,16 @@ class linear_model(object):
         self.whiten = whiten
         self.var_PCA = var_PCA
         self.init_type = init_type.lower()
-        self.organise_by_kurtosis = (
-            organise_by_kurtosis  # A flag used to organise the ICA components
+        self.organise_by_kurt = (
+            organise_by_kurt  # A flag used to organise the ICA components
         )
         self.perform_gso = perform_gso
         self.batch_size = batch_size
         self.alpha_reg = alpha_reg
         self.sumt_flag = sumt_flag  # SUMT approach to alpha_reg
         self.sumt_parameters = sumt_parameters  # Parameters for SUMT updating
-        self.jacobian_update_type = (
-            jacobian_update_type.lower()
+        self.hessian_update_type = (
+            hessian_update_type.lower()
         )  # Type of jacobian update
         self.use_ls = use_ls
         self.use_hessian = use_hessian
@@ -117,13 +119,13 @@ class linear_model(object):
             self.alpha_cnt = 0
 
         # Quasi-Newton solvers
-        if self.jacobian_update_type != "full":
+        if self.hessian_update_type != "full":
             self.quasi_newton_inst = quasi_Newton(
-                self.jacobian_update_type, use_inverse=True
+                self.hessian_update_type, use_inverse=True
             )
             print("Using a quasi-Newton iteration scheme.")
 
-        if self.jacobian_update_type != "full" and self.use_hessian:
+        if self.hessian_update_type != "full" and self.use_hessian:
             print(
                 "Selected quasi-Newton scheme but opted to "
                 "not use hessian in update step."
@@ -340,7 +342,7 @@ class linear_model(object):
         else:
             gradient = self.gradient_store  # Use the new stored gradient
 
-        if self.jacobian_update_type == "full":
+        if self.hessian_update_type == "full":
             # t0 = time.time()
 
             if self.use_hessian:
@@ -487,7 +489,7 @@ class linear_model(object):
                 )
 
             # Update
-            if self.jacobian_update_type != "full":
+            if self.hessian_update_type != "full":
                 self.quasi_newton_inst.initialise_jacobian(self.n_sources + 1)
 
             self.cnt_iter = 0
@@ -691,7 +693,7 @@ class linear_model(object):
         Y = np.dot(X, W_update.T)
         kurt = np.mean(Y**4, axis=0) - 3  # Excess kurtosis
 
-        if self.organise_by_kurtosis:
+        if self.organise_by_kurt:
             pos_idx = np.argsort(kurt)[::-1]
             kurt = kurt[pos_idx]
 
@@ -727,7 +729,7 @@ class linear_model(object):
             else:
                 save_name = "spectral_W_final.png"
             plt.savefig(os.path.join(self.save_dir, save_name))
-            plt.show()
+            plt.close("all")
 
         return W_update, Lambda_update
 
