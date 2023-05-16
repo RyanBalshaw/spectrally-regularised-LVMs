@@ -887,7 +887,7 @@ class linear_model(object):
         return self
 
     def transform(self, X):
-        return np.dot(self.preprocess_inst.preprocess_data(X), self.W.T)
+        return np.dot(self.processor_inst.preprocess_data(X), self.W.T)
 
     def inverse_transform(self, S):
         r, c = S.shape
@@ -921,5 +921,10 @@ class linear_model(object):
 
         return spectral_W
 
-    def get_solver_results(self):
+    def get_model_parameters(self):
+        # TODO return dictionary of solution parameters.
+        pass
+
+    def set_model_parameters(self):
+        # TODO input dictionary of solution parameters and set model.
         pass
