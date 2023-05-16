@@ -14,13 +14,13 @@ from .spectral_constraint import spectral_objective
 from .spectrally_constrained_model import linear_model
 
 __author__ = "Ryan Balshaw"
-__version__ = "0.1.0.1"
+__version__ = "0.1.1"
 __email__ = "ryanbalshaw81@gmail.com"
 __description__ = (
     "Train linear LVMs with the addition "
     "of a spectral constraint with minimal effort."
 )
-__uri__ = "http://spectrally-constrained-lvms.readthedocs.io/"
+# __uri__ = "http://spectrally-constrained-lvms.readthedocs.io/"
 __all__ = [
     "spectral_objective",
     "negentropy_cost",

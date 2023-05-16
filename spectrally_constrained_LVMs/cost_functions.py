@@ -124,7 +124,7 @@ class costClass(object):
         grad_norm = np.linalg.norm(grad_current - grad_check)
 
         if self.verbose:
-            print(f"Finished! The gradient norm (row-wise) is: {np.round(grad_norm)}")
+            print(f"Finished! The gradient norm is: {np.round(grad_norm)}")
 
         return grad_current, grad_check, grad_norm
 
@@ -175,7 +175,7 @@ class user_cost(costClass):
 
     """
 
-    def __init__(self, use_hessian: bool, verbose=True):
+    def __init__(self, use_hessian: bool = True, verbose: bool = True):
         """
 
         Parameters
@@ -254,7 +254,13 @@ class user_cost(costClass):
 
 
 class sympy_cost(costClass):
-    def __init__(self, n_samples, n_features, use_hessian=False, verbose=True):
+    def __init__(
+        self,
+        n_samples: int,
+        n_features: int,
+        use_hessian: bool = False,
+        verbose: bool = True,
+    ):
         super().__init__(verbose)
         self.n_samples = n_samples
         self.n_features = n_features
@@ -376,7 +382,7 @@ class sympy_cost(costClass):
 
 
 class negentropy_cost(costClass):
-    def __init__(self, source_name: str, source_params: dict, verbose=True):
+    def __init__(self, source_name: str, source_params: dict, verbose: bool = True):
         super().__init__(verbose)
         self.source_name = source_name
         self.source_params = source_params  # dictionary of parameters
@@ -451,7 +457,7 @@ class negentropy_cost(costClass):
 
 
 class variance_cost(user_cost):
-    def __init__(self, use_hessian: bool, verbose=True):
+    def __init__(self, use_hessian: bool = True, verbose: bool = True):
         super().__init__(use_hessian, verbose)
 
         def loss(X, w, y):
