@@ -14,7 +14,7 @@ from .spectral_constraint import spectral_objective
 from .spectrally_constrained_model import linear_model
 
 __author__ = "Ryan Balshaw"
-__version__ = "0.1.0.1"
+__version__ = "0.1.1"
 __email__ = "ryanbalshaw81@gmail.com"
 __description__ = (
     "Train linear LVMs with the addition "
