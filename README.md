@@ -4,26 +4,25 @@
 ![GitHub issues](https://img.shields.io/github/issues-raw/RyanBalshaw/spectrally-constrained-LVMs)
 ![PyPI](https://img.shields.io/pypi/v/spectrally-constrained-lvms)
 ![PyPI - Wheel](https://img.shields.io/pypi/wheel/spectrally-constrained-lvms?color=blueviolet)
-![Read the Docs](https://img.shields.io/readthedocs/spectrally-constrained-lvms)
 ![GitHub last commit](https://img.shields.io/github/last-commit/RyanBalshaw/spectrally-constrained-LVMs)
+
+[//]: # (![Read the Docs]&#40;https://img.shields.io/readthedocs/spectrally-constrained-lvms&#41;)
 
 A repository for all code for the package. This is the first setup of this project.
 
-The package can be installed using [pip](https://pypi.org/project/pip/):
-
 # Documentation
-Please visit... for the documentation.
+Please visit [the Github repository](https://github.com/RyanBalshaw/spectrally-constrained-LVMs) for the documentation.
 
 ## Purpose
 words words words
 
 # Installation
-
+The package can be installed using [pip](https://pypi.org/project/pip/):
 ```sh
-pip install package_name
+pip install spectrally-constrained-LVMs
 ```
 
-*Current version:* 0.1.0
+*Current version:* 0.1.1
 
 # Requirements
 
@@ -32,15 +31,23 @@ file included in this repository.
 
 Note that the following packages should be installed on your system:
 - Numpy
+- Add the rest
 
 # API usage
 
+## Model parameter estimation
 A generic example is shown below:
 ```shell
-
+import numpy as np
 ```
 
+## Cost function implementation
+A generic example is shown below:
+```shell
+import numpy as np
+```
 # Contributing
-Words words words
+Describe how to use Poetry to contribute.
 
 # License
+This project is licensed under MIT License - see the [LICENSE](https://github.com/RyanBalshaw/spectrally-constrained-LVMs/blob/main/LICENSE) file for details.
