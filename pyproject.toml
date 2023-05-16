@@ -1,15 +1,15 @@
 [tool.poetry]
 name = "spectrally-constrained-LVMs"
-version = "0.1.0.2"
+version = "0.1.1"
 description = "An optimisation implementation of linear transforms with a spectral constraint."
 authors = ["Ryan Balshaw <ryanbalshaw81@gmail.com>"]
 maintainers = ["Ryan Balshaw <ryanbalshaw81@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/RyanBalshaw/scICA"
-repository = "https://github.com/RyanBalshaw/scICA"
-documentation = "https://github.com/RyanBalshaw/scICA"
-keywords = ["Linear transformation", "spectral constraint", "PCA", "ICA"]
+homepage = "https://github.com/RyanBalshaw/spectrally-constrained-LVMs"
+repository = "https://github.com/RyanBalshaw/spectrally-constrained-LVMs"
+documentation = "https://github.com/RyanBalshaw/spectrally-constrained-LVMs"
+keywords = ["Linear LVMs", "spectral constraint", "PCA", "ICA"]
 include = ["LICENSE"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -53,4 +53,6 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.urls]
-"Bug tracker" = "https://github.com/RyanBalshaw/scICA/issues"
+"Bug tracker" = "https://github.com/RyanBalshaw/spectrally-constrained-LVMs/issues"
+
+[tool.poetry_bumpversion.file."./spectrally_constrained_LVMs/__init__.py"] # Uses
