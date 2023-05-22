@@ -31,18 +31,18 @@ class data_processor(object):
     Methods
     -------
     initialise_preprocessing(X)
-        A method that initialises all of the processing attributes
-        for the pre-processing (standardising with whitening). Solves
-        for the whitening transform parameters.
+            A method that initialises all of the processing attributes
+            for the pre-processing (standardising with whitening). Solves
+            for the whitening transform parameters.
 
     standardise_data(X)
-        Standardises the columns of X to be zero-mean and unit-variance.
+            Standardises the columns of X to be zero-mean and unit-variance.
 
     preprocess_data(X)
-        Transforms the X matrix to the whitened space (if required).
+            Transforms the X matrix to the whitened space (if required).
 
     unprocess_data(X)
-        Transforms a X matrix from the whitened space to the data space.
+            Transforms a X matrix from the whitened space to the data space.
 
     """
 
@@ -51,12 +51,12 @@ class data_processor(object):
         Parameters
         ----------
         whiten: bool
-            A flag to control whether the processing should whiten the data.
+                A flag to control whether the processing should whiten the data.
 
         var_PCA: float | None (default None)
-            A value that is in [0, 1] that specifies how much of the variance
-            you wish to keep. Allows one to remove some of the non-dominant sources
-            in the data.
+                A value that is in [0, 1] that specifies how much of the variance
+                you wish to keep. Allows one to remove some of the non-dominant sources
+                in the data.
         """
         self.whiten = whiten
         self.var_PCA = var_PCA
@@ -68,8 +68,8 @@ class data_processor(object):
         Parameters
         ----------
         X: ndarray
-            The initialisation matrix from which the pre-processing parameters are
-            obtained.
+                The initialisation matrix from which the pre-processing parameters are
+                obtained.
 
         Returns
         -------
@@ -128,12 +128,12 @@ class data_processor(object):
         Parameters
         ----------
         X: ndarray
-            original feature matrix
+                original feature matrix
 
         Returns
         -------
         X_standardised: ndarray
-            Zero-mean, unit variance feature matrix.
+                Zero-mean, unit variance feature matrix.
         """
 
         X_standardised = (X - self.mean_) / self.std_
@@ -147,12 +147,12 @@ class data_processor(object):
         Parameters
         ----------
         X: ndarray
-            original feature matrix
+                original feature matrix
 
         Returns
         -------
         X_whitened: ndarray
-            The whitened feature matrix
+                The whitened feature matrix
         """
         X_standardised = self.standardise_data(X)
 
@@ -168,12 +168,12 @@ class data_processor(object):
         Parameters
         ----------
         X: ndarray
-            The whitened feature matrix
+                The whitened feature matrix
 
         Returns
         -------
         X_unwhitened: ndarray
-            The unwhitened feature matrix
+                The unwhitened feature matrix
         """
         X_unwhitened = np.dot(np.dot(X, self.recover_transform.T), self.Vh)
         # X_unwhitened = np.dot(X, self.recover_transform.T)
@@ -191,7 +191,7 @@ class batch_sampler(object):
     and then sampling in a loop or something like that:
 
     for i in range(10):
-        Xi = next(data_sampler)
+            Xi = next(data_sampler)
     """
 
     def __init__(self, batch_size, random_sampler=True, include_end=False):
@@ -199,16 +199,16 @@ class batch_sampler(object):
         Parameters
         ----------
         batch_size: int
-            The batch size used by the sampler.
+                The batch size used by the sampler.
 
         random_sampler: bool
-            A flag to specify whether the sampler runs by randomly selecting indices
-            from the data (random_sampler=True) or if it loops through
-            the data in sequence.
+                A flag to specify whether the sampler runs by randomly selecting indices
+                from the data (random_sampler=True) or if it loops through
+                the data in sequence.
 
         include_end: bool
-            A flag to specify whether the data that does not fit into integer
-            batch increments is used.
+                A flag to specify whether the data that does not fit into integer
+                batch increments is used.
         """
         self.batch_size = batch_size
         self.random_sampler = random_sampler
@@ -221,10 +221,10 @@ class batch_sampler(object):
         Parameters
         ----------
         data: ndarray
-            A matrix of data samples.
+                A matrix of data samples.
 
         iter_idx: int
-            This specifies which axis in data is to be iterated over.
+                This specifies which axis in data is to be iterated over.
 
         Returns
         -------
@@ -233,7 +233,7 @@ class batch_sampler(object):
         Raises
         ------
         AssertionError
-            This is raised when the data is not a numpy array
+                This is raised when the data is not a numpy array
 
         """
         if hasattr(data, "copy"):
@@ -293,11 +293,11 @@ class batch_sampler(object):
         Parameters
         ----------
         idx: int
-            The index of the iteration indices that are extracted.
+                The index of the iteration indices that are extracted.
 
         Returns
         -------
-            The starting point of the iteration range.
+                The starting point of the iteration range.
         """
         return self._iter_range[idx]
 
@@ -308,7 +308,7 @@ class batch_sampler(object):
         Returns
         -------
         data_batch: ndarray
-            The samples from the observed data.
+                The samples from the observed data.
 
         """
         if self._iter_cnt < self._max_iter:
@@ -362,11 +362,11 @@ class quasi_Newton(object):
         Parameters
         ----------
         jacobian_update_type: str
-            Specifies the quasi-Newton method used.
+                Specifies the quasi-Newton method used.
 
         use_inverse: bool
-            A flag used to specify whether the Hessian inverse or the
-            standard Hessian is to be approximated.
+                A flag used to specify whether the Hessian inverse or the
+                standard Hessian is to be approximated.
         """
         self.jacobian_update_type = jacobian_update_type.lower()  # SR1, DFP, BFGS
         self.use_inverse = use_inverse
@@ -379,16 +379,16 @@ class quasi_Newton(object):
         Parameters
         ----------
         delta_params_k: ndarray
-            The parameter difference (x_{t} - x_{t-1}) vector.
+                The parameter difference (x_{t} - x_{t-1}) vector.
 
         grad_diff_k: ndarray
-            The gradient difference (df/dx @ x_{t} - df/dx @ x_{t-1}) vector.
+                The gradient difference (df/dx @ x_{t} - df/dx @ x_{t-1}) vector.
 
         Returns
         -------
         update_term: ndarray
-            The SR1 update step factoring in whether the inverse Hessian or direct
-            Hessian are approximated.
+                The SR1 update step factoring in whether the inverse Hessian or direct
+                Hessian are approximated.
         """
         if self.use_inverse:
             t1 = delta_params_k - self.jacobian_mat_iter @ grad_diff_k
@@ -409,16 +409,16 @@ class quasi_Newton(object):
         Parameters
         ----------
         delta_params_k: ndarray
-            The parameter difference (x_{t} - x_{t-1}) vector.
+                The parameter difference (x_{t} - x_{t-1}) vector.
 
         grad_diff_k: ndarray
-            The gradient difference (df/dx @ x_{t} - df/dx @ x_{t-1}) vector.
+                The gradient difference (df/dx @ x_{t} - df/dx @ x_{t-1}) vector.
 
         Returns
         -------
         update_term: ndarray
-            The DFP update step factoring in whether the inverse Hessian or direct
-            Hessian are approximated.
+                The DFP update step factoring in whether the inverse Hessian or direct
+                Hessian are approximated.
         """
         gamma_k = 1 / (grad_diff_k.T @ delta_params_k)
 
@@ -455,16 +455,16 @@ class quasi_Newton(object):
         Parameters
         ----------
         delta_params_k: ndarray
-            The parameter difference (x_{t} - x_{t-1}) vector.
+                The parameter difference (x_{t} - x_{t-1}) vector.
 
         grad_diff_k: ndarray
-            The gradient difference (df/dx @ x_{t} - df/dx @ x_{t-1}) vector.
+                The gradient difference (df/dx @ x_{t} - df/dx @ x_{t-1}) vector.
 
         Returns
         -------
         update_term: ndarray
-            The BFGS update step factoring in whether the inverse Hessian or direct
-            Hessian are approximated.
+                The BFGS update step factoring in whether the inverse Hessian or direct
+                Hessian are approximated.
         """
         gamma_k = 1 / (grad_diff_k.T @ delta_params_k)
 
@@ -504,25 +504,15 @@ class quasi_Newton(object):
         Parameters
         ----------
         m: int
-            The dimensionality of the feature space.
+                The dimensionality of the feature space.
 
         Initialises
         -----------
         self.jacobian_mat_iter: ndarray
-            The Hessian used during iteration.
+                The Hessian used during iteration.
         """
-        if self.use_inverse:
-            if self.jacobian_update_type == "bfgs":
-                self.jacobian_mat_iter = np.eye(m)
 
-            else:
-                self.jacobian_mat_iter = 0.1 * np.eye(m)
-        else:
-            if self.jacobian_update_type == "bfgs":
-                self.jacobian_mat_iter = np.eye(m)
-
-            else:
-                self.jacobian_mat_iter = 10 * np.eye(m)
+        self.jacobian_mat_iter = np.eye(m)
 
     def compute_update(self, gradient_vector):
         """
@@ -532,12 +522,12 @@ class quasi_Newton(object):
         Parameters
         ----------
         gradient_vector: ndarray
-            The Nx1 gradient vector
+                The Nx1 gradient vector
 
         Returns
         -------
         update: ndarray
-            The quasi-Newton parameter update.
+                The quasi-Newton parameter update.
         """
         if not hasattr(self, "jacobian_mat_iter"):
             self.initialise_jacobian(gradient_vector.shape[0])
@@ -557,10 +547,10 @@ class quasi_Newton(object):
         Parameters
         ----------
         delta_params_k: ndarray
-            The parameter difference (x_{t} - x_{t-1}) vector.
+                The parameter difference (x_{t} - x_{t-1}) vector.
 
         grad_diff_k: ndarray
-            The gradient difference (df/dx @ x_{t} - df/dx @ x_{t-1}) vector.
+                The gradient difference (df/dx @ x_{t} - df/dx @ x_{t-1}) vector.
         """
         if self.jacobian_update_type == "sr1":
             update_term = self.symmetric_rank_one(delta_params_k, grad_diff_k)
@@ -589,13 +579,13 @@ class deflation_orthogonalisation(object):
     Methods
     -------
     projection_operator(u, v)
-        words
+            words
 
     gram_schmidt_orthogonalisation(w, W, idx)
-        words
+            words
 
     global_gso(W)
-        words
+            words
 
     """
 
@@ -607,9 +597,9 @@ class deflation_orthogonalisation(object):
         Parameters
         ----------
         u: ndarray
-            A Nx1 array that we wish to orthogalise against (remains unchanged)
+                A Nx1 array that we wish to orthogalise against (remains unchanged)
         v: ndarray
-            A Nx1 array that we wish to orthogonalise (changes)
+                A Nx1 array that we wish to orthogonalise (changes)
 
         Returns
         -------
@@ -626,20 +616,21 @@ class deflation_orthogonalisation(object):
         Parameters
         ----------
         w: ndarray
-            A Nx1 array that contains the vector we want to orthogonalise.
+                A Nx1 array that contains the vector we want to orthogonalise.
 
         W: ndarray
-            A MxN array that contains the vectors we want to orthogonalise w against.
+                A MxN array that contains the vectors we want to orthogonalise
+                w against.
 
         idx: int
-            The upper index (cannot be zero) for the rows of W that
-            we want to orthogonalise against.
+                The upper index (cannot be zero) for the rows of W that
+                we want to orthogonalise against.
 
         Returns
         -------
         w_orth: ndarray
-            A Nx1 array that contains the orthogonalised w vector using the first
-            idx + 1 vectors in W.
+                A Nx1 array that contains the orthogonalised w vector using the first
+                idx + 1 vectors in W.
 
         Note: I have played around with vectorised versions of this, but
         it did not offer significant computational improvements.
@@ -678,13 +669,13 @@ class deflation_orthogonalisation(object):
         Parameters
         ----------
         W: ndarray
-            A MxN array that contains the vectors we want to orthogonalise
-            in the rows (i.e. assumes that W = [w_1, w_N]^T).
+                A MxN array that contains the vectors we want to orthogonalise
+                in the rows (i.e. assumes that W = [w_1, w_N]^T).
 
         Returns
         -------
         W_orth: ndarray
-            A MxN array of orthogonalised vectors.
+                A MxN array of orthogonalised vectors.
         """
 
         W_orth = np.zeros_like(W, dtype="f")
@@ -706,18 +697,18 @@ def Hankel_matrix(signal, Lw=512, Lsft=1):
     Parameters
     ----------
     signal: ndarray
-        A (n,) shaped array that contains a time series of measurement values
+            A (n,) shaped array that contains a time series of measurement values
 
     Lw: int
-        The window length/signal segment length
+            The window length/signal segment length
 
     Lsft: int
-        The shift parameter for the sliding window
+            The shift parameter for the sliding window
 
     Returns
     -------
     Hmat: ndarray
-        A no_of_samples x Lw array of sliding window segments.
+            A no_of_samples x Lw array of sliding window segments.
 
     """
     signal = signal.flatten()
