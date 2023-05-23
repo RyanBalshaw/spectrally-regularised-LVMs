@@ -1,6 +1,6 @@
 # Copyright 2023-present Ryan Balshaw
 """
-A complete implementation of the scICA method.
+This script defines model parameter estimation process via the linear_model class.
 """
 
 import os
@@ -13,26 +13,47 @@ import scipy.stats as scistats
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 
-from .cost_functions import costClass
+from .cost_functions import CostClass
 from .helper_methods import (
-    batch_sampler,
-    data_processor,
-    deflation_orthogonalisation,
-    quasi_Newton,
+    BatchSampler,
+    DataProcessor,
+    DeflationOrthogonalisation,
+    QuasiNewton,
 )
-from .spectral_constraint import spectral_objective
+from .spectral_constraint import SpectralObjective
 
 
-def initialise_W(n_sources, m, init_type):
-    """initialise_W docstring"""
-    if init_type == "broadband":
-        W = np.zeros((n_sources, m))
+def initialise_W(n_sources: int, n_features: int, init_type: str):
+    """
+    A method that initialises the W matrix.
+
+    Parameters
+    ----------
+    n_sources : int
+            The number of source vectors to initialise.
+
+    n_features : int
+            The shape of the source vectors
+
+    init_type : str
+            The initialisation type for the vectors. Options are either
+            'broadband' or 'random'. Broadband implies that vectors are dirac deltas,
+            random implies that the vectors are randomly samples
+
+    Returns
+    -------
+    W : ndarray
+            The initialised W matrix of shape (n_sources, n_features) that is normalised
+            row-wise (ensures that each w vector is unit).
+    """
+    if init_type.lower() == "broadband":
+        W = np.zeros((n_sources, n_features))
 
         # Set to one (impulse response)
         W[:, 0] = 1
 
-    elif init_type == "random":
-        W = np.random.randn(n_sources, m)
+    elif init_type.lower() == "random":
+        W = np.random.randn(n_sources, n_features)
 
     else:
         print(f"Initialisation type ({init_type}) not understood.")
@@ -45,38 +66,194 @@ def initialise_W(n_sources, m, init_type):
 
 
 def initialise_lambda(n_sources):
-    """initialise_lambda docstring"""
-    Lambda = np.ones((n_sources, 1))  # np.zeros((n_sources, 1)) #
+    """
+    A method that initialises the lambda terms for lagrange expression.
+
+    This is initialised to be a vector of ones.
+
+    Returns
+    -------
+    Lambda: ndarray
+            A vector of ones with shape (n_sources, 1)
+
+    """
+    Lambda = np.ones((n_sources, 1))
 
     return Lambda
 
 
-class linear_model(object):
-    """Linear model docstring"""
+cost_inst = TypeVar("cost_inst", bound=CostClass)
+
+
+class LinearModel(object):
+    """
+    This class encapsulates the parameter estimation step of linear LVMs by defining
+    a class that combines each of the different aspects of this package.
+
+    The objective of this object is
+
+    Methods
+    -------
+    kurtosis(y)
+            A method that calculates the kurtosis of a set of samples y.
+
+    _function(param_vector, self_inst, W, X, idx)
+            A static method that calculates the langrange expression.
+            It is typeset so that it can interface with scipy.optimize.minimize methods.
+
+    _gradient(param_vector, self_inst, W, X, idx)
+            A static method that calculates the gradient of the langrange expression.
+            It is typeset so that it can interface with scipy.optimize.minimize methods.
+
+    _hessian(param_vector, self_inst, W, X, idx)
+            A static method that calculates the Hessian of the langrange expression.
+            It is typeset so that it can interface with scipy.optimize.minimize methods.
+
+    line_search(delta, gradient, w, lambda_vector, W, X, idx)
+            A method that performs a 1D line search on the delta vector to find a step
+            size that satisfies the Armijo condition.
+
+    lagrange_function(X, w, y, W, idx, lambda_vector)
+            A method that calculates the lagrange expression.
+
+    lagrange_gradient(X, w, y, W, idx, lambda_vector)
+            A method that calculates the gradient of the lagrange expression.
+
+    lagrange_hessian(X, w, y, W, idx, lambda_vector)
+            A method that calculates the Hessian of the lagrange expression.
+
+    parameter_update(self, X, w, y, W, idx, lambda_vector)
+            A method that performs a parameter update based on the users optimisation
+            properties.
+
+    spectral_trainer(X, W, n_iters, learning_rate, tol, Lambda, Fs)
+            A method that
+
+    update_params(w_current, lambda_current, delta_w, delta_lambda, W, idx)
+            A method which calculates the update to w and lambda based off some global
+            delta Phi vector, normalises w and performs GSO is requested.
+
+    spectral_fit(X, W, n_iters = 1, learning_rate, tol, Lambda, Fs)
+            A method that estimates the model parameters.
+
+    fit(self, X, n_iters, learning_rate, tol, Fs)
+            A method that uses spectral_fit, and allows users to use the sequential
+            unconstrained minimisation technique (SUMT). This was done to make the
+            API call similar to scikit-learn.
+
+    transform(X)
+            A method that transforms X to the latent domain via X @ W. If whitening is
+            enabled the X represents an unwhitened matrix.
+
+    inverse_transform(Z)
+            A method that transforms samples from the latent domain to the data domain.
+            If whitening is enabled then the recovered matrix represents the
+            standardised data domain.
+
+    compute_spectral_W(W)
+            A static method that computes the spectral representations of the vectors
+            in W.
+
+    get_model_parameters()
+            A method which return the solution parameters in a model_dict dictionary.
+
+    set_model_parameters(model_dict, X)
+            A method which sets the solution parameters based off the model_dict
+            dictionary and X (X defines the pre-processing steps).
+    """
 
     def __init__(
         self,
         n_sources: int,  # keep
-        cost_instance: TypeVar("cost_inst", bound=costClass),  # keep
+        cost_instance: cost_inst,
         whiten: bool = True,  # keep
-        init_type: str = "broadband",  # broadband or random - keep
-        organise_by_kurt: bool = False,  # keep
-        perform_gso: bool = True,  # keep
-        batch_size: int | None = None,  # keep
-        var_PCA: bool | None = None,  # keep
-        alpha_reg: float = 1.0,  # keep
-        sumt_flag: bool = False,  # keep
-        sumt_parameters: dict[str, float] = {  # keep
-            "alpha_init": 0.1,
-            "alpha_end": 10,
-            "alpha_multiplier": 10,
-        },
-        hessian_update_type: str = "full",  # full, SR1, DFP, BFGS
-        use_ls: bool = True,  # keep
-        use_hessian: bool = True,  # Controls whether SGD or Newton
-        save_dir: bool | None = None,  # Not sure
-        verbose: bool = False,  # keep
+        init_type: str = "broadband",
+        perform_gso: bool = True,
+        batch_size: int | None = None,
+        var_PCA: bool | None = None,
+        alpha_reg: float = 1.0,
+        sumt_flag: bool = False,
+        sumt_parameters: dict[str, float] | None = None,
+        organise_by_kurt: bool = False,
+        hessian_update_type: str = "actual",
+        use_ls: bool = True,
+        use_hessian: bool = True,
+        save_dir: bool | None = None,
+        verbose: bool = False,
     ):
+        """
+        The initialisation of the linear_model class.
+
+        Parameters
+        ----------
+        n_sources : int
+                The number of latent sources that are to be estimated.
+
+        cost_instance : instance which inherits from CostClass
+                The objective function instance that the user chooses.
+
+        whiten : bool (default = True)
+                Specifies whether the data matrix X is to be whitened. By default, all X
+                matrices are standardised.
+
+        init_type : str (default = 'broadband')
+                The initialisation strategy for W. Options are 'broadband' or 'random'.
+                'broadband' sets each w vector to a dirac delta, while 'random' randomly
+                initialises the vectors by sampling from an isotropic Gaussian
+                distribution.
+
+        perform_gso : bool (default = True)
+                A flag to specify whether Gram-Schmidt Orthogonalisation is used during
+                parameter estimation.
+
+        batch_size : int | None (default = None)
+                This variable allows users to perform stochastic optimisation if an
+                integer value is entered. Default value implies all rows of X are used.
+
+        var_PCA : float | None (default = None)
+                This variable allows users to pre-process X by discarding any trailing
+                eigenvalues. Default value of None implies that it is not used.
+
+        alpha_reg : float (default = 1.0)
+                Defines the penalty enforcement parameter applied to the spectral
+                constraint.
+
+        sumt_flag : bool (default = False)
+                A flag that specifies whether the sequential unconstrained minimisation
+                technique is to be used during parameter estimation.
+
+        sumt_parameters : dict | None (default = None)
+                The parameters for SUMT iteration. If default value is used, the
+                dictionary is initialised to: {'alpha_init':0.1, 'alpha_end':10,
+                'alpha_multiplier':100}. The expected keys for this dictionary are given
+                in this docstring.
+
+        organise_by_kurt : bool (default = False)
+                A flag to control whether the vectors in W are to be organised by the
+                kurtosis of the latent sources.
+
+        hessian_update_type : str (default = 'actual')
+                This specifies whether the actual Hessian is to be used during parameter
+                estimation or if quasi-Newton strategies are to be employed. Options
+                are: 'actual', 'SR1', 'DFP', 'BFGS'.
+
+        use_ls : bool (default = True)
+                A flag that specifies whether a linear line search is to be performed
+                on the .
+
+        use_hessian : bool (default = True)
+                This flag specifies whether a second or first order optimisation method
+                is used. If use_hessian = False then the method defaults to gradient
+                descent.
+
+        save_dir : str | None (default = None)
+                Defines whether visualisation of the parameter estimation properties are
+                to be stored in some directory. If a string is entered, this string is
+                expected to be the directory in which the figures are to be saved.
+
+        verbose : bool (default = False)
+                Defines the verbosity mode for the parameter estimation step.
+        """
         # Initialise instances
         self.n_sources = n_sources
         self.cost_instance = cost_instance  # ({'source_name':'exp', 'alpha':1})
@@ -100,17 +277,22 @@ class linear_model(object):
         self.verbose = verbose
 
         # Initialise the processor instance  (could be in base class except for var_PCA)
-        self.processor_inst = data_processor(self.whiten, self.var_PCA)
+        self.processor_inst = DataProcessor(self.whiten, self.var_PCA)
 
         if self.perform_gso:
             # Initialise the orthogonalisation instance (could be in base class)
-            self.gs_inst = deflation_orthogonalisation()
+            self.gs_inst = DeflationOrthogonalisation()
 
         # Sequential unconstrained minimisation technique parameters
         if self.sumt_flag:
-            # self.eps_1 = self.sumt_parameters["eps_1"]
-            # self.eps_2 = 1e-3 # Not applicable here
-            self.alpha_init = self.sumt_parameters["alpha_init"]  # 10**-6
+            if self.sumt_parameters is None:  # Initialise
+                self.sumt_parameters = {
+                    "alpha_init": 0.1,
+                    "alpha_end": 100,
+                    "alpha_multiplier": 10,
+                }
+
+            self.alpha_init = self.sumt_parameters["alpha_init"]
             self.alpha_end = self.sumt_parameters[
                 "alpha_end"
             ]  # Overrides the default value
@@ -119,13 +301,13 @@ class linear_model(object):
             self.alpha_cnt = 0
 
         # Quasi-Newton solvers
-        if self.hessian_update_type != "full":
-            self.quasi_newton_inst = quasi_Newton(
+        if self.hessian_update_type != "actual":
+            self.quasi_newton_inst = QuasiNewton(
                 self.hessian_update_type, use_inverse=True
             )
             print("Using a quasi-Newton iteration scheme.")
 
-        if self.hessian_update_type != "full" and self.use_hessian:
+        if self.hessian_update_type != "actual" and self.use_hessian:
             print(
                 "Selected quasi-Newton scheme but opted to "
                 "not use hessian in update step."
@@ -139,7 +321,20 @@ class linear_model(object):
         if not self.whiten:
             print("Non-whitened version is chosen.")
 
-    def kurtosis(self, y):  # Important to FastICA
+    def kurtosis(self, y):
+        """
+
+        Parameters
+        ----------
+        y : ndarray
+                A vector or matrix of samples. If y is a vector, it is expected to be
+                a column vector. If it is a matrix then each feature is given in
+                a column.
+
+        Returns
+        -------
+        kurtosis of the samples.
+        """
         if self.whiten:  # y is zero-mean unit-variance
             if y.shape[1] == 1:
                 return np.mean(y**4) - 3
@@ -154,9 +349,32 @@ class linear_model(object):
                 return scistats.kurtosis(y, axis=0, fisher=True)
 
     @staticmethod
-    def _function(
-        param_vector, self_inst, W, X, idx
-    ):  # Used for scipy.optimize.line_search
+    def _function(param_vector, self_inst, W, X, idx):
+        """
+        A static method that calculates the langrange expression. It is typeset so that
+        it can interface with scipy.optimize.minimize methods.
+
+        Parameters
+        ----------
+        param_vector : ndarray
+                A vector that is given as [w.T, lambda].T
+
+        self_inst : instance
+                The instance of the LinearModel class.
+
+        W : ndarray
+                The matrix of w vectors stored in the rows of W.
+
+        X : ndarray
+                The data matrix.
+
+        idx : int
+                The current iteration index for the parameters.
+
+        Returns
+        -------
+        The lagrangian expression evaluated at X and param_vector.
+        """
         if len(param_vector.shape) == 1:  # (n,) shaped vector
             w, lambda_vector = param_vector[: W.shape[1]], param_vector[W.shape[1] :]
 
@@ -176,6 +394,31 @@ class linear_model(object):
 
     @staticmethod
     def _gradient(param_vector, self_inst, W, X, idx):
+        """
+        A static method that calculates the gradient of the langrange expression.
+        It is typeset so that it can interface with scipy.optimize.minimize methods.
+
+        Parameters
+        ----------
+        param_vector : ndarray
+                A vector that is given as [w.T, lambda].T
+
+        self_inst : instance
+                The instance of the LinearModel class.
+
+        W : ndarray
+                The matrix of w vectors stored in the rows of W.
+
+        X : ndarray
+                The data matrix.
+
+        idx : int
+                The current iteration index for the parameters.
+
+        Returns
+        -------
+        The gradient of the lagrangian expression evaluated at X and param_vector.
+        """
         # Used for scipy.optimize.line_search
 
         if len(param_vector.shape) == 1:  # (n,) shaped vector
@@ -197,6 +440,31 @@ class linear_model(object):
 
     @staticmethod
     def _hessian(param_vector, self_inst, W, X, idx):
+        """
+        A static method that calculates the Hessian of the langrange expression.
+        It is typeset so that it can interface with scipy.optimize.minimize methods.
+
+        Parameters
+        ----------
+        param_vector : ndarray
+                A vector that is given as [w.T, lambda].T
+
+        self_inst : instance
+                The instance of the LinearModel class.
+
+        W : ndarray
+                The matrix of w vectors stored in the rows of W.
+
+        X : ndarray
+                The data matrix.
+
+        idx : int
+                The current iteration index for the parameters.
+
+        Returns
+        -------
+        The Hessian of the lagrangian expression evaluated at X and param_vector.
+        """
         # Used for scipy.optimize.line_search
         if len(param_vector.shape) == 1:  # (n,) shaped vector
             w, lambda_vector = param_vector[: W.shape[1]], param_vector[W.shape[1] :]
@@ -215,10 +483,43 @@ class linear_model(object):
 
         return self_inst.lagrange_hessian(X, w, y, W, idx, lambda_vector)
 
-    def line_search(
-        self, delta, gradient, w, lambda_vector, W, X, idx, visualise=False
-    ):
-        ## Compute alpha parameter
+    def line_search(self, delta, gradient, w, lambda_vector, W, X, idx):
+        """
+        Performs a 1D line search on the delta vector to find a step size that satisfies
+        the Armijo condition. Uses scipy.optimize.minimize routines.
+
+        Parameters
+        ----------
+        delta : ndarray
+                The parameter update vector.
+
+        gradient : ndarray
+                The gradient vector at the current iteration.
+
+        w : ndarray
+                The current w vector being optimised.
+
+        lambda_vector : ndarray
+                The current lambda_eq value being optimised.
+
+        W : ndarray
+                The matrix of w vectors stored in the rows of W.
+
+        X : ndarray
+                The data matrix.
+
+        idx : int
+                The current iteration index for the parameters.
+
+        Returns
+        -------
+        alpha_val: float
+                The step size that should be applied to delta.
+
+        conv_flag: bool
+                A flag that specifies whether the line search converged.
+        """
+        # Compute alpha parameter
         x0 = np.vstack((w.copy(), lambda_vector.copy()))[:, 0]
         c1 = 1e-4
         # c2 = 0.9
@@ -251,17 +552,47 @@ class linear_model(object):
             alpha_val = ls_dict[0]
             conv_flag = True
 
-            # print(f"Line search converged, using to step size of {alpha_val}.")
+        # print(f"Line search converged, using to step size of {alpha_val}.")
 
         else:
             alpha_val = 1
             conv_flag = False
             print("Line search failed, defaulting to step size of 1.")
-            # raise SystemExit
+        # raise SystemExit
 
         return alpha_val, conv_flag
 
     def lagrange_function(self, X, w, y, W, idx, lambda_vector):
+        """
+        This method calculates the lagrangian expression.
+
+        Parameters
+        ----------
+        X: ndarray
+                The data matrix X.
+
+        w : ndarray
+                The current w vector being optimised.
+
+                y : ndarray
+                                The transformed variable X @ w.
+
+        W : ndarray
+                The matrix of w vectors stored in the rows of W.
+
+        X : ndarray
+                The data matrix.
+
+        idx : int
+                The current iteration index for the parameters.
+
+        lambda_vector : ndarray
+                The current lambda_eq value being optimised.
+
+        Returns
+        -------
+        The evaluation of the lagrangian expression.
+        """
         # Compute ICA loss term
         objective_loss = self.cost_instance.cost(X, w, y)
 
@@ -277,11 +608,40 @@ class linear_model(object):
 
         # Compute the constraint term
         h_w = w.T @ w - 1
-        constraint = lambda_vector @ (h_w)
+        constraint = lambda_vector @ h_w
 
         return objective_loss + spectral_loss + constraint[0, 0]
 
     def lagrange_gradient(self, X, w, y, W, idx, lambda_vector):
+        """
+        This method calculates the gradient of the lagrangian expression.
+        Parameters
+        ----------
+        X: ndarray
+                The data matrix X.
+
+        w : ndarray
+                The current w vector being optimised.
+
+                y : ndarray
+                                The transformed variable X @ w.
+
+        W : ndarray
+                The matrix of w vectors stored in the rows of W.
+
+        X : ndarray
+                The data matrix.
+
+        idx : int
+                The current iteration index for the parameters.
+
+        lambda_vector : ndarray
+                The current lambda_eq value being optimised.
+
+        Returns
+        -------
+        The evaluation of the gradient of the lagrangian expression.
+        """
         # t0 = time.time()
         grad_cost = self.cost_instance.cost_gradient(X, w, y)
         # t1 = time.time()
@@ -305,9 +665,9 @@ class linear_model(object):
                 axis=1,
                 keepdims=True,
             )
-            # t1 = time.time()
-            # print(f"Computing the spectral derivative took
-            # {np.round(t1 - t0, 5)} seconds")
+        # t1 = time.time()
+        # print(f"Computing the spectral derivative took
+        # {np.round(t1 - t0, 5)} seconds")
 
         # Stack the two derivatives
         grad_vector = np.vstack((grad_lagrange, h_w))
@@ -315,6 +675,36 @@ class linear_model(object):
         return grad_vector
 
     def lagrange_hessian(self, X, w, y, W, idx, lambda_vector):
+        """
+        This method calculates the Hessian of the lagrangian expression.
+        Parameters
+        ----------
+        X: ndarray
+                The data matrix X.
+
+        w : ndarray
+                The current w vector being optimised.
+
+                y : ndarray
+                                The transformed variable X @ w.
+
+        W : ndarray
+                The matrix of w vectors stored in the rows of W.
+
+        X : ndarray
+                The data matrix.
+
+        idx : int
+                The current iteration index for the parameters.
+
+        lambda_vector : ndarray
+                The current lambda_eq value being optimised.
+
+        Returns
+        -------
+        The evaluation of the Hessian of the lagrangian expression.
+        """
+
         jac_cost = self.cost_instance.cost_hessian(X, w, y)
 
         # Compute the jacobian of the Lagrangian gradient vector
@@ -332,117 +722,115 @@ class linear_model(object):
 
         return jacobian
 
-    def Newton_update(self, X, w, y, W, idx, lambda_vector):
-        if self.gradient_store is None:
-            # t0 = time.time()
-            gradient = self.lagrange_gradient(X, w, y, W, idx, lambda_vector)
-            # t1 = time.time()
-            # print(f"Calculate derivative: {t1 - t0} seconds")
+    def parameter_update(self, X, w, y, W, idx, lambda_vector):
+        """
+        The method get an updated estimate of the parameters. Combines all the
+        user choices into one simple step. It accounts for standard gradient descent,
+        stochastic gradient descent, second order methods, and quasi-second order
+        methods.
 
-        else:
-            gradient = self.gradient_store  # Use the new stored gradient
+        Parameters
+        ----------
+        X: ndarray
+                The data matrix X.
 
-        if self.hessian_update_type == "full":
-            # t0 = time.time()
+        w : ndarray
+                The current w vector being optimised.
 
-            if self.use_hessian:
+                y : ndarray
+                                The transformed variable X @ w.
+
+        W : ndarray
+                The matrix of w vectors stored in the rows of W.
+
+        X : ndarray
+                The data matrix.
+
+        idx : int
+                The current iteration index for the parameters.
+
+        lambda_vector : ndarray
+                The current lambda_eq value being optimised.
+
+        Returns
+        -------
+        delta_w : ndarray
+                The update that should be applied to w.
+
+        delta_lambda: ndarray
+                The update that should be applied to lambda.
+
+        gradient : ndarray
+                The gradient evaluation at the current iteration index.
+        """
+        # Define flag that allows for solver re-initialisation
+        self._reinit_flag = False
+
+        # Calculate the gradient
+        gradient = self.lagrange_gradient(X, w, y, W, idx, lambda_vector)
+
+        if self.use_hessian:
+            if self.hessian_update_type == "actual":
                 jacobian = self.lagrange_hessian(X, w, y, W, idx, lambda_vector)
 
-            else:
-                jacobian = np.eye(gradient.shape[0])
-
-            # t1 = time.time()
-            # print(f"Calculate Jacobian: {t1 - t0} seconds")
-
-            # t0 = time.time()
-            delta = -1 * np.linalg.solve(jacobian, gradient)
-            # t1 = time.time()
-            # print(f"Solve for delta: {t1 - t0} seconds")
-
-            ## Compute alpha parameter
-            if self.use_ls:
-                alpha_multiplier, conv_flag = self.line_search(
-                    delta, gradient, w, lambda_vector, W, X, idx, visualise=False
-                )
-                # alpha_multiplier = 1
-                # bs_opt = self.backtracking(delta,
-                #                            gradient,
-                #                            w,
-                #                            lambda_vector,
-                #                            W,
-                #                            X,
-                #                            idx,
-                #                            max_iter=100)
-                #
-                # if bs_opt[0] is not None:
-                #     alpha_multiplier = bs_opt[0]
-                #     print(alpha_multiplier)
+                # Compute the update
+                delta = -1 * np.linalg.solve(jacobian, gradient)
 
             else:
-                alpha_multiplier = (
-                    self._training_learning_rate
-                )  # Use the prescribed learning rate.
-
-            # Scale delta by alpha
-            delta = alpha_multiplier * delta
-
-            # if not conv_flag:
-            #     print("\n Line search did not converge.")
-
-            ## Split into W and Lambda
-            delta_w, delta_lambda = delta[: w.shape[0], [0]], delta[w.shape[0] :, [0]]
+                # Compute the delta term using quasi-Newton approach
+                delta = self.quasi_newton_inst.compute_update(gradient)
 
         else:
-            # t0 = time.time()
+            jacobian = np.eye(gradient.shape[0])
 
-            ## Compute the delta term
-            delta = self.quasi_newton_inst.compute_update(gradient)
+            # Compute the update
+            delta = -1 * np.linalg.solve(
+                jacobian, gradient
+            )  # Should just be negative gradient
 
-            ## Compute alpha parameter
-            alpha, conv_flag = self.line_search(
+        # Compute alpha parameter
+        if self.use_ls:
+            alpha_multiplier, conv_flag = self.line_search(
                 delta, gradient, w, lambda_vector, W, X, idx
             )
-            # alpha = 1
 
-            if conv_flag:
-                # Scale delta by alpha
-                delta = alpha * delta
+        else:
+            alpha_multiplier = self._training_learning_rate
+            conv_flag = True
+
+        # Scale delta by alpha
+        delta = alpha_multiplier * delta
+
+        # Split into W and Lambda updates
+        delta_w, delta_lambda = delta[: w.shape[0], [0]], delta[w.shape[0] :, [0]]
+
+        # Compute quasi-Newton updates, if required
+        if self.hessian_update_type != "actual" and self.use_hessian:
+            if conv_flag:  # Compute quasi-Newton updates.
+                # Compute the new parameters
+                w_new, lambda_new = self.update_params(
+                    w.copy(), lambda_vector.copy(), delta_w, delta_lambda, W, idx
+                )
+
+                # Compute gradient_diff_k
+                gradient_next = self.lagrange_gradient(X, w_new, y, W, idx, lambda_new)
+                gradient_diff_k = gradient_next - gradient
+
+                # Update the Hessian approximation
+                self.quasi_newton_inst.update_jacobian(delta, gradient_diff_k)
 
             else:
                 if self.verbose:
                     print("\n Line search did not converge.")
 
-                delta *= 0.0  # Don't perform any update
+                delta_w *= 0.0  # Don't perform any update
+                delta_lambda *= 0.0  # Don't perform any update
+
+                self._reinit_flag = True  # Set to true to allow solver to continue
+
                 self.quasi_newton_inst.initialise_jacobian(
                     delta.shape[0]
                 )  # Re-initialise the Jacobian
-
-            ## Split into W and Lambda
-            delta_w, delta_lambda = delta[: w.shape[0], [0]], delta[w.shape[0] :, [0]]
-
-            ## Compute the new parameters
-            w_new, lambda_new = self.update_params(
-                w.copy(), lambda_vector.copy(), delta_w, delta_lambda, W, idx
-            )
-
-            ## Compute gradient_diff_k
-            gradient_next = self.lagrange_gradient(X, w_new, y, W, idx, lambda_new)
-            gradient_diff_k = gradient_next - gradient
-            self.gradient_store = gradient_next
-
-            # t1 = time.time()
-            # print(f"Calculate Jacobian: {t1 - t0} seconds")
-
-            ## Update the Hessian approximation
-            # t0 = time.time()
-            self.quasi_newton_inst.update_jacobian(delta, gradient_diff_k)
-
-            # t1 = time.time()
-        # if idx > 1:
-        #     print(f"Calculate delta: {t1 - t0} seconds")
-        #
-        # if t1 - t0 > 3:
-        #     print("Hit a break, check out why it is taking so long.")
 
         return delta_w, delta_lambda, gradient
 
@@ -489,8 +877,8 @@ class linear_model(object):
                 )
 
             # Update
-            if self.hessian_update_type != "full":
-                self.quasi_newton_inst.initialise_jacobian(self.n_sources + 1)
+            if self.hessian_update_type != "actual":
+                self.quasi_newton_inst.initialise_jacobian(W.shape[1] + 1)
 
             self.cnt_iter = 0
             error = np.inf
@@ -504,7 +892,7 @@ class linear_model(object):
                 if self.batch_size is None:
                     Y = np.dot(X, w_new)
 
-                    delta_w, delta_lambda, gradient = self.Newton_update(
+                    delta_w, delta_lambda, gradient = self.parameter_update(
                         X,
                         w_new,
                         Y,
@@ -518,7 +906,7 @@ class linear_model(object):
                         self._data_sampler
                     )  # Perhaps this should be reinitialised within this method?
                     Y = np.dot(Xi, w_new)
-                    delta_w, delta_lambda, gradient = self.Newton_update(
+                    delta_w, delta_lambda, gradient = self.parameter_update(
                         Xi, w_new, Y, W_, idx, lambda_new
                     )
 
@@ -566,8 +954,10 @@ class linear_model(object):
                 # Update counter
                 self.cnt_iter += 1
 
-                # t1 = time.time()
-                # print(f"Final steps: {t1 - t0} seconds")
+                if self._reinit_flag:
+                    error = (
+                        np.inf
+                    )  # Stops solver from terminating on quasi-Newton re-initialisation
 
             if self.save_dir is not None:
                 fig, ax = plt.subplots(4, 2, figsize=(8, 12))
@@ -640,17 +1030,6 @@ class linear_model(object):
             self.w_similarity_.append(w_similarity[: self.cnt_iter])
             self.spectral_loss_.append(spectral_loss[: self.cnt_iter])
 
-            # t1 = time.time()
-            # print(f"Calculate metrics: {t1 - t0} seconds")
-
-            # fig, ax = plt.subplots(1, 1, figsize=(10, 10))
-            # n = 512
-            # freq = np.fft.fftfreq(n, 1 / 25e3)[: n // 2]
-            # val = 2 / n * np.abs(np.fft.fft(w_new[:, 0]))[: n // 2]
-            # ax.plot(freq, val)
-            #
-            # plt.show(block=True)
-
         # Return the updated matrices
         return W_, Lambda_
 
@@ -668,8 +1047,8 @@ class linear_model(object):
         if idx > 0 and self.perform_gso:
             # t0 = time.time()
             w_new = self.gs_inst.gram_schmidt_orthogonalisation(w_new, W, idx)
-            # t1 = time.time()
-            # print(f"Perform GSO: {t1 - t0} seconds")
+        # t1 = time.time()
+        # print(f"Perform GSO: {t1 - t0} seconds")
 
         return w_new, lambda_new
 
@@ -756,13 +1135,13 @@ class linear_model(object):
         Lambda = initialise_lambda(self.n_sources)
 
         # Initialise spectral objective instance
-        self.spectral_obj = spectral_objective(
+        self.spectral_obj = SpectralObjective(
             m, save_hessian_flag=False, inv_hessian_flag=False, verbose=False
         )
 
         # Initialise the batch sampler
         if self.batch_size is not None:
-            batch_sampler_inst = batch_sampler(self.batch_size, include_end=True)
+            batch_sampler_inst = BatchSampler(self.batch_size, include_end=True)
             self._data_sampler = iter(batch_sampler_inst(X_preprocess, iter_idx=0))
 
         # Train based on the users choice (SUMT or standard)
@@ -846,7 +1225,7 @@ class linear_model(object):
                 self.spectral_loss_,
             ) = param_iters[pos_min]
 
-            ## Check pos_min
+            # Check pos_min
 
             self.Lambda = lambda_iters[pos_min + 1]
             self.W = W_iters[
@@ -889,13 +1268,11 @@ class linear_model(object):
     def transform(self, X):
         return np.dot(self.processor_inst.preprocess_data(X), self.W.T)
 
-    def inverse_transform(self, S):
-        r, c = S.shape
-
-        S_ = S.copy()
+    def inverse_transform(self, Z):
+        Z_ = Z.copy()
 
         # Transform back to the training feature space
-        X_recon = np.dot(S_, self.W)
+        X_recon = np.dot(Z_, self.W)
 
         # Un-process the data (still zero-mean, unit-variance)
         X_orig_recon = self.processor_inst.unprocess_data(X_recon)
