@@ -97,7 +97,7 @@ class CostClass(object):
         Examples
         --------
         cost_gradient = lambda X, w, y: -2 * np.mean(y * X, axis=0,
-                                                    keepdims = True)
+                                                                        keepdims = True)
 
         """
         self._cost_gradient = cost_gradient
@@ -350,6 +350,7 @@ class UserCost(CostClass):
         ----------
         X : ndarray
                 The feature matrix of size (n_samples, n_features)
+
         w : ndarray
                 The transformation vector of size (n_features, 1)
 
@@ -370,6 +371,7 @@ class UserCost(CostClass):
         ----------
         X : ndarray
                 The feature matrix of size (n_samples, n_features)
+
         w : ndarray
                 The transformation vector of size (n_features, 1)
 
@@ -390,6 +392,7 @@ class UserCost(CostClass):
         ----------
         X : ndarray
                 The feature matrix of size (n_samples, n_features)
+
         w : ndarray
                 The transformation vector of size (n_features, 1)
 
@@ -575,7 +578,7 @@ class SympyCost(CostClass):
         -------
         AttributeError
                 This is raised if the user's cost function has not been defined
-                 within the instance.
+                within the instance.
         """
         if hasattr(self, "_sympy_cost"):
             print("Calculating the sympy method components...")
@@ -656,6 +659,7 @@ class SympyCost(CostClass):
         ----------
         X : ndarray
                 The feature matrix of size (n_samples, n_features)
+
         w : ndarray
                 The transformation vector of size (n_features, 1)
 
@@ -664,7 +668,7 @@ class SympyCost(CostClass):
 
         Returns
         -------
-                cost function evaluation of (X, w, y)
+        cost function evaluation of (X, w, y)
         """
         self._check_X(X)
         self._check_w(w)
@@ -682,6 +686,7 @@ class SympyCost(CostClass):
         ----------
         X : ndarray
                 The feature matrix of size (n_samples, n_features)
+
         w : ndarray
                 The transformation vector of size (n_features, 1)
 
@@ -690,7 +695,7 @@ class SympyCost(CostClass):
 
         Returns
         -------
-                derivative function evaluation of (X, w, y)
+        derivative function evaluation of (X, w, y)
         """
         return self._cost_gradient(X, w, y)
 
@@ -702,6 +707,7 @@ class SympyCost(CostClass):
         ----------
         X : ndarray
                 The feature matrix of size (n_samples, n_features)
+
         w : ndarray
                 The transformation vector of size (n_features, 1)
 
@@ -710,7 +716,7 @@ class SympyCost(CostClass):
 
         Returns
         -------
-                Hessian function evaluation of (X, w, y)
+        Hessian function evaluation of (X, w, y)
         """
         if self.use_hessian:
             return self._cost_hessian(X, w, y)
@@ -775,6 +781,7 @@ class NegentropyCost(CostClass):
         ----------
         X : ndarray
                 The feature matrix of size (n_samples, n_features)
+
         w : ndarray
                 The transformation vector of size (n_features, 1)
 
@@ -783,7 +790,7 @@ class NegentropyCost(CostClass):
 
         Returns
         -------
-
+        Negentropy cost in minimisation setting using (X, w, y)
 
         """
 
@@ -803,6 +810,7 @@ class NegentropyCost(CostClass):
         ----------
         X : ndarray
                 The feature matrix of size (n_samples, n_features)
+
         w : ndarray
                 The transformation vector of size (n_features, 1)
 
@@ -811,7 +819,7 @@ class NegentropyCost(CostClass):
 
         Returns
         -------
-        Derivative of the negetropy function evalation using (X, w, y)
+        Derivative of the negetropy function evaluation using (X, w, y)
         """
         g_y = self.source_instance.first_derivative(y)
 
@@ -833,17 +841,17 @@ class NegentropyCost(CostClass):
         Parameters
         ----------
         X : ndarray
-            The feature matrix of size (n_samples, n_features)
+                The feature matrix of size (n_samples, n_features)
 
         w : ndarray
-            The transformation vector of size (n_features, 1)
+                The transformation vector of size (n_features, 1)
 
         y : ndarray
-            The transformed variable y = X @ w of size (n_samples, 1)
+                The transformed variable y = X @ w of size (n_samples, 1)
 
         approx_flag : bool (default = True)
-            This flag specifies whether an approximation to the expectation in the
-            Hessian is used or not.
+                This flag specifies whether an approximation to the expectation in the
+                Hessian is used or not.
 
         Returns
         -------
@@ -910,11 +918,13 @@ class VarianceCost(UserCost):
             Parameters
             ----------
             X : ndarray
-            The feature matrix of size (n_samples, n_features)
+                    The feature matrix of size (n_samples, n_features)
+
             w : ndarray
-                    The transformation vector of size (n_features, 1)
+                            The transformation vector of size (n_features, 1)
+
             y : ndarray
-                    The transformed variable y = X @ w of size (n_samples, 1)
+                            The transformed variable y = X @ w of size (n_samples, 1)
 
             Returns
             -------
@@ -930,9 +940,11 @@ class VarianceCost(UserCost):
             Parameters
             ----------
             X : ndarray
-            The feature matrix of size (n_samples, n_features)
+                    The feature matrix of size (n_samples, n_features)
+
             w : ndarray
                     The transformation vector of size (n_features, 1)
+
             y : ndarray
                     The transformed variable y = X @ w of size (n_samples, 1)
 
@@ -950,9 +962,11 @@ class VarianceCost(UserCost):
             Parameters
             ----------
             X : ndarray
-            The feature matrix of size (n_samples, n_features)
+                    The feature matrix of size (n_samples, n_features)
+
             w : ndarray
                     The transformation vector of size (n_features, 1)
+
             y : ndarray
                     The transformed variable y = X @ w of size (n_samples, 1)
 
