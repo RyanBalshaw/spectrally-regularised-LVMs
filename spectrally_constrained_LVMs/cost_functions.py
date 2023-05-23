@@ -14,7 +14,7 @@ import sympy as sp
 from spectrally_constrained_LVMs.negen_approx import initialise_sources
 
 
-class costClass(object):
+class CostClass(object):
     """
     Base class for different formulations of the user
     cost function.
@@ -43,13 +43,13 @@ class costClass(object):
             This method return the internal self._cost_hessian instance.
 
     check_gradient(X, w, y, step_size)
-            This method takes in a initial set of variables X, w, y, and a
+            This method takes in an initial set of variables X, w, y, and a
             finite difference step size. The function is used to check the
             self._cost_gradient method using a central finite-difference
             approach.
 
     check_hessian(X, w, y, step_size)
-            This method takes in a initial set of variables X, w, y, and a
+            This method takes in an initial set of variables X, w, y, and a
             finite difference step size. The function is used to check the
             self._cost_hessian method using a central finite-difference
             approach.
@@ -64,6 +64,9 @@ class costClass(object):
                 A boolean flag to control any possible
                 print statements.
         """
+        self._cost = None
+        self._cost_gradient = None
+        self._cost_hessian = None
         self.verbose = verbose
 
     def set_cost(self, cost_func):
@@ -74,7 +77,10 @@ class costClass(object):
         ----------
         cost_func : function
                 The users cost function.
-                Example: cost_func = lambda X, w, y: -1 * np.mean(y ** 2, axis=0)
+
+        Examples
+        --------
+        cost_func = lambda X, w, y: -1 * np.mean(y ** 2, axis=0)
 
         """
         self._cost = cost_func
@@ -87,9 +93,11 @@ class costClass(object):
         ----------
         cost_gradient : function
                 The users gradient vector of the cost function.
-        Example:
-                cost_gradient = lambda X, w, y: -2 * np.mean(y * X, axis=0,
-                                                            keepdims = True)
+
+        Examples
+        --------
+        cost_gradient = lambda X, w, y: -2 * np.mean(y * X, axis=0,
+                                                    keepdims = True)
 
         """
         self._cost_gradient = cost_gradient
@@ -102,7 +110,10 @@ class costClass(object):
         ----------
         cost_hessian : function
                 The users gradient vector of the cost function.
-                Example: cost_hessian = lambda X, w, y: -2 /X.shape[0] * (X.T @ X)
+
+        Examples
+        --------
+        cost_hessian = lambda X, w, y: -2 /X.shape[0] * (X.T @ X)
 
         """
         self._cost_hessian = cost_hessian
@@ -289,7 +300,7 @@ class costClass(object):
         return hess_current, hess_check, hess_norm
 
 
-class user_cost(costClass):
+class UserCost(CostClass):
     """
     An object that implements the general user cost function
     class. This allows the user to manually define their cost function
@@ -300,8 +311,8 @@ class user_cost(costClass):
     the set_ methods that are available to an instance of this class, which is
     inherited from costClass.
 
-    Assumed function format from user: func(X, w, y) where X is an ndarray
-    with shape (n_samples, n_features), w is an ndarray with shape (n_features, 1)
+    Assumed function format from user: func(X, w, y) where X is a ndarray
+    with shape (n_samples, n_features), w is a ndarray with shape (n_features, 1)
     and y is the linear transformation X @ w with shape (n_samples, 1).
 
     Methods
@@ -396,9 +407,9 @@ class user_cost(costClass):
             return np.eye(w.shape[0])
 
 
-class sympy_cost(costClass):
+class SympyCost(CostClass):
     """
-    This class implements the a general user cost function class based off SymPy.
+    This class implements a general user cost function class based off SymPy.
     This allows the user to manually define a symbolic representation of their
     cost function, and the necessary higher-order derivatives are calculated
     symbolically and then lambdified.
@@ -412,11 +423,11 @@ class sympy_cost(costClass):
     This can be done using the set_ methods that are available to an instance of this
     class, which is inherited from costClass.
 
-    Assumed function format from user: func(X, w, y) where X is an ndarray
-    with shape (n_samples, n_features), w is an ndarray with shape (n_features, 1)
+    Assumed function format from user: func(X, w, y) where X is a ndarray
+    with shape (n_samples, n_features), w is a ndarray with shape (n_features, 1)
     and y is the linear transformation X @ w with shape (n_samples, 1).
 
-    Note that while y is a input that is given for repeatability,
+    Note that while y is an input that is given for repeatability,
 
     Methods
     -------
@@ -456,7 +467,7 @@ class sympy_cost(costClass):
                 method returns and identity matrix.
 
         verbose : bool (default = True)
-                A flag to control the verbosity of different nethod calls.
+                A flag to control the verbosity of different method calls.
         """
         super().__init__(verbose)
         self.n_samples = n_samples
@@ -617,8 +628,8 @@ class sympy_cost(costClass):
 
         Parameters
         ----------
-        X : ndarray
-                The input X matrix.
+        w : ndarray
+                The input w vector.
 
         Raises
         -------
@@ -653,7 +664,7 @@ class sympy_cost(costClass):
 
         Returns
         -------
-                cost function evalation of (X, w, y)
+                cost function evaluation of (X, w, y)
         """
         self._check_X(X)
         self._check_w(w)
@@ -679,7 +690,7 @@ class sympy_cost(costClass):
 
         Returns
         -------
-                derivative function evalation of (X, w, y)
+                derivative function evaluation of (X, w, y)
         """
         return self._cost_gradient(X, w, y)
 
@@ -699,7 +710,7 @@ class sympy_cost(costClass):
 
         Returns
         -------
-                Hessian function evalation of (X, w, y)
+                Hessian function evaluation of (X, w, y)
         """
         if self.use_hessian:
             return self._cost_hessian(X, w, y)
@@ -708,13 +719,13 @@ class sympy_cost(costClass):
             return np.eye(w.shape[0])
 
 
-class negentropy_cost(costClass):
+class NegentropyCost(CostClass):
     """
     This class implements the Negentropy cost that is commonly applied to ICA
-    via negentropy maximisation\kurtosis maximisation. Inherits from costClass.
+    via negentropy maximisation or kurtosis maximisation. Inherits from CostClass.
 
-    Assumed function format: func(X, w, y) where X is an ndarray
-    with shape (n_samples, n_features), w is an ndarray with shape (n_features, 1)
+    Assumed function format: func(X, w, y) where X is a ndarray
+    with shape (n_samples, n_features), w is a ndarray with shape (n_features, 1)
     and y is the linear transformation X @ w with shape (n_samples, 1).
 
     Methods
@@ -802,8 +813,6 @@ class negentropy_cost(costClass):
         -------
         Derivative of the negetropy function evalation using (X, w, y)
         """
-        N, m = X.shape
-
         g_y = self.source_instance.first_derivative(y)
 
         # Calculate the expectation
@@ -824,15 +833,21 @@ class negentropy_cost(costClass):
         Parameters
         ----------
         X : ndarray
-                The feature matrix of size (n_samples, n_features)
+            The feature matrix of size (n_samples, n_features)
+
         w : ndarray
-                The transformation vector of size (n_features, 1)
+            The transformation vector of size (n_features, 1)
+
         y : ndarray
-                The transformed variable y = X @ w of size (n_samples, 1)
+            The transformed variable y = X @ w of size (n_samples, 1)
+
+        approx_flag : bool (default = True)
+            This flag specifies whether an approximation to the expectation in the
+            Hessian is used or not.
 
         Returns
         -------
-        Hessian of the negetropy function evalation using (X, w, y)
+        Hessian of the negentropy function evaluation using (X, w, y)
         """
         N, m = X.shape
 
@@ -868,7 +883,7 @@ class negentropy_cost(costClass):
         return jacobian
 
 
-class variance_cost(user_cost):
+class VarianceCost(UserCost):
     """
     This method implements the PCA variance maximisation objective. It inherits from
     the user_cost class and simply implements the three necessary
