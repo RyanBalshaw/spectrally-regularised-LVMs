@@ -1,17 +1,17 @@
 # Copyright 2023-present Ryan Balshaw
 """Spectrally-constrained-LVMs. Train linear LVMs with the addition
  of a spectral constraint with minimal effort."""
-from .cost_functions import negentropy_cost, sympy_cost, user_cost, variance_cost
+from .cost_functions import NegentropyCost, SympyCost, UserCost, VarianceCost
 from .helper_methods import (
-    Hankel_matrix,
-    batch_sampler,
-    data_processor,
-    deflation_orthogonalisation,
-    quasi_Newton,
+    BatchSampler,
+    DataProcessor,
+    DeflationOrthogonalisation,
+    QuasiNewton,
+    hankel_matrix,
 )
-from .negen_approx import cube_object, exp_object, logcosh_object, quad_object
-from .spectral_constraint import spectral_objective
-from .spectrally_constrained_model import linear_model
+from .negen_approx import CubeObject, ExpObject, LogcoshObject, QuadObject
+from .spectral_constraint import SpectralObjective
+from .spectrally_constrained_model import LinearModel
 
 __author__ = "Ryan Balshaw"
 __version__ = "0.1.1"
@@ -22,19 +22,19 @@ __description__ = (
 )
 # __uri__ = "http://spectrally-constrained-lvms.readthedocs.io/"
 __all__ = [
-    "spectral_objective",
-    "negentropy_cost",
-    "sympy_cost",
-    "user_cost",
-    "variance_cost",
-    "Hankel_matrix",
-    "batch_sampler",
-    "data_processor",
-    "deflation_orthogonalisation",
-    "quasi_Newton",
-    "cube_object",
-    "exp_object",
-    "logcosh_object",
-    "quad_object",
-    "linear_model",
+    "SpectralObjective",
+    "NegentropyCost",
+    "SympyCost",
+    "UserCost",
+    "VarianceCost",
+    "hankel_matrix",
+    "BatchSampler",
+    "DataProcessor",
+    "DeflationOrthogonalisation",
+    "QuasiNewton",
+    "CubeObject",
+    "ExpObject",
+    "LogcoshObject",
+    "QuadObject",
+    "LinearModel",
 ]
