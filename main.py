@@ -5,37 +5,29 @@ Docstring
 import os
 
 import numpy as np
-import sympy as sp
 
-from spectrally_constrained_LVMs import (
-    Hankel_matrix,
-    linear_model,
-    negentropy_cost,
-    sympy_cost,
-    user_cost,
-    variance_cost,
-)
+from spectrally_constrained_LVMs import LinearModel, NegentropyCost, hankel_matrix
 
 # from matplotlib import pyplot as plt
 
 
 if __name__ == "__main__":
-    Lw = 512
+    Lw = 256
     Lsft = 1
     source_name = "exp"
 
     tmp_dir_path = os.path.join(os.environ["TMP_DIR"], ("sica_") + source_name)
 
-    # # Phenomenological model signal
-    data_dir = os.path.join(
-        os.environ["DATA_DIR"],
-        "singleFiles",
-        # "cs2_imp_files",
-        "ica_pheno_const_bd.npy",
-    )
-    Fs = 25e3
-    data_dict = np.load(data_dir, allow_pickle=True).item()
-    x_signal = data_dict["x_total"]
+    # Phenomenological model signal
+    # data_dir = os.path.join(
+    #     os.environ["DATA_DIR"],
+    #     "singleFiles",
+    #     # "cs2_imp_files",
+    #     "ica_pheno_const_bd.npy",
+    # )
+    # Fs = 25e3
+    # data_dict = np.load(data_dir, allow_pickle=True).item()
+    # x_signal = data_dict["x_total"]
 
     # plt.figure()
     # n = len(x_signal)
@@ -46,16 +38,28 @@ if __name__ == "__main__":
     # plt.show(block = True)
 
     # IMS dataset
+    data_dir = os.path.join(os.environ["DATA_DIR"], "Datasets", "IMS", "IMS_Dataset2")
+    # )
+    Fs = 20480
+    files = sorted(os.listdir(data_dir))
+    data_dict = np.loadtxt(os.path.join(data_dir, files[637]))
+    x_signal = data_dict[:, 0]
+
+    # Gearbox signal
     # data_dir = os.path.join(
-    #     os.environ["DATA_DIR"], "Datasets", "IMS", "IMS_Dataset2")
-    # #)
-    # Fs = 20480
-    # files = sorted(os.listdir(data_dir))
-    # data_dict = np.loadtxt(os.path.join(data_dir, files[540]))
-    # x_signal = data_dict[:, 0]
+    #     os.environ["DATA_DIR"],
+    #     "Datasets",
+    #     "Gearbox",
+    #     "Exp1Ds",
+    #     "Exp1D_R1336.mat"
+    # )  # r"D:\PhD_Files\Datasets\Gearbox\Exp1Ds\Exp1D_R1400.mat"
+    # Fs = 25.6e3
+    # data_mat = io.loadmat(data_dir)
+    # x_signal = data_mat["Track1"][0, :]
+    # x_signal = x_signal[:len(x_signal) // 2]
 
     #######################################
-    X = Hankel_matrix(x_signal, Lw, Lsft)
+    X = hankel_matrix(x_signal, Lw, Lsft)
     # X = X[: X.shape[0] // 12, :]
     # print(X.shape)
 
@@ -91,10 +95,10 @@ if __name__ == "__main__":
     # test_inst.set_hessian(hess)
 
     # Method 3
-    test_inst = negentropy_cost(source_name="exp", source_params={"alpha": 1})
+    test_inst = NegentropyCost(source_name="exp", source_params={"alpha": 1})
 
     # Method 4
-    # test_inst = variance_cost(use_hessian=False, verbose=True)
+    # test_inst = VarianceCost(use_hessian=True, verbose=True)
 
     # Alternative PCA cost function.
     # linear_model = lambda X, w: X @ w
@@ -123,27 +127,57 @@ if __name__ == "__main__":
     # )
     #
 
-    sICA_inst = linear_model(
-        n_sources=5,
+    # def l1_l2_norm(X, w, y):
+    #
+    #     N = X.shape[0]
+    #
+    #     E1 = np.mean(np.abs(y), axis = 0)
+    #     E2 = np.mean(y**2, axis = 0)
+    #
+    #     return np.sqrt(N) * E1 / np.sqrt(E2)
+    #
+    # def l1_l2_grad(X, w, y):
+    #
+    #     N = X.shape[0]
+    #
+    #     E1 = np.mean(np.abs(y), axis=0)
+    #     E2 = np.mean(y ** 2, axis=0)
+    #
+    #     p1 = np.mean(np.sign(y) * X, axis = 0, keepdims=True).T / np.sqrt(E2)
+    #     p2 = -1 * E1 / ((E2)**(3/2)) * np.mean(y * X, axis = 0, keepdims=True).T
+    #
+    #     return np.sqrt(N)  * (p1 + p2)
+    #
+    #
+    # def l1_l2_hessian(X, w, y):
+    #     pass
+
+    # test_inst = user_cost(use_hessian=False)
+    #
+    # test_inst.set_cost(l1_l2_norm)
+    # test_inst.set_gradient(l1_l2_grad)
+
+    sICA_inst = LinearModel(
+        n_sources=2,
         cost_instance=test_inst,
         whiten=True,
         init_type="broadband",
-        organise_by_kurt=True,
         perform_gso=True,
         batch_size=None,
         var_PCA=None,
-        alpha_reg=10,  # 0.0005,
+        alpha_reg=1,  # 0.0005,
         sumt_flag=True,
         sumt_parameters={
             "eps_1": 1e-4,
-            "alpha_init": 1,
-            "alpha_end": 100,
+            "alpha_init": 0.1,
+            "alpha_end": 10,
             "alpha_multiplier": 10,
         },
-        hessian_update_type="full",
+        organise_by_kurt=True,
+        hessian_update_type="actual",
         use_ls=True,
         use_hessian=True,
-        save_dir=tmp_dir_path,
+        save_dir=None,  # tmp_dir_path,
         verbose=True,
     )
 
