@@ -24,14 +24,14 @@ import copy
 import numpy as np
 
 
-class data_processor(object):
+class DataProcessor(object):
     """
     A method that processes the data matrices.
 
     Methods
     -------
     initialise_preprocessing(X)
-        A method that initialises all of the processing attributes
+        A method that initialises all the processing attributes
         for the pre-processing (standardising with whitening). Solves
         for the whitening transform parameters.
 
@@ -42,8 +42,7 @@ class data_processor(object):
         Transforms the X matrix to the whitened space (if required).
 
     unprocess_data(X)
-        Transforms a X matrix from the whitened space to the data space.
-
+        Transforms an X matrix from the whitened space to the data space.
     """
 
     def __init__(self, whiten: bool = True, var_PCA: float | None = None):
@@ -128,7 +127,7 @@ class data_processor(object):
         Parameters
         ----------
         X: ndarray
-            original feature matrix
+            The original feature matrix X.
 
         Returns
         -------
@@ -147,12 +146,12 @@ class data_processor(object):
         Parameters
         ----------
         X: ndarray
-            original feature matrix
+            The original feature matrix X.
 
         Returns
         -------
         X_whitened: ndarray
-            The whitened feature matrix
+            The whitened feature matrix.
         """
         X_standardised = self.standardise_data(X)
 
@@ -163,7 +162,7 @@ class data_processor(object):
 
     def unprocess_data(self, X):
         """
-        A method that unwhitens the whitened data matrix X
+        A method that un-whitens the whitened data matrix X
 
         Parameters
         ----------
@@ -173,7 +172,7 @@ class data_processor(object):
         Returns
         -------
         X_unwhitened: ndarray
-            The unwhitened feature matrix
+            The un-whitened feature matrix
         """
         X_unwhitened = np.dot(np.dot(X, self.recover_transform.T), self.Vh)
         # X_unwhitened = np.dot(X, self.recover_transform.T)
@@ -181,7 +180,7 @@ class data_processor(object):
         return X_unwhitened
 
 
-class batch_sampler(object):
+class BatchSampler(object):
     """
     This is a simple iterator instance that can be called during runtime using:
 
@@ -199,7 +198,7 @@ class batch_sampler(object):
         Parameters
         ----------
         batch_size: int
-            The batch size used by the sampler.
+                The batch size used by the sampler.
 
         random_sampler: bool
             A flag to specify whether the sampler runs by randomly selecting indices
@@ -274,7 +273,7 @@ class batch_sampler(object):
 
     def __iter__(self):
         """
-        Initalises the iteration counter when iter() is applied to the sampler
+        Initialises the iteration counter when iter() is applied to the sampler
         instance.
 
         Returns
@@ -316,7 +315,7 @@ class batch_sampler(object):
 
         else:
             self._iter_cnt = 0
-            # raise StopIteration # I am breaking many Python laws.
+        # raise StopIteration # I am breaking many Python laws.
 
         # This code should be in the if statement
         if not self.random_sampler:
@@ -338,7 +337,7 @@ class batch_sampler(object):
         return data_batch
 
 
-class quasi_Newton(object):
+class QuasiNewton(object):
     """
     This method implements different Hessian approximation strategies and
     performs the updates on each call.
@@ -443,7 +442,7 @@ class quasi_Newton(object):
             t3 = grad_diff_k @ grad_diff_k.T * gamma_k
 
             update_term = (
-                (t1) @ self.jacobian_mat_iter @ (t2) + t3 - self.jacobian_mat_iter
+                t1 @ self.jacobian_mat_iter @ t2 + t3 - self.jacobian_mat_iter
             )  # subtract to fix update rule below
 
         return update_term
@@ -496,33 +495,22 @@ class quasi_Newton(object):
 
         return update_term
 
-    def initialise_jacobian(self, m):
+    def initialise_jacobian(self, n_features):
         """
         A method that initialises the Jacobian matrix.
         Assumes that
 
         Parameters
         ----------
-        m: int
+        n_features: int
             The dimensionality of the feature space.
 
-        Initialises
         -----------
         self.jacobian_mat_iter: ndarray
             The Hessian used during iteration.
         """
-        if self.use_inverse:
-            if self.jacobian_update_type == "bfgs":
-                self.jacobian_mat_iter = np.eye(m)
 
-            else:
-                self.jacobian_mat_iter = 0.1 * np.eye(m)
-        else:
-            if self.jacobian_update_type == "bfgs":
-                self.jacobian_mat_iter = np.eye(m)
-
-            else:
-                self.jacobian_mat_iter = 10 * np.eye(m)
+        self.jacobian_mat_iter = np.eye(n_features)
 
     def compute_update(self, gradient_vector):
         """
@@ -581,7 +569,7 @@ class quasi_Newton(object):
         self.iter_index += 1
 
 
-class deflation_orthogonalisation(object):
+class DeflationOrthogonalisation(object):
     """
     This method implements the Gram-Schmidt orthogonalisation
     process and some helper methods.
@@ -589,13 +577,14 @@ class deflation_orthogonalisation(object):
     Methods
     -------
     projection_operator(u, v)
-        words
+        This method computes the projection operator of v onto u.
 
     gram_schmidt_orthogonalisation(w, W, idx)
-        words
+        This method performs GS orthogonalisation. of w w.r.t the vectors in W up
+        to the W position.
 
     global_gso(W)
-        words
+        This method performs GSO sequentially for the rows in W.
 
     """
 
@@ -629,7 +618,8 @@ class deflation_orthogonalisation(object):
             A Nx1 array that contains the vector we want to orthogonalise.
 
         W: ndarray
-            A MxN array that contains the vectors we want to orthogonalise w against.
+            A MxN array that contains the vectors we want to orthogonalise
+            w against.
 
         idx: int
             The upper index (cannot be zero) for the rows of W that
@@ -699,7 +689,7 @@ class deflation_orthogonalisation(object):
         return W_orth
 
 
-def Hankel_matrix(signal, Lw=512, Lsft=1):
+def hankel_matrix(signal, Lw=512, Lsft=1):
     """
     A method that performs hankelisation for the user.
 

@@ -13,4 +13,12 @@ To use spectrally-constrained-LVMs, first install it using pip:
    (.venv) $ pip install spectrally-constrained-LVMs
 
 >>> import spectrally_constrained_LVMs as scLVMs
+>>> scLVMs.LinearModel()
+   (.venv) $ pip install spectrally-constrained-LVMs
+
+>>> import spectrally_constrained_LVMs as scLVMs
+>>> scLVMs.LinearModel()
+   (.venv) $ pip install spectrally-constrained-LVMs
+
+>>> import spectrally_constrained_LVMs as scLVMs
 >>> scLVMs.linear_model()

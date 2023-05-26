@@ -5,90 +5,7 @@ The negentropy approximation functions for the negentropy-based ICA methods.
 import numpy as np
 
 
-class general_object(object):
-    """
-    An object that implements the first derivative, second derivative and
-    gamma functions of the XXXX (fill in here) function. These functions are used in the
-    negentropy calculation for negentropy-based ICA.
-
-    Methods
-    -------
-    function(u = float)
-        Return the function form of G(u) for the XXXX function
-
-    first_derivative(u = float)
-        Return the function form of the first derivative g(u) for the XXXX function
-
-    second_derivative(u = float)
-        Return the function form of the second derivative g'(u) for the XXXX function
-
-    gamma(u = float)
-        Return the function form of ratio g'(u)/g(u) for the XXXX function
-    """
-
-    def function(self, u: float):
-        """
-        This method implements the functional form of G(u)
-
-        Parameters
-        ----------
-        u: (float): The input value to be fed through G(u)
-
-        Returns
-        -------
-            float: The computation of G(u)
-        """
-
-        return None
-
-    def first_derivative(self, u: float):
-        """
-        This method implements the first derivative of G(.) for g(u)
-
-        Parameters
-        ----------
-        u: (float): The input value to be fed through g(u)
-
-        Returns
-        -------
-            float: The computation of g(u)
-        """
-
-        return None
-
-    def second_derivative(self, u: float):
-        """
-        This method implements the second derivative of G(.) for g'(u)
-
-        Parameters
-        ----------
-        u: (float): The input value to be fed through g'(u)
-
-        Returns
-        -------
-            float: The computation of g'(u)
-        """
-
-        return None
-
-    def gamma(self, u):
-        """
-        This method implements the ratio of the second derivative to
-        the first derivative (gamma(u) = g'(u) / g(u))
-
-        Parameters
-        ----------
-        u: (float): The input value to be fed through gamma(u)
-
-        Returns
-        -------
-            float: The computation of gamma(u)
-        """
-
-        return None
-
-
-class logcosh_object(object):
+class LogcoshObject(object):
     """
     An object that implements the first derivative, second derivative and
     gamma functions of the logcosh function. These functions are used in the
@@ -97,16 +14,18 @@ class logcosh_object(object):
     Methods
     -------
     function(u = float) -> 1/a1 * log((exp(a1 * u) + exp(-a1 * u)) / 2)
-        Return the function form of G(u) for the logcosh function
+            Return the function form of G(u) for the logcosh function
 
     first_derivative(u = float) -> tanh
-        Return the function form of the first derivative g(u) for the logcosh function
+            Return the function form of the first derivative g(u) for the logcosh
+            function
 
     second_derivative(u = float) -> 1 - tanh^2(u)
-        Return the function form of the second derivative g'(u) for the logcosh function
+            Return the function form of the second derivative g'(u) for the logcosh
+            function
 
     gamma(u = float)
-        Return the function form of ratio g'(u)/g(u) for the logcosh function
+            Return the function form of ratio g'(u)/g(u) for the logcosh function
     """
 
     def __init__(self, a1=None):
@@ -115,12 +34,12 @@ class logcosh_object(object):
         Parameters
         ----------
         a1: float
-            The a1 parameter for the  generalised logcosh function.
+                The a1 parameter for the  generalised logcosh function.
 
         Raises
         ------
         ValueError
-            If the a1 value is outside the recommended domain of [1, 2]
+                If the a1 value is outside the recommended domain of [1, 2]
         """
         if a1 is None:
             self.a1 = [1]  # [a1 = 1]
@@ -140,17 +59,18 @@ class logcosh_object(object):
 
         Parameters
         ----------
-        u: (float): The input value to be fed through G(u)
+        u: float
+                The input value to be fed through G(u)
 
         Returns
         -------
-            float: The computation of G(u)
+        The computation of G(u)
 
         """
 
         return (
             1
-            / (self.a1)
+            / self.a1
             * np.log((np.exp(self.a1 * u) + np.exp(-self.a1 * u)) / 2 + 1e-12)
         )  # 1e-12 for stability
 
@@ -160,11 +80,12 @@ class logcosh_object(object):
 
         Parameters
         ----------
-        u: (float): The input value to be fed through g(u)
+        u: (float):
+                The input value to be fed through g(u)
 
         Returns
         -------
-            float: The computation of g(u)
+        The computation of g(u)
         """
         # au = self.a1 * u
         # e_au = np.exp(au)
@@ -180,11 +101,12 @@ class logcosh_object(object):
 
         Parameters
         ----------
-        u: (float): The input value to be fed through g'(u)
+        u: (float):
+                The input value to be fed through g'(u)
 
         Returns
         -------
-            float: The computation of g'(u)
+        The computation of g'(u)
         """
         d1 = self.first_derivative(self.a1 * u)
 
@@ -197,11 +119,12 @@ class logcosh_object(object):
 
         Parameters
         ----------
-        u: (float): The input value to be fed through gamma(u)
+        u: (float):
+                The input value to be fed through gamma(u)
 
         Returns
         -------
-            float: The computation of gamma(u)
+        The computation of gamma(u)
         """
         return self.second_derivative(u) / self.first_derivative(u)
 
@@ -230,7 +153,7 @@ class logcosh_object(object):
     #     return np.array([-1, 1]) * deriv.reshape(-1, 1)
 
 
-class exp_object(object):
+class ExpObject(object):
     """
     An object that implements the first derivative, second derivative and
     gamma functions of the exp function. These functions are used in the
@@ -239,16 +162,16 @@ class exp_object(object):
     Methods
     -------
     function(u = float) -> -1/a2 * exp(-a2/2 * u^2)
-        Return the function form of G(u) for the exp function
+            Return the function form of G(u) for the exp function
 
     first_derivative(u = float) -> u * exp(-a2/2 * u^2)
-        Return the function form of the first derivative g(u) for the exp function
+            Return the function form of the first derivative g(u) for the exp function
 
     second_derivative(u = float) -> (1 - a2 * u^*2) * exp(-a2 / 2 * u^2)
-        Return the function form of the second derivative g'(u) for the exp function
+            Return the function form of the second derivative g'(u) for the exp function
 
     gamma(u = float) -> (1 - a2 * u^2) / u
-        Return the function form of ratio g'(u)/g(u) for the exp function
+            Return the function form of ratio g'(u)/g(u) for the exp function
     """
 
     def __init__(self, a2=None):
@@ -256,12 +179,12 @@ class exp_object(object):
         Parameters
         ----------
         a2: float - default: 1
-            The a2 parameter for the exp function.
+                The a2 parameter for the exp function.
 
         Raises
         ------
         ValueError
-            If the a2 value is outside the recommended domain of [0, 2]
+                If the a2 value is outside the recommended domain of [0, 2]
         """
         if a2 is None:
             self.a2 = [1]  # [a2 = 1]
@@ -282,11 +205,12 @@ class exp_object(object):
 
         Parameters
         ----------
-        u: (float): The input value to be fed through G(u)
+        u: (float):
+                The input value to be fed through G(u)
 
         Returns
         -------
-            float: The computation of G(u)
+        The computation of G(u)
         """
         return -1 / self.a2 * np.exp(-self.a2 / 2 * u**2)
 
@@ -296,11 +220,12 @@ class exp_object(object):
 
         Parameters
         ----------
-        u: (float): The input value to be fed through g(u)
+        u: (float):
+                The input value to be fed through g(u)
 
         Returns
         -------
-            float: The computation of g(u)
+        The computation of g(u)
         """
         return u * np.exp(-self.a2 * u * u / 2)
 
@@ -310,11 +235,12 @@ class exp_object(object):
 
         Parameters
         ----------
-        u: (float): The input value to be fed through g'(u)
+        u: (float):
+                The input value to be fed through g'(u)
 
         Returns
         -------
-            float: The computation of g'(u)
+        The computation of g'(u)
         """
         return np.exp(-self.a2 * u * u / 2) * (1 - self.a2 * u * u)
 
@@ -325,16 +251,17 @@ class exp_object(object):
 
         Parameters
         ----------
-        u: (float): The input value to be fed through gamma(u)
+        u: (float):
+                The input value to be fed through gamma(u)
 
         Returns
         -------
-            float: The computation of gamma(u)
+        The computation of gamma(u)
         """
         return (1 - self.a2 * u * u) / u
 
 
-class quad_object(object):
+class QuadObject(object):
     """
     An object that implements the first derivative, second derivative and
     gamma functions of the quad (u**4) function. These functions are used in the
@@ -343,77 +270,87 @@ class quad_object(object):
     Methods
     -------
     function(u = float) -> 1/4 u^4
-        Return the function form of G(u) for the quartic function
+            Return the function form of G(u) for the quartic function
 
     first_derivative(u = float) -> u^3
-        Return the function form of the first derivative g(u) for the quartic function
+            Return the function form of the first derivative g(u) for the quartic
+            function
 
     second_derivative(u = float) -> 3 u ^2
-        Return the function form of the second derivative g'(u) for the quartic function
+            Return the function form of the second derivative g'(u) for the quartic
+            function
 
     gamma(u = float) -> 3 / u
-        Return the function form of ratio g'(u)/g(u) for the quartic function
+            Return the function form of ratio g'(u)/g(u) for the quartic function
     """
 
-    def function(self, u):
+    @staticmethod
+    def function(u):
         """
         This method implements the functional form of G(u)
 
         Parameters
         ----------
-        u: (float): The input value to be fed through G(u)
+        u: (float):
+                The input value to be fed through G(u)
 
         Returns
         -------
-            float: The computation of G(u)
+        The computation of G(u)
         """
         return 1 / 4 * u**4
 
-    def first_derivative(self, u):
+    @staticmethod
+    def first_derivative(u):
         """
         This method implements the first derivative of G(.) for g(u)
 
         Parameters
         ----------
-        u: (float): The input value to be fed through g(u)
+        u: (float):
+                The input value to be fed through g(u)
 
         Returns
         -------
-            float: The computation of g(u)
+        The computation of g(u)
         """
         return u**3
 
-    def second_derivative(self, u):
+    @staticmethod
+    def second_derivative(u):
         """
         This method implements the second derivative of G(.) for g'(u)
 
         Parameters
         ----------
-        u: (float): The input value to be fed through g'(u)
+        u: (float):
+                The input value to be fed through g'(u)
 
         Returns
         -------
-            float: The computation of g'(u)
+        The computation of g'(u)
         """
         return 3 * u**2
 
-    def gamma(self, u):
+    @staticmethod
+    def gamma(u):
         """
         This method implements the ratio of the second derivative to
         the first derivative (gamma(u) = g'(u) / g(u))
 
         Parameters
         ----------
-        u: (float): The input value to be fed through gamma(u)
+        u: (float):
+                The input value to be fed through gamma(u)
 
         Returns
         -------
-            float: The computation of gamma(u)
+        The computation of gamma(u)
         """
         return 3 / u
 
 
-class cube_object(object):
+class CubeObject(object):
     """
     An object that implements the first derivative, second derivative and
     gamma functions of the quad (u**4) function. These functions are used in the
@@ -422,79 +359,89 @@ class cube_object(object):
     Methods
     -------
     function(u = float) -> u^3
-        Return the function form of G(u) for the quartic function
+            Return the function form of G(u) for the cube function
 
     first_derivative(u = float) -> 3 u^2
-        Return the function form of the first derivative g(u) for the quartic function
+            Return the function form of the first derivative g(u) for the cube
+            function
 
     second_derivative(u = float) -> 6 u
-        Return the function form of the second derivative g'(u) for the quartic function
+            Return the function form of the second derivative g'(u) for the cube
+            function
 
     gamma(u = float) -> 2 / u
-        Return the function form of ratio g'(u)/g(u) for the quartic function
+            Return the function form of ratio g'(u)/g(u) for the cube function
     """
 
-    def function(self, u):
+    @staticmethod
+    def function(u):
         """
         This method implements the functional form of G(u)
 
         Parameters
         ----------
-        u: (float): The input value to be fed through G(u)
+        u: (float):
+                The input value to be fed through G(u)
 
         Returns
         -------
-            float: The computation of G(u)
+        The computation of G(u)
         """
         return u**3
 
-    def first_derivative(self, u):
+    @staticmethod
+    def first_derivative(u):
         """
         This method implements the first derivative of G(.) for g(u)
 
         Parameters
         ----------
-        u: (float): The input value to be fed through g(u)
+        u: (float):
+                The input value to be fed through g(u)
 
         Returns
         -------
-            float: The computation of g(u)
+        The computation of g(u)
         """
         return 3 * u**2
 
-    def second_derivative(self, u):
+    @staticmethod
+    def second_derivative(u):
         """
         This method implements the second derivative of G(.) for g'(u)
 
         Parameters
         ----------
-        u: (float): The input value to be fed through g'(u)
+        u: (float):
+                The input value to be fed through g'(u)
 
         Returns
         -------
-            float: The computation of g'(u)
+        The computation of g'(u)
         """
         return 6 * u
 
-    def gamma(self, u):
+    @staticmethod
+    def gamma(u):
         """
         This method implements the ratio of the second derivative to
         the first derivative (gamma(u) = g'(u) / g(u))
 
         Parameters
         ----------
-        u: (float): The input value to be fed through gamma(u)
+        u: (float):
+                The input value to be fed through gamma(u)
 
         Returns
         -------
-            float: The computation of gamma(u)
+                The computation of gamma(u)
         """
         return 2 / u
 
 
 def initialise_sources(
     source_name: str = "logcosh",
-    source_params: dict = {"source_name": "logcosh", "alpha": 1},
+    source_params: dict | None = None,
 ):
     """
     A function that takes in the source name and its associated parameters
@@ -504,27 +451,35 @@ def initialise_sources(
     Parameters
     ----------
     source_name: str
-        The name of the source that is to be used.
+            The name of the source that is to be used.
 
-    source_params: dict (default {"source_name":"logcosh", 'alpha':1})
-        The dictionary of parameters for the associated approximator.
+    source_params: dict | None (default None)
+            The dictionary of parameters for the associated approximator.
+            Format: {"alpha": alpha_val} where alpha_val is some float.
 
     Returns
     -------
+    source_instance:
+            The source instance that is to be used.
+
+    source_expecation: float
+            The evaluation of G(nu) for a set number of samples.
 
     """
+    if source_params is None:
+        source_params = {"alpha": 1}
 
     if source_name.lower() == "logcosh":
-        source_instance = logcosh_object(source_params["alpha"])
+        source_instance = LogcoshObject(source_params["alpha"])
 
     elif source_name.lower() == "exp":
-        source_instance = exp_object(source_params["alpha"])
+        source_instance = ExpObject(source_params["alpha"])
 
     elif source_name.lower() == "quad":
-        source_instance = quad_object()
+        source_instance = QuadObject()
 
     elif source_name.lower() == "cube":
-        source_instance = cube_object()
+        source_instance = CubeObject()
 
     else:
         print("Source name ({}) is unknown. Exiting the function.".format(source_name))

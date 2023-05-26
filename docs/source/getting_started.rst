@@ -16,12 +16,16 @@ Creating recipes
 ----------------
 
 To retrieve a list of random ingredients,
-you can use the ``spectrally-constrained-lvms.Hankel_matrix()`` function:
+you can use the ``spectrally-constrained-lvms.hankel_matrix()`` function:
 
-.. autofunction:: spectrally-constrained-lvms.helper_methods.Hankel_matrix
+.. autofunction:: spectrally-constrained-lvms.helper_methods.hankel_matrix
 
-The ``kind`` parameter should be either ``"meat"``, ``"fish"``,
-or ``"veggies"``.
+>>> import spectrally_constrained_LVMs as scLVMs
+>>> scLVMs.LinearModel()
+For example:
+
+>>> import spectrally_constrained_LVMs as scLVMs
+>>> scLVMs.LinearModel()
 For example:
 
 >>> import spectrally_constrained_LVMs as scLVMs
