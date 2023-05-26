@@ -5,6 +5,7 @@
 ![PyPI](https://img.shields.io/pypi/v/spectrally-constrained-lvms)
 ![PyPI - Wheel](https://img.shields.io/pypi/wheel/spectrally-constrained-lvms?color=blueviolet)
 ![GitHub last commit](https://img.shields.io/github/last-commit/RyanBalshaw/spectrally-constrained-LVMs)
+[![Documentation Status](https://readthedocs.org/projects/spectrally-constrained-lvms/badge/?version=latest)](https://spectrally-constrained-lvms.readthedocs.io/en/latest/?badge=latest)
 
 [//]: # (![Read the Docs]&#40;https://img.shields.io/readthedocs/spectrally-constrained-lvms&#41;)
 
