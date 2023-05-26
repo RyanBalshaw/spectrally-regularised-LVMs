@@ -11,7 +11,7 @@ Additionally, there are two specific methods implemented here:
 import numpy as np
 import sympy as sp
 
-from spectrally_constrained_LVMs.negen_approx import initialise_sources
+from .negen_approx import initialise_sources
 
 
 class CostClass(object):
