@@ -28,6 +28,7 @@ __all__ = [
     "UserCost",
     "VarianceCost",
     "hankel_matrix",
+    "LinearModel",
     "BatchSampler",
     "DataProcessor",
     "DeflationOrthogonalisation",
@@ -36,5 +37,4 @@ __all__ = [
     "ExpObject",
     "LogcoshObject",
     "QuadObject",
-    "LinearModel",
 ]

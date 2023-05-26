@@ -30,21 +30,21 @@ def initialise_W(n_sources: int, n_features: int, init_type: str):
     Parameters
     ----------
     n_sources : int
-            The number of source vectors to initialise.
+        The number of source vectors to initialise.
 
     n_features : int
-            The shape of the source vectors
+        The shape of the source vectors
 
     init_type : str
-            The initialisation type for the vectors. Options are either
-            'broadband' or 'random'. Broadband implies that vectors are dirac deltas,
-            random implies that the vectors are randomly samples
+        The initialisation type for the vectors. Options are either
+        'broadband' or 'random'. Broadband implies that vectors are
+        dirac deltas, random implies that the vectors are randomly samples.
 
     Returns
     -------
     W : ndarray
-            The initialised W matrix of shape (n_sources, n_features) that is normalised
-            row-wise (ensures that each w vector is unit).
+        The initialised W matrix of shape (n_sources, n_features)
+        that is normalised row-wise (ensures that each w vector is unit).
     """
     if init_type.lower() == "broadband":
         W = np.zeros((n_sources, n_features))
@@ -74,7 +74,7 @@ def initialise_lambda(n_sources):
     Returns
     -------
     Lambda: ndarray
-            A vector of ones with shape (n_sources, 1)
+        A vector of ones with shape (n_sources, 1)
 
     """
     Lambda = np.ones((n_sources, 1))
@@ -95,71 +95,74 @@ class LinearModel(object):
     Methods
     -------
     kurtosis(y)
-            A method that calculates the kurtosis of a set of samples y.
+        A method that calculates the kurtosis of a set of samples y.
 
     _function(param_vector, self_inst, W, X, idx)
-            A static method that calculates the langrange expression.
-            It is typeset so that it can interface with scipy.optimize.minimize methods.
+        A static method that calculates the langrange expression.
+        It is typeset so that it can interface with scipy.optimize.minimize
+        methods.
 
     _gradient(param_vector, self_inst, W, X, idx)
-            A static method that calculates the gradient of the langrange expression.
-            It is typeset so that it can interface with scipy.optimize.minimize methods.
+        A static method that calculates the gradient of the langrange
+        expression. It is typeset so that it can interface with
+        scipy.optimize.minimize methods.
 
     _hessian(param_vector, self_inst, W, X, idx)
-            A static method that calculates the Hessian of the langrange expression.
-            It is typeset so that it can interface with scipy.optimize.minimize methods.
+        A static method that calculates the Hessian of the langrange
+        expression. It is typeset so that it can interface with scipy.optimize.minimize
+        methods.
 
     line_search(delta, gradient, w, lambda_vector, W, X, idx)
-            A method that performs a 1D line search on the delta vector to find a step
-            size that satisfies the Armijo condition.
+        A method that performs a 1D line search on the delta vector to find a step
+        size that satisfies the Armijo condition.
 
     lagrange_function(X, w, y, W, idx, lambda_vector)
-            A method that calculates the lagrange expression.
+        A method that calculates the lagrange expression.
 
     lagrange_gradient(X, w, y, W, idx, lambda_vector)
-            A method that calculates the gradient of the lagrange expression.
+        A method that calculates the gradient of the lagrange expression.
 
     lagrange_hessian(X, w, y, W, idx, lambda_vector)
-            A method that calculates the Hessian of the lagrange expression.
+        A method that calculates the Hessian of the lagrange expression.
 
     parameter_update(self, X, w, y, W, idx, lambda_vector)
-            A method that performs a parameter update based on the users optimisation
-            properties.
+        A method that performs a parameter update based on the users optimisation
+        properties.
 
     spectral_trainer(X, W, n_iters, learning_rate, tol, Lambda, Fs)
-            A method that
+        A method that
 
     update_params(w_current, lambda_current, delta_w, delta_lambda, W, idx)
-            A method which calculates the update to w and lambda based off some global
-            delta Phi vector, normalises w and performs GSO is requested.
+        A method which calculates the update to w and lambda based off some global
+        delta Phi vector, normalises w and performs GSO is requested.
 
     spectral_fit(X, W, n_iters = 1, learning_rate, tol, Lambda, Fs)
-            A method that estimates the model parameters.
+        A method that estimates the model parameters.
 
     fit(self, X, n_iters, learning_rate, tol, Fs)
-            A method that uses spectral_fit, and allows users to use the sequential
-            unconstrained minimisation technique (SUMT). This was done to make the
-            API call similar to scikit-learn.
+        A method that uses spectral_fit, and allows users to use the sequential
+        unconstrained minimisation technique (SUMT). This was done to make the
+        API call similar to scikit-learn.
 
     transform(X)
-            A method that transforms X to the latent domain via X @ W. If whitening is
-            enabled the X represents an unwhitened matrix.
+        A method that transforms X to the latent domain via X @ W. If whitening is
+        enabled the X represents an unwhitened matrix.
 
     inverse_transform(Z)
-            A method that transforms samples from the latent domain to the data domain.
-            If whitening is enabled then the recovered matrix represents the
-            standardised data domain.
+        A method that transforms samples from the latent domain to the data domain.
+        If whitening is enabled then the recovered matrix represents the
+        standardised data domain.
 
     compute_spectral_W(W)
-            A static method that computes the spectral representations of the vectors
-            in W.
+        A static method that computes the spectral representations of the vectors
+        in W.
 
     get_model_parameters()
-            A method which return the solution parameters in a model_dict dictionary.
+        A method which return the solution parameters in a model_dict dictionary.
 
     set_model_parameters(model_dict, X)
-            A method which sets the solution parameters based off the model_dict
-            dictionary and X (X defines the pre-processing steps).
+        A method which sets the solution parameters based off the model_dict
+        dictionary and X (X defines the pre-processing steps).
     """
 
     def __init__(
@@ -178,7 +181,7 @@ class LinearModel(object):
         hessian_update_type: str = "actual",
         use_ls: bool = True,
         use_hessian: bool = True,
-        save_dir: bool | None = None,
+        save_dir: str | None = None,
         verbose: bool = False,
     ):
         """
@@ -187,72 +190,72 @@ class LinearModel(object):
         Parameters
         ----------
         n_sources : int
-                The number of latent sources that are to be estimated.
+            The number of latent sources that are to be estimated.
 
         cost_instance : instance which inherits from CostClass
-                The objective function instance that the user chooses.
+            The objective function instance that the user chooses.
 
         whiten : bool (default = True)
-                Specifies whether the data matrix X is to be whitened. By default, all X
-                matrices are standardised.
+            Specifies whether the data matrix X is to be whitened. By default, all X
+            matrices are standardised.
 
         init_type : str (default = 'broadband')
-                The initialisation strategy for W. Options are 'broadband' or 'random'.
-                'broadband' sets each w vector to a dirac delta, while 'random' randomly
-                initialises the vectors by sampling from an isotropic Gaussian
-                distribution.
+            The initialisation strategy for W. Options are 'broadband' or 'random'.
+            'broadband' sets each w vector to a dirac delta, while 'random' randomly
+            initialises the vectors by sampling from an isotropic Gaussian
+            distribution.
 
         perform_gso : bool (default = True)
-                A flag to specify whether Gram-Schmidt Orthogonalisation is used during
-                parameter estimation.
+            A flag to specify whether Gram-Schmidt Orthogonalisation is used during
+            parameter estimation.
 
         batch_size : int | None (default = None)
-                This variable allows users to perform stochastic optimisation if an
-                integer value is entered. Default value implies all rows of X are used.
+            This variable allows users to perform stochastic optimisation if an
+            integer value is entered. Default value implies all rows of X are used.
 
         var_PCA : float | None (default = None)
-                This variable allows users to pre-process X by discarding any trailing
-                eigenvalues. Default value of None implies that it is not used.
+            This variable allows users to pre-process X by discarding any trailing
+            eigenvalues. Default value of None implies that it is not used.
 
         alpha_reg : float (default = 1.0)
-                Defines the penalty enforcement parameter applied to the spectral
-                constraint.
+            Defines the penalty enforcement parameter applied to the spectral
+            constraint.
 
         sumt_flag : bool (default = False)
-                A flag that specifies whether the sequential unconstrained minimisation
-                technique is to be used during parameter estimation.
+            A flag that specifies whether the sequential unconstrained minimisation
+            technique is to be used during parameter estimation.
 
         sumt_parameters : dict | None (default = None)
-                The parameters for SUMT iteration. If default value is used, the
-                dictionary is initialised to: {'alpha_init':0.1, 'alpha_end':10,
-                'alpha_multiplier':100}. The expected keys for this dictionary are given
-                in this docstring.
+            The parameters for SUMT iteration. If default value is used, the
+            dictionary is initialised to: {'alpha_init':0.1, 'alpha_end':10,
+            'alpha_multiplier':100}. The expected keys for this dictionary are given
+            in this docstring.
 
         organise_by_kurt : bool (default = False)
-                A flag to control whether the vectors in W are to be organised by the
-                kurtosis of the latent sources.
+            A flag to control whether the vectors in W are to be organised by the
+            kurtosis of the latent sources.
 
         hessian_update_type : str (default = 'actual')
-                This specifies whether the actual Hessian is to be used during parameter
-                estimation or if quasi-Newton strategies are to be employed. Options
-                are: 'actual', 'SR1', 'DFP', 'BFGS'.
+            This specifies whether the actual Hessian is to be used during parameter
+            estimation or if quasi-Newton strategies are to be employed. Options
+            are: 'actual', 'SR1', 'DFP', 'BFGS'.
 
         use_ls : bool (default = True)
-                A flag that specifies whether a linear line search is to be performed
-                on the .
+            A flag that specifies whether a linear line search is to be performed
+            on the .
 
         use_hessian : bool (default = True)
-                This flag specifies whether a second or first order optimisation method
-                is used. If use_hessian = False then the method defaults to gradient
-                descent.
+            This flag specifies whether a second or first order optimisation method
+            is used. If use_hessian = False then the method defaults to gradient
+            descent.
 
         save_dir : str | None (default = None)
-                Defines whether visualisation of the parameter estimation properties are
-                to be stored in some directory. If a string is entered, this string is
-                expected to be the directory in which the figures are to be saved.
+            Defines whether visualisation of the parameter estimation properties are
+            to be stored in some directory. If a string is entered, this string is
+            expected to be the directory in which the figures are to be saved.
 
         verbose : bool (default = False)
-                Defines the verbosity mode for the parameter estimation step.
+            Defines the verbosity mode for the parameter estimation step.
         """
         # Initialise instances
         self.n_sources = n_sources
@@ -327,9 +330,9 @@ class LinearModel(object):
         Parameters
         ----------
         y : ndarray
-                A vector or matrix of samples. If y is a vector, it is expected to be
-                a column vector. If it is a matrix then each feature is given in
-                a column.
+            A vector or matrix of samples. If y is a vector, it is expected to be
+            a column vector. If it is a matrix then each feature is given in
+            a column.
 
         Returns
         -------
@@ -357,19 +360,19 @@ class LinearModel(object):
         Parameters
         ----------
         param_vector : ndarray
-                A vector that is given as [w.T, lambda].T
+            A vector that is given as [w.T, lambda].T
 
         self_inst : instance
-                The instance of the LinearModel class.
+            The instance of the LinearModel class.
 
         W : ndarray
-                The matrix of w vectors stored in the rows of W.
+            The matrix of w vectors stored in the rows of W.
 
         X : ndarray
-                The data matrix.
+            The data matrix.
 
         idx : int
-                The current iteration index for the parameters.
+            The current iteration index for the parameters.
 
         Returns
         -------
@@ -401,19 +404,19 @@ class LinearModel(object):
         Parameters
         ----------
         param_vector : ndarray
-                A vector that is given as [w.T, lambda].T
+            A vector that is given as [w.T, lambda].T
 
         self_inst : instance
-                The instance of the LinearModel class.
+            The instance of the LinearModel class.
 
         W : ndarray
-                The matrix of w vectors stored in the rows of W.
+            The matrix of w vectors stored in the rows of W.
 
         X : ndarray
-                The data matrix.
+            The data matrix.
 
         idx : int
-                The current iteration index for the parameters.
+            The current iteration index for the parameters.
 
         Returns
         -------
@@ -447,19 +450,19 @@ class LinearModel(object):
         Parameters
         ----------
         param_vector : ndarray
-                A vector that is given as [w.T, lambda].T
+            A vector that is given as [w.T, lambda].T
 
         self_inst : instance
-                The instance of the LinearModel class.
+            The instance of the LinearModel class.
 
         W : ndarray
-                The matrix of w vectors stored in the rows of W.
+            The matrix of w vectors stored in the rows of W.
 
         X : ndarray
-                The data matrix.
+            The data matrix.
 
         idx : int
-                The current iteration index for the parameters.
+            The current iteration index for the parameters.
 
         Returns
         -------
@@ -491,33 +494,33 @@ class LinearModel(object):
         Parameters
         ----------
         delta : ndarray
-                The parameter update vector.
+            The parameter update vector.
 
         gradient : ndarray
-                The gradient vector at the current iteration.
+            The gradient vector at the current iteration.
 
         w : ndarray
-                The current w vector being optimised.
+            The current w vector being optimised.
 
         lambda_vector : ndarray
-                The current lambda_eq value being optimised.
+            The current lambda_eq value being optimised.
 
         W : ndarray
-                The matrix of w vectors stored in the rows of W.
+            The matrix of w vectors stored in the rows of W.
 
         X : ndarray
-                The data matrix.
+            The data matrix.
 
         idx : int
-                The current iteration index for the parameters.
+            The current iteration index for the parameters.
 
         Returns
         -------
         alpha_val: float
-                The step size that should be applied to delta.
+            The step size that should be applied to delta.
 
         conv_flag: bool
-                A flag that specifies whether the line search converged.
+            A flag that specifies whether the line search converged.
         """
         # Compute alpha parameter
         x0 = np.vstack((w.copy(), lambda_vector.copy()))[:, 0]
@@ -569,25 +572,25 @@ class LinearModel(object):
         Parameters
         ----------
         X: ndarray
-                The data matrix X.
+            The data matrix X.
 
         w : ndarray
-                The current w vector being optimised.
+            The current w vector being optimised.
 
-                y : ndarray
-                                The transformed variable X @ w.
+        y : ndarray
+            The transformed variable X @ w.
 
         W : ndarray
-                The matrix of w vectors stored in the rows of W.
+            The matrix of w vectors stored in the rows of W.
 
         X : ndarray
-                The data matrix.
+            The data matrix.
 
         idx : int
-                The current iteration index for the parameters.
+            The current iteration index for the parameters.
 
         lambda_vector : ndarray
-                The current lambda_eq value being optimised.
+            The current lambda_eq value being optimised.
 
         Returns
         -------
@@ -618,25 +621,25 @@ class LinearModel(object):
         Parameters
         ----------
         X: ndarray
-                The data matrix X.
+            The data matrix X.
 
         w : ndarray
-                The current w vector being optimised.
+            The current w vector being optimised.
 
-                y : ndarray
-                                The transformed variable X @ w.
+        y : ndarray
+            The transformed variable X @ w.
 
         W : ndarray
-                The matrix of w vectors stored in the rows of W.
+            The matrix of w vectors stored in the rows of W.
 
         X : ndarray
-                The data matrix.
+            The data matrix.
 
         idx : int
-                The current iteration index for the parameters.
+            The current iteration index for the parameters.
 
         lambda_vector : ndarray
-                The current lambda_eq value being optimised.
+            The current lambda_eq value being optimised.
 
         Returns
         -------
@@ -680,25 +683,25 @@ class LinearModel(object):
         Parameters
         ----------
         X: ndarray
-                The data matrix X.
+            The data matrix X.
 
         w : ndarray
-                The current w vector being optimised.
+            The current w vector being optimised.
 
-                y : ndarray
-                                The transformed variable X @ w.
+        y : ndarray
+            The transformed variable X @ w.
 
         W : ndarray
-                The matrix of w vectors stored in the rows of W.
+            The matrix of w vectors stored in the rows of W.
 
         X : ndarray
-                The data matrix.
+            The data matrix.
 
         idx : int
-                The current iteration index for the parameters.
+            The current iteration index for the parameters.
 
         lambda_vector : ndarray
-                The current lambda_eq value being optimised.
+            The current lambda_eq value being optimised.
 
         Returns
         -------
@@ -732,36 +735,36 @@ class LinearModel(object):
         Parameters
         ----------
         X: ndarray
-                The data matrix X.
+            The data matrix X.
 
         w : ndarray
-                The current w vector being optimised.
+            The current w vector being optimised.
 
-                y : ndarray
-                                The transformed variable X @ w.
+        y : ndarray
+            The transformed variable X @ w.
 
         W : ndarray
-                The matrix of w vectors stored in the rows of W.
+            The matrix of w vectors stored in the rows of W.
 
         X : ndarray
-                The data matrix.
+            The data matrix.
 
         idx : int
-                The current iteration index for the parameters.
+            The current iteration index for the parameters.
 
         lambda_vector : ndarray
-                The current lambda_eq value being optimised.
+            The current lambda_eq value being optimised.
 
         Returns
         -------
         delta_w : ndarray
-                The update that should be applied to w.
+            The update that should be applied to w.
 
         delta_lambda: ndarray
-                The update that should be applied to lambda.
+            The update that should be applied to lambda.
 
         gradient : ndarray
-                The gradient evaluation at the current iteration index.
+            The gradient evaluation at the current iteration index.
         """
         # Define flag that allows for solver re-initialisation
         self._reinit_flag = False
@@ -835,6 +838,43 @@ class LinearModel(object):
         return delta_w, delta_lambda, gradient
 
     def spectral_trainer(self, X, W, n_iters, learning_rate, tol, Lambda, Fs):
+        """
+        This method estimates the model parameters for some X and W.
+
+        Parameters
+        ----------
+        X : ndarray
+            The data matrix X.
+
+        W : ndarray
+                The source vector matrix W.
+
+        n_iters : int
+                The max number of iterations that are to be performed for each source.
+
+        learning_rate : float
+                A learning rate. This is only used if required by the user, and will
+                only appear if use_ls is not activated.
+
+        tol : float
+                The tolerance on the convergence error, error =| w_new^T @ w_prev - 1|.
+                Used to stop the solver if it converges.
+
+        Lambda : ndarray
+                A vector of lambda parameters for the Lagrange expressions.
+
+        Fs : float
+                The sampling frequency of the observed signal. Only used if the user
+                wants to store visualisations of the solution vectors.
+
+        Returns
+        -------
+        W_ : ndarray
+                The estimated source vectors.
+
+        Lambda_: ndarray
+                The estimated lambda values for the lagrange expressions.
+        """
         # Initialise training metrics
         self.kurtosis_ = []
         self.variance_ = []
@@ -1034,6 +1074,38 @@ class LinearModel(object):
         return W_, Lambda_
 
     def update_params(self, w_current, lambda_current, delta_w, delta_lambda, W, idx):
+        """
+        A method that computes the update to the w and lambda parameters, performs GSO
+        if required by the user and ensures that w is a unit vector.
+
+        Parameters
+        ----------
+        w_current : ndarray
+                The current source vector.
+
+        lambda_current : ndarray
+                The current lambda value for the Lagrangian expression.
+
+        delta_w : ndarray
+                The update to be applied to the source vector.
+
+        delta_lambda : ndarray
+                The update to be applied to the lambda value.
+
+        W : ndarray
+                The W matrix of source vectors.
+
+        idx : int
+                The index of the source vector in W that is currently being solved for.
+
+        Returns
+        -------
+        w_new : ndarray
+                The updated w vector.
+
+        lambda_new :
+                The updated lambda value.
+        """
         # Update W_new
         w_new = w_current + delta_w
 
@@ -1062,6 +1134,44 @@ class LinearModel(object):
         Lambda=None,
         Fs: float | int = 25e3,
     ):
+        """
+        This method estimates the model parameters for some given X, W, and Lambda.
+
+        Parameters
+        ----------
+        X : ndarray
+            The data matrix X.
+
+        W : ndarray
+                The source vector matrix W.
+
+        n_iters : int
+                The max number of iterations that are to be performed for each source.
+
+        learning_rate : float
+                A learning rate. This is only used if required by the user, and will
+                only appear if use_ls is not activated.
+
+        tol : float
+                The tolerance on the convergence error, error =| w_new^T @ w_prev - 1|.
+                Used to stop the solver if it converges.
+
+        Lambda : ndarray
+                A vector of lambda parameters for the Lagrange expressions.
+
+        Fs : float
+                The sampling frequency of the observed signal. Only used if the user
+                wants to store visualisations of the solution vectors.
+
+        Returns
+        -------
+        W_update : ndarray
+                The estimated W matrix.
+
+        Lambda_update : ndarray
+                The estimated Lambda values.
+
+        """
         # Call the spectral trainer
         W_update, Lambda_update = self.spectral_trainer(
             X, W, n_iters, learning_rate, tol, Lambda, Fs
@@ -1119,6 +1229,44 @@ class LinearModel(object):
         tol=1e-4,
         Fs: int | float = 25e3,
     ):
+        """
+        This method follows the scikit-learn API call and estimates the model parameters
+        based off the users initialisation choices.
+
+        Parameters
+        ----------
+        This method estimates the model parameters for some given X, W, and Lambda.
+
+        Parameters
+        ----------
+        X : ndarray
+            The data matrix X.
+
+        n_iters : int
+                        The max number of iterations that are to be performed for each
+                        source.
+
+        learning_rate : float
+                        A learning rate. This is only used if required by the user, and
+                        will only appear if use_ls is not activated.
+
+        tol : float
+                        The tolerance on the convergence error,
+                        error =| w_new^T @ w_prev - 1|. Used to stop the solver
+                        if it converges.
+
+        Fs : float
+                        The sampling frequency of the observed signal. Only used if
+                        the user wants to store visualisations of the solution vectors.
+
+        Returns
+        -------
+        self : instance
+                        This method returns self so that it can be chained onto the
+                        initialisation of the class via
+                        model_inst = LinearModel(...).fit(...).
+
+        """
         # Initialise pre-processing
         self.processor_inst.initialise_preprocessing(X)
 
@@ -1149,9 +1297,8 @@ class LinearModel(object):
             param_iters = []
             W_iters = [W.copy()]
             lambda_iters = [Lambda.copy()]
-            cluster_info = []
+            spectral_W_iters = [self.compute_spectral_W(W)]
             solution_error = []
-            # penalty_error = [] Not applicable
 
             # Initialise the penalty parameter term
             self.alpha_reg = self.alpha_init
@@ -1184,12 +1331,9 @@ class LinearModel(object):
                 W_iters.append(W_update.copy())
                 lambda_iters.append(Lambda_update.copy())
 
-                # Get spectral_W
+                # Get spectral representation of W
                 spectral_W = self.compute_spectral_W(W_update)
-                # self.cluster_components()
-
-                # Store cluster info
-                cluster_info.append((spectral_W,))
+                spectral_W_iters.append(spectral_W)
 
                 solution_error.append(
                     np.mean(np.linalg.norm(W_iters[-1] - W_iters[-2], axis=1))
@@ -1200,7 +1344,7 @@ class LinearModel(object):
                     print("----" * 10)
                     print(
                         f"\nFor alpha = {self.alpha_reg}, "
-                        f"error = {solution_error[-1]}.\n"
+                        f"error = {np.round(solution_error[-1], 4)}.\n"
                     )
                     print("----" * 10, "\n")
 
@@ -1232,15 +1376,13 @@ class LinearModel(object):
                 pos_min + 1
             ]  # un-adjust pos_min as W_iters has an initial point.
 
-            opt_cluster = cluster_info[pos_min]
-
-            self.spectral_W = opt_cluster[0]
+            self.spectral_W = spectral_W_iters[pos_min + 1]
 
             # Store for looking at later.
             self.param_iters = param_iters
             self.lambda_iters = lambda_iters
             self.W_iters = W_iters
-            self.cluster_info = cluster_info
+            self.spectral_W_iters = spectral_W_iters
 
         else:
             W_update, Lambda_update = self.spectral_fit(
@@ -1266,21 +1408,73 @@ class LinearModel(object):
         return self
 
     def transform(self, X):
-        return np.dot(self.processor_inst.preprocess_data(X), self.W.T)
+        """
+        This method transforms a data matrix X to the latent space.
 
-    def inverse_transform(self, Z):
+        Parameters
+        ----------
+        X : ndarray
+            The data matrix X.
+
+        Returns
+        -------
+        Z : ndarray
+            The projection of X to the latent space.
+        """
+
+        Z = self.processor_inst.preprocess_data(X) @ self.W.T
+
+        return Z
+
+    def inverse_transform(self, Z, full_inverse: bool = False):
+        """
+        This method transforms a latent matrix X to the latent space.
+
+        Parameters
+        ----------
+        Z : ndarray
+            The latent matrix Z.
+
+        full_inverse : bool
+            A flag to specify whether the recovered data matrix X must be
+            returned in standardised form or in the original, un-standardised
+            domain.
+
+        Returns
+        -------
+        X_recon : ndarray
+            The reconstruction of X from the latent matrix Z.
+        """
         Z_ = Z.copy()
 
         # Transform back to the training feature space
         X_recon = np.dot(Z_, self.W)
 
         # Un-process the data (still zero-mean, unit-variance)
-        X_orig_recon = self.processor_inst.unprocess_data(X_recon)
+        X_recon = self.processor_inst.unprocess_data(X_recon)
 
-        return X_orig_recon
+        if full_inverse:
+            X_recon = (X_recon * self.processor_inst.std_) + self.processor_inst.mean_
+
+        return X_recon
 
     @staticmethod
     def compute_spectral_W(W):
+        """
+        This method computes the spectral representation of the vectors in the W
+        matrix.
+
+        Parameters
+        ----------
+        W : ndarray
+                The source vector matrix W.
+
+        Returns
+        -------
+        spectral_W : ndarray
+                A matrix that contains the spectral magnitude information of the
+                sources.
+        """
         # Get the spectral content of the filters
         r, c = W.shape
 
@@ -1299,9 +1493,71 @@ class LinearModel(object):
         return spectral_W
 
     def get_model_parameters(self):
-        # TODO return dictionary of solution parameters.
-        pass
+        """
+        This method gets all the important model parameters and .
 
-    def set_model_parameters(self):
-        # TODO input dictionary of solution parameters and set model.
-        pass
+        Returns
+        -------
+        dict_params : dict
+                A dictionary which stores all the solution information.
+        """
+        dict_params = {
+            "W": self.W,
+            "spectral_W": self.spectral_W,
+            "kurtosis_": self.kurtosis_,
+            "variance_": self.variance_,
+            "grad_norm_": self.grad_norm_,
+            "cost_": self.cost_,
+            "lagrange_cost_": self.lagrange_cost_,
+            "w_similarity_": self.w_similarity_,
+            "spectral_loss_": self.spectral_loss_,
+            "excess_kurtosis_": self.excess_kurtosis_,
+        }
+
+        if self.sumt_flag:
+            dict_params["solution_error"] = self.solution_error
+            dict_params["W_iters"] = self.W_iters
+            dict_params["spectral_W_iters"] = self.spectral_W_iters
+            dict_params["param_iters"] = self.param_iters
+            dict_params["lambda_iters"] = self.lambda_iters
+            dict_params["alpha_values"] = 10.0 ** (
+                np.arange(
+                    np.log10(self.sumt_parameters["alpha_init"]),
+                    np.log10(self.sumt_parameters["alpha_end"]) + 1,
+                    1,
+                )
+            )
+
+        return dict_params
+
+    def set_model_parameters(self, X, dict_params: dict):
+        """
+        This method takes the X matrix and a parameter dictionary, initialises the
+        pre-processing components and then creates the necessary class attributes
+        from the dictionary.
+
+        Parameters
+        ----------
+        X : ndarray
+            The data matrix X.
+
+        dict_params : dict
+                The parameter dictionary that is returned by the .get_model_parameters()
+                method.
+
+        Returns
+        -------
+        self : instance
+                This method returns self so that it can be chained onto the
+                initialisation of the class via
+                model_inst = LinearModel(...).set_model_parameters(...).
+        """
+
+        # Initialise pre-processing
+        self.processor_inst.initialise_preprocessing(X)
+
+        # Store dictionary
+        for k, v in dict_params.items():
+            setattr(self, k, v)
+
+        return self
