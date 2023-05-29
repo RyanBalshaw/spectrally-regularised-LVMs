@@ -22,37 +22,37 @@ class CostClass(object):
     Methods
     -------
     set_cost(cost_func)
-            This method takes in a cost_func variable and sets it as
-            an internal attribute self._cost.
+        This method takes in a cost_func variable and sets it as
+        an internal attribute self._cost.
 
     set_gradient(cost_gradient)
-            This method takes in a cost_gradient variable and sets it as
-            an internal attribute self._cost_gradient.
+        This method takes in a cost_gradient variable and sets it as
+        an internal attribute self._cost_gradient.
 
     set_hessian(cost_hessian)
-            This method takes in a cost_hessian variable and sets it as
-            an internal attribute self._cost_hessian.
+        This method takes in a cost_hessian variable and sets it as
+        an internal attribute self._cost_hessian.
 
     get_cost()
-            This method return the internal self._cost instance.
+        This method return the internal self._cost instance.
 
     get_gradient()
-            This method return the internal self._cost_gradient instance.
+        This method return the internal self._cost_gradient instance.
 
     get_hessian()
-            This method return the internal self._cost_hessian instance.
+        This method return the internal self._cost_hessian instance.
 
     check_gradient(X, w, y, step_size)
-            This method takes in an initial set of variables X, w, y, and a
-            finite difference step size. The function is used to check the
-            self._cost_gradient method using a central finite-difference
-            approach.
+        This method takes in an initial set of variables X, w, y, and a
+        finite difference step size. The function is used to check the
+        self._cost_gradient method using a central finite-difference
+        approach.
 
     check_hessian(X, w, y, step_size)
-            This method takes in an initial set of variables X, w, y, and a
-            finite difference step size. The function is used to check the
-            self._cost_hessian method using a central finite-difference
-            approach.
+        This method takes in an initial set of variables X, w, y, and a
+        finite difference step size. The function is used to check the
+        self._cost_hessian method using a central finite-difference
+        approach.
     """
 
     def __init__(self, verbose: bool = True):
@@ -61,8 +61,8 @@ class CostClass(object):
         Parameters
         ----------
         verbose : bool
-                A boolean flag to control any possible
-                print statements.
+            A boolean flag to control any possible
+            print statements.
         """
         self._cost = None
         self._cost_gradient = None
@@ -76,7 +76,7 @@ class CostClass(object):
         Parameters
         ----------
         cost_func : function
-                The users cost function.
+            The users cost function.
 
         Examples
         --------
@@ -92,12 +92,12 @@ class CostClass(object):
         Parameters
         ----------
         cost_gradient : function
-                The users gradient vector of the cost function.
+            The users gradient vector of the cost function.
 
         Examples
         --------
         cost_gradient = lambda X, w, y: -2 * np.mean(y * X, axis=0,
-                                                                        keepdims = True)
+            keepdims=True)
 
         """
         self._cost_gradient = cost_gradient
@@ -109,7 +109,7 @@ class CostClass(object):
         Parameters
         ----------
         cost_hessian : function
-                The users gradient vector of the cost function.
+            The users gradient vector of the cost function.
 
         Examples
         --------
@@ -166,29 +166,29 @@ class CostClass(object):
         Parameters
         ----------
         X : ndarray
-                An array of size n_samples x n_features.
+            An array of size n_samples x n_features.
 
         w : ndarray
-                An column vector of size n_features x 1
+            An column vector of size n_features x 1
 
         y : ndarray
-                An column vector of size n_features x 1. Expected to be
-                equivalent to X @ w.
+            An column vector of size n_features x 1. Expected to be
+            equivalent to X @ w.
 
         step_size : float (default = 1e-4)
-                The finite difference step size.
+            The finite difference step size.
 
         Returns
         -------
         grad_current : ndarray
-                The gradient based off the internal self._cost_gradient instance.
+            The gradient based off the internal self._cost_gradient instance.
 
         grad_check : ndarray
-                The finite-difference approximation to the gradient
+            The finite-difference approximation to the gradient
 
         grad_norm : ndarray
-                The L2 norm between the analytical gradient and the finite difference
-                approximation.
+            The L2 norm between the analytical gradient and the finite difference
+            approximation.
 
         Note that this is a helper method. costClass operates as a base class,
         so you will find that methods such as self.cost() and self.cost_gradient()
@@ -232,29 +232,29 @@ class CostClass(object):
         Parameters
         ----------
         X : ndarray
-                An array of size n_samples x n_features.
+            An array of size n_samples x n_features.
 
         w : ndarray
-                An column vector of size n_features x 1
+            An column vector of size n_features x 1
 
         y : ndarray
-                An column vector of size n_features x 1. Expected to be
-                equivalent to X @ w.
+            An column vector of size n_features x 1. Expected to be
+            equivalent to X @ w.
 
         step_size : float (default = 1e-4)
-                The finite difference step size.
+            The finite difference step size.
 
         Returns
         -------
         hess_current : ndarray
-                The hessian based off the internal self._cost_hessian instance.
+            The hessian based off the internal self._cost_hessian instance.
 
         hess_check : ndarray
-                The finite-difference approximation to the hessian.
+            The finite-difference approximation to the hessian.
 
         hess_norm : ndarray
-                The L2 norm (average of the row-wise L2 norm) between the analytical
-                hessian and the finite difference approximation.
+            The L2 norm (average of the row-wise L2 norm) between the analytical
+            hessian and the finite difference approximation.
 
         Note that this is a helper method. costClass operates as a base class,
         so you will find that methods such as self.cost() and self.cost_hessian()
@@ -318,16 +318,16 @@ class UserCost(CostClass):
     Methods
     -------
     cost(X, w, y)
-            This method accesses the internal self._cost instance attribute and
-            returns its output self._cost(X, w, y).
+        This method accesses the internal self._cost instance attribute and
+        returns its output self._cost(X, w, y).
 
     cost_gradient(X, w, y)
-            This method accesses the internal self._cost_gradient instance attribute and
-            returns its output self._cost_gradient(X, w, y).
+        This method accesses the internal self._cost_gradient instance attribute and
+        returns its output self._cost_gradient(X, w, y).
 
     cost_hessian(X, w, y)
-            This method accesses the internal self._cost_hessian instance attribute and
-            returns its output self._cost_hessian(X, w, y).
+        This method accesses the internal self._cost_hessian instance attribute and
+        returns its output self._cost_hessian(X, w, y).
     """
 
     def __init__(self, use_hessian: bool = True, verbose: bool = True):
@@ -335,9 +335,9 @@ class UserCost(CostClass):
         Parameters
         ----------
         use_hessian : bool
-                A flag to control whether you use the Hessian or not.
-                This is useful in the parameter estimation step, as you may wish to just
-                perform steepest descent instead of using Newton's method.
+            A flag to control whether you use the Hessian or not.
+            This is useful in the parameter estimation step, as you may wish to just
+            perform steepest descent instead of using Newton's method.
         """
         super().__init__(verbose)
         self.use_hessian = use_hessian
@@ -349,13 +349,13 @@ class UserCost(CostClass):
         Parameters
         ----------
         X : ndarray
-                The feature matrix of size (n_samples, n_features)
+            The feature matrix of size (n_samples, n_features)
 
         w : ndarray
-                The transformation vector of size (n_features, 1)
+            The transformation vector of size (n_features, 1)
 
         y : ndarray
-                The transformed variable y = X @ w of size (n_samples, 1)
+            The transformed variable y = X @ w of size (n_samples, 1)
 
         Returns
         -------
@@ -370,13 +370,13 @@ class UserCost(CostClass):
         Parameters
         ----------
         X : ndarray
-                The feature matrix of size (n_samples, n_features)
+            The feature matrix of size (n_samples, n_features)
 
         w : ndarray
-                The transformation vector of size (n_features, 1)
+            The transformation vector of size (n_features, 1)
 
         y : ndarray
-                The transformed variable y = X @ w of size (n_samples, 1)
+            The transformed variable y = X @ w of size (n_samples, 1)
 
         Returns
         -------
@@ -391,13 +391,13 @@ class UserCost(CostClass):
         Parameters
         ----------
         X : ndarray
-                The feature matrix of size (n_samples, n_features)
+            The feature matrix of size (n_samples, n_features)
 
         w : ndarray
-                The transformation vector of size (n_features, 1)
+            The transformation vector of size (n_features, 1)
 
         y : ndarray
-                The transformed variable y = X @ w of size (n_samples, 1)
+            The transformed variable y = X @ w of size (n_samples, 1)
 
         Returns
         -------
@@ -435,16 +435,16 @@ class SympyCost(CostClass):
     Methods
     -------
     cost(X, w, y)
-            This method accesses the internal self._cost instance attribute and
-            returns its output self._cost(X, w, y).
+        This method accesses the internal self._cost instance attribute and
+        returns its output self._cost(X, w, y).
 
     cost_gradient(X, w, y)
-            This method accesses the internal self._cost_gradient instance attribute and
-            returns its output self._cost_gradient(X, w, y).
+        This method accesses the internal self._cost_gradient instance attribute and
+        returns its output self._cost_gradient(X, w, y).
 
     cost_hessian(X, w, y)
-            This method accesses the internal self._cost_hessian instance attribute and
-            returns its output self._cost_hessian(X, w, y).
+        This method accesses the internal self._cost_hessian instance attribute and
+        returns its output self._cost_hessian(X, w, y).
     """
 
     def __init__(
@@ -459,18 +459,18 @@ class SympyCost(CostClass):
         Parameters
         ----------
         n_samples : int
-                The number of samples in X.
+            The number of samples in X.
 
         n_features : int
-                The number of features in X.
+            The number of features in X.
 
         use_hessian : bool (default = True)
-                A flag to specify whether the Hessian (2nd derivative) of the loss
-                function must be used. If use_hessian = False, the .cost_hessian()
-                method returns and identity matrix.
+            A flag to specify whether the Hessian (2nd derivative) of the loss
+            function must be used. If use_hessian = False, the .cost_hessian()
+            method returns and identity matrix.
 
         verbose : bool (default = True)
-                A flag to control the verbosity of different method calls.
+            A flag to control the verbosity of different method calls.
         """
         super().__init__(verbose)
         self.n_samples = n_samples
@@ -485,7 +485,7 @@ class SympyCost(CostClass):
         Parameters
         ----------
         cost_func : function
-                The users cost function defined symbolically.
+            The users cost function defined symbolically.
 
         """
         self._sympy_cost = cost_func
@@ -496,14 +496,14 @@ class SympyCost(CostClass):
         Returns
         -------
         X: sp.IndexedBase instance
-                An indexable SymPy matrix of size (n_samples, n_features)
+            An indexable SymPy matrix of size (n_samples, n_features)
 
         w:  sp.IndexedBase instance
-                An indexable SymPy matrix of size (n_features, 1)
+            An indexable SymPy matrix of size (n_features, 1)
 
         (i, j): tuple
-                A set of index variables that can be used to iterate over
-                the X and w sp.IndexedBase instances.
+            A set of index variables that can be used to iterate over
+            the X and w sp.IndexedBase instances.
 
         """
         i, j = sp.symbols("i j", cls=sp.Idx)
@@ -577,8 +577,8 @@ class SympyCost(CostClass):
         Raises
         -------
         AttributeError
-                This is raised if the user's cost function has not been defined
-                within the instance.
+            This is raised if the user's cost function has not been defined
+            within the instance.
         """
         if hasattr(self, "_sympy_cost"):
             print("Calculating the sympy method components...")
@@ -604,14 +604,14 @@ class SympyCost(CostClass):
         Parameters
         ----------
         X : ndarray
-                The input X matrix.
+            The input X matrix.
 
         Raises
         -------
         AssertionError
-                This is raised if the shape of X, given to and cost, cost_gradient or
-                cost_hessian call does not match the pre-defined shape given on instant
-                creation.
+            This is raised if the shape of X, given to and cost, cost_gradient or
+            cost_hessian call does not match the pre-defined shape given on instant
+            creation.
 
         """
         r, c = X.shape
@@ -632,14 +632,14 @@ class SympyCost(CostClass):
         Parameters
         ----------
         w : ndarray
-                The input w vector.
+            The input w vector.
 
         Raises
         -------
         AssertionError
-                This is raised if the shape of X, given to and cost, cost_gradient or
-                cost_hessian call does not match the pre-defined shape given on instant
-                creation.
+            This is raised if the shape of X, given to and cost, cost_gradient or
+            cost_hessian call does not match the pre-defined shape given on instant
+            creation.
 
         """
         r, c = w.shape
@@ -658,13 +658,13 @@ class SympyCost(CostClass):
         Parameters
         ----------
         X : ndarray
-                The feature matrix of size (n_samples, n_features)
+            The feature matrix of size (n_samples, n_features)
 
         w : ndarray
-                The transformation vector of size (n_features, 1)
+            The transformation vector of size (n_features, 1)
 
         y : ndarray
-                The transformed variable y = X @ w of size (n_samples, 1)
+            The transformed variable y = X @ w of size (n_samples, 1)
 
         Returns
         -------
@@ -685,13 +685,13 @@ class SympyCost(CostClass):
         Parameters
         ----------
         X : ndarray
-                The feature matrix of size (n_samples, n_features)
+            The feature matrix of size (n_samples, n_features)
 
         w : ndarray
-                The transformation vector of size (n_features, 1)
+            The transformation vector of size (n_features, 1)
 
         y : ndarray
-                The transformed variable y = X @ w of size (n_samples, 1)
+            The transformed variable y = X @ w of size (n_samples, 1)
 
         Returns
         -------
@@ -706,13 +706,13 @@ class SympyCost(CostClass):
         Parameters
         ----------
         X : ndarray
-                The feature matrix of size (n_samples, n_features)
+            The feature matrix of size (n_samples, n_features)
 
         w : ndarray
-                The transformation vector of size (n_features, 1)
+            The transformation vector of size (n_features, 1)
 
         y : ndarray
-                The transformed variable y = X @ w of size (n_samples, 1)
+            The transformed variable y = X @ w of size (n_samples, 1)
 
         Returns
         -------
@@ -737,16 +737,16 @@ class NegentropyCost(CostClass):
     Methods
     -------
     cost(X, w, y)
-            This method calculates and returns the negentropy approximation
-            objective function.
+        This method calculates and returns the negentropy approximation
+        objective function.
 
     cost_gradient(X, w, y)
-            This method calculates and returns the gradient of the negentropy
-            approximation objective function.
+        This method calculates and returns the gradient of the negentropy
+        approximation objective function.
 
     cost_hessian(X, w, y)
-            This method calculates and returns the Hessian of the negentropy
-            approximation objective function.
+        This method calculates and returns the Hessian of the negentropy
+        approximation objective function.
     """
 
     def __init__(self, source_name: str, source_params: dict, verbose: bool = True):
@@ -755,14 +755,14 @@ class NegentropyCost(CostClass):
         Parameters
         ----------
         source_name : str
-                The name of the source function used for negentropy estimation.
-                Options: logcosh, exp, quad, cube
+            The name of the source function used for negentropy estimation.
+            Options: logcosh, exp, quad, cube
 
         source_params :  dict
-                A dictionary containing the source parameter {'alpha': 1}
+            A dictionary containing the source parameter {'alpha': 1}
 
         verbose : bool
-                Controls the verbosity of the instance.
+            Controls the verbosity of the instance.
         """
         super().__init__(verbose)
         self.source_name = source_name
@@ -773,6 +773,11 @@ class NegentropyCost(CostClass):
             source_name, self.source_params
         )
 
+        # Enable compatability with CostClass
+        self.set_cost(self.cost)
+        self.set_gradient(self.cost_gradient)
+        self.set_hessian(self.cost_hessian)
+
     def cost(self, X, w, y):  # Important to negentropy-based ICA
         """
         Negentropy-estimate calculation for the objective function.
@@ -780,13 +785,13 @@ class NegentropyCost(CostClass):
         Parameters
         ----------
         X : ndarray
-                The feature matrix of size (n_samples, n_features)
+            The feature matrix of size (n_samples, n_features)
 
         w : ndarray
-                The transformation vector of size (n_features, 1)
+            The transformation vector of size (n_features, 1)
 
         y : ndarray
-                The transformed variable y = X @ w of size (n_samples, 1)
+            The transformed variable y = X @ w of size (n_samples, 1)
 
         Returns
         -------
@@ -809,13 +814,13 @@ class NegentropyCost(CostClass):
         Parameters
         ----------
         X : ndarray
-                The feature matrix of size (n_samples, n_features)
+            The feature matrix of size (n_samples, n_features)
 
         w : ndarray
-                The transformation vector of size (n_features, 1)
+            The transformation vector of size (n_features, 1)
 
         y : ndarray
-                The transformed variable y = X @ w of size (n_samples, 1)
+            The transformed variable y = X @ w of size (n_samples, 1)
 
         Returns
         -------
@@ -841,17 +846,17 @@ class NegentropyCost(CostClass):
         Parameters
         ----------
         X : ndarray
-                The feature matrix of size (n_samples, n_features)
+            The feature matrix of size (n_samples, n_features)
 
         w : ndarray
-                The transformation vector of size (n_features, 1)
+            The transformation vector of size (n_features, 1)
 
         y : ndarray
-                The transformed variable y = X @ w of size (n_samples, 1)
+            The transformed variable y = X @ w of size (n_samples, 1)
 
         approx_flag : bool (default = True)
-                This flag specifies whether an approximation to the expectation in the
-                Hessian is used or not.
+            This flag specifies whether an approximation to the expectation in the
+            Hessian is used or not.
 
         Returns
         -------
@@ -894,7 +899,7 @@ class NegentropyCost(CostClass):
 class VarianceCost(UserCost):
     """
     This method implements the PCA variance maximisation objective. It inherits from
-    the user_cost class and simply implements the three necessary
+    the UserCost class and simply implements the three necessary components.
     """
 
     def __init__(self, use_hessian: bool = True, verbose: bool = True):
@@ -904,9 +909,9 @@ class VarianceCost(UserCost):
         Parameters
         ----------
         use_hessian : bool
-                A flag to control whether you use the Hessian or not.
-                This is useful in the parameter estimation step, as you may wish to just
-                perform steepest descent instead of using Newton's method.
+            A flag to control whether you use the Hessian or not.
+            This is useful in the parameter estimation step, as you may wish to just
+            perform steepest descent instead of using Newton's method.
         """
         super().__init__(use_hessian, verbose)
 
@@ -918,13 +923,13 @@ class VarianceCost(UserCost):
             Parameters
             ----------
             X : ndarray
-                    The feature matrix of size (n_samples, n_features)
+                The feature matrix of size (n_samples, n_features)
 
             w : ndarray
-                            The transformation vector of size (n_features, 1)
+                The transformation vector of size (n_features, 1)
 
             y : ndarray
-                            The transformed variable y = X @ w of size (n_samples, 1)
+                The transformed variable y = X @ w of size (n_samples, 1)
 
             Returns
             -------
@@ -940,13 +945,13 @@ class VarianceCost(UserCost):
             Parameters
             ----------
             X : ndarray
-                    The feature matrix of size (n_samples, n_features)
+                The feature matrix of size (n_samples, n_features)
 
             w : ndarray
-                    The transformation vector of size (n_features, 1)
+                The transformation vector of size (n_features, 1)
 
             y : ndarray
-                    The transformed variable y = X @ w of size (n_samples, 1)
+                The transformed variable y = X @ w of size (n_samples, 1)
 
             Returns
             -------
@@ -962,13 +967,13 @@ class VarianceCost(UserCost):
             Parameters
             ----------
             X : ndarray
-                    The feature matrix of size (n_samples, n_features)
+                The feature matrix of size (n_samples, n_features)
 
             w : ndarray
-                    The transformation vector of size (n_features, 1)
+                The transformation vector of size (n_features, 1)
 
             y : ndarray
-                    The transformed variable y = X @ w of size (n_samples, 1)
+                The transformed variable y = X @ w of size (n_samples, 1)
 
             Returns
             -------
@@ -982,39 +987,41 @@ class VarianceCost(UserCost):
 
 
 # if __name__ == "__main__":
-# 	def l1_l2_norm(X, w, y):
-# 		N = X.shape[0]
+# def l1_l2_norm(X, w, y):
+# 	N = X.shape[0]
 #
-# 		E1 = np.mean(np.abs(y), axis=0)
-# 		E2 = np.mean(y ** 2, axis=0)
+# 	E1 = np.mean(np.abs(y), axis=0)
+# 	E2 = np.mean(y ** 2, axis=0)
 #
-# 		return -1 * np.sqrt(N) * E1 / np.sqrt(E2)
-#
-#
-# 	def l1_l2_grad(X, w, y):
-# 		N = X.shape[0]
-#
-# 		E1 = np.mean(np.abs(y), axis=0)
-# 		E2 = np.mean(y ** 2, axis=0)
-#
-# 		p1 = np.mean(np.sign(y) * X, axis=0).T / np.sqrt(E2)
-# 		p2 = -1 * E1 / ((E2) ** (3 / 2)) * np.mean(y * X, axis=0).T
-#
-# 		return -1 * np.sqrt(N) * (p1 + p2)
+# 	return -1 * np.sqrt(N) * E1 / np.sqrt(E2)
 #
 #
-# 	def l1_l2_hessian(X, w, y):
-# 		pass
+# def l1_l2_grad(X, w, y):
+# 	N = X.shape[0]
+#
+# 	E1 = np.mean(np.abs(y), axis=0)
+# 	E2 = np.mean(y ** 2, axis=0)
+#
+# 	p1 = np.mean(np.sign(y) * X, axis=0).T / np.sqrt(E2)
+# 	p2 = -1 * E1 / ((E2) ** (3 / 2)) * np.mean(y * X, axis=0).T
+#
+# 	return -1 * np.sqrt(N) * (p1 + p2)
 #
 #
-# 	test_instance = user_cost(use_hessian=False)
+# def l1_l2_hessian(X, w, y):
+# 	pass
+
+
+# test_instance = user_cost(use_hessian=False)
+# test_instance = NegentropyCost(source_name='exp', source_params={'alpha': 1})
+
+# test_instance.set_cost(l1_l2_norm)
+# test_instance.set_gradient(l1_l2_grad)
 #
-# 	test_instance.set_cost(l1_l2_norm)
-# 	test_instance.set_gradient(l1_l2_grad)
+# Lw = 256
+# X_ = np.random.randn(1000, Lw)
+# w_ = np.random.randn(Lw, 1)
+# y_ = X_ @ w_
 #
-# 	Lw = 256
-# 	X_ = np.random.randn(1000, Lw)
-# 	w_ = np.random.randn(Lw, 1)
-# 	y_ = X_ @ w_
-#
-# 	grad_tup = test_instance.check_gradient(X_, w_, y_, 1e-4)
+# res_grad = test_instance.check_gradient(X_, w_, y_, 1e-4)
+# res_hess = test_instance.check_gradient(X_, w_, y_, 1e-4)
