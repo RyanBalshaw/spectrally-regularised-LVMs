@@ -6,7 +6,7 @@
 ![Read the Docs](https://img.shields.io/readthedocs/spectrally-constrained-lvms?color=informational)
 ![GitHub issues](https://img.shields.io/github/issues/RyanBalshaw/spectrally-constrained-LVMs?color=critical)
 
-*Current version:* 0.1.1
+*Current version:* 0.1.2
 
 Spectrally-constrained-LVMs is a Python-based package which facilitates the estimation of the linear latent variable model (LVM) parameters with a unique spectral constraint in single-channel time-series applications.
 
