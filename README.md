@@ -11,7 +11,7 @@
 Spectrally-regularised-LVMs is a Python-based package which facilitates the estimation of the linear latent variable model (LVM) parameters with a unique spectral regularisation term in single channel time-series applications.
 
 ## Purpose
-LVMs are a statistical methodology which tries to capture the underlying structure in some observed data. This package caters to single channel time-series applications and provides a methodology to estimate the LVM parameters. The model parameters are encouraged to be diverse via a spectral regularisation which penalises source duplication of the spectral information captured by the latent sources.
+LVMs are a statistical methodology which tries to capture the underlying structure in some observed data. This package caters to single channel time-series applications and provides a methodology to estimate the LVM parameters. The model parameters are encouraged to be diverse via a spectral regularisation term which penalises source duplication of the spectral information captured by the latent sources.
 
 The purpose of this package is to provide a complete methodology that caters to a variety of LVM objective functions.
 
