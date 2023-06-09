@@ -1,6 +1,6 @@
 # Copyright 2023-present Ryan Balshaw
 """
-The spectral constraint method to be added to negentropy-based ICA approach.
+The spectral regularisation class used for LVM parameter estimation.
 """
 import numpy as np
 
