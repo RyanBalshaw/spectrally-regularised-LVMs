@@ -6,19 +6,12 @@ Tutorials
 Tutorial 1
 ------------
 
-To use spectrally-constrained-LVMs, first install it using pip:
+To use spectrally-regularised-LVMs, first install it using pip:
 
 .. code-block:: console
 
-   (.venv) $ pip install spectrally-constrained-LVMs
+   (.venv) $ pip install spectrally-regularised-LVMs
 
->>> import spectrally_constrained_LVMs as scLVMs
+>>> import spectrally_regularised_LVMs as srLVMs
 >>> scLVMs.LinearModel()
    (.venv) $ pip install spectrally-constrained-LVMs
-
->>> import spectrally_constrained_LVMs as scLVMs
->>> scLVMs.LinearModel()
-   (.venv) $ pip install spectrally-constrained-LVMs
-
->>> import spectrally_constrained_LVMs as scLVMs
->>> scLVMs.linear_model()

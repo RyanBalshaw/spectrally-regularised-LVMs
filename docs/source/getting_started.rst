@@ -6,27 +6,20 @@ Getting Started
 Installation
 ------------
 
-To use spectrally-constrained-LVMs, first install it using pip:
+To use spectrally-regularised-LVMs, first install it using pip:
 
 .. code-block:: console
 
-   (.venv) $ pip install spectrally-constrained-LVMs
+   (.venv) $ pip install spectrally-regularised-LVMs
 
 Creating recipes
 ----------------
 
 To retrieve a list of random ingredients,
-you can use the ``spectrally-constrained-lvms.hankel_matrix()`` function:
+you can use the ``spectrally-regularised-lvms.hankel_matrix()`` function:
 
-.. autofunction:: spectrally-constrained-lvms.helper_methods.hankel_matrix
+.. autofunction:: spectrally-regularised-lvms.helper_methods.hankel_matrix
 
->>> import spectrally_constrained_LVMs as scLVMs
+>>> import spectrally_regularised_LVMs as srLVMs
 >>> scLVMs.LinearModel()
 For example:
-
->>> import spectrally_constrained_LVMs as scLVMs
->>> scLVMs.LinearModel()
-For example:
-
->>> import spectrally_constrained_LVMs as scLVMs
->>> scLVMs.linear_model()

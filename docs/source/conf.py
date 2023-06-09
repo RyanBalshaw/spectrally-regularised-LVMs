@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.abspath("../.."))
 
 # -- Project information
 
-project = "spectrally-constrained-LVMs"
+project = "spectrally-regularised-LVMs"
 copyright = "2023, Balshaw"
 author = "Ryan Balshaw"
 
