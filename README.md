@@ -6,9 +6,9 @@
 ![Read the Docs](https://img.shields.io/readthedocs/spectrally-constrained-lvms?color=informational)
 ![GitHub issues](https://img.shields.io/github/issues/RyanBalshaw/spectrally-constrained-LVMs?color=critical)
 
-*Current version:* 0.1.3
+*Current version:* 0.1.1
 
-Spectrally-constrained-LVMs is a Python-based package which facilitates the estimation of the linear latent variable model (LVM) parameters with a unique spectral constraint in single-channel time-series applications.
+Spectrally-regularised-LVMs is a Python-based package which facilitates the estimation of the linear latent variable model (LVM) parameters with a unique spectral constraint in single-channel time-series applications.
 
 ## Purpose
 LVMs are a statistical methodology which tries to capture the underlying structure in some observed data. This package caters to single channel time-series applications and provides a methodology to estimate the LVM parameters. The model parameters are encouraged to be diverse via a spectral constraint which enforces non-duplication of the spectral information captured by the latent sources.
@@ -16,18 +16,18 @@ LVMs are a statistical methodology which tries to capture the underlying structu
 The purpose of this package is to provide a complete methodology that caters to a variety of LVM objective functions.
 
 # Documentation
-Please visit [the docs](http://spectrally-constrained-lvms.readthedocs.io/) for all supporting documentation for this package.
+Please visit [the docs](http://spectrally-regularised-lvms.readthedocs.io/) for all supporting documentation for this package.
 
 # Installation
 The package is designed to be used through the Python API, and  can be installed using [pip](https://pypi.org/project/pip/):
 ```console
-$ pip install spectrally-constrained-LVMs
+$ pip install spectrally-regularised-LVMs
 ```
 
 # Requirements
 
 This package used Python ≥ 3.10 or later to run. For other python dependencies, please check the `pyproject.toml`
-[file](https://github.com/RyanBalshaw/spectrally-constrained-LVMs/blob/main/pyproject.toml) included in this repository. The dependencies of this package are as follows:
+[file](https://github.com/RyanBalshaw/spectrally-regularised-LVMs/blob/main/pyproject.toml) included in this repository. The dependencies of this package are as follows:
 
 |          Package                   	           | Version 	  |
 |:----------------------------------------------:|:----------:|
@@ -44,22 +44,22 @@ This package used Python ≥ 3.10 or later to run. For other python dependencies
 ## Model parameter estimation
 A generic example is shown below:
 ```python
-import spectrally_constrained_LVMs as scLVMs
+import spectrally_regularised_LVMs as srLVMs
 
 # Load in some data
 signal_data = ... # Load a single channel time-series signal
 Fs = ... # Sampling frequency of the data
 
 # Hankelise the data
-X = scLVMs.hankel_matrix(signal_data,
+X = srLVMs.hankel_matrix(signal_data,
                           Lw = 512,
                           Lsft = 1)
 
 # Define a cost function for latent sources with maximum variance
-cost_inst = scLVMs.VarianceCost()
+cost_inst = srLVMs.VarianceCost()
 
 # Define a model instance
-model_inst = scLVMs.LinearModel(n_sources=10,
+model_inst = srLVMs.LinearModel(n_sources=10,
                                  cost_instance=cost_inst,
                                  whiten=False,
                                  alpha_reg=1.0)
@@ -76,7 +76,7 @@ This package allows users to implement their own objective functions. Two exampl
 This method allows users to implement their objective function and all required higher order derivatives manually. This is demonstrated through:
 ```python
 import numpy as np
-import spectrally_constrained_LVMs as scLVMs
+import spectrally_regularised_LVMs as srLVMs
 
 # Define objective function (maximise source variance)
 def cost(X, w, y):
@@ -94,7 +94,7 @@ def hess(X, w, y):
     return -2 * np.cov(X, rowvar=False)
 
 # Initialise the cost instance
-user_cost = scLVMs.UserCost(use_hessian = True)
+user_cost = srLVMs.UserCost(use_hessian = True)
 
 # Define the objective function, gradient and Hessian
 user_cost.set_cost(cost)
@@ -115,13 +115,13 @@ Users can also use [SymPy](https://www.sympy.org/en/index.html) to implement the
 ```python
 import sympy as sp
 import numpy as np
-import spectrally_constrained_LVMs as scLVMs
+import spectrally_regularised_LVMs as srLVMs
 
 n_samples = 1000 # Fix the number of samples in the data
 n_features = 16 # Fix the number of features
 
 # Initialise the cost function instance
-user_cost = scLVMs.SympyCost(n_samples, n_features, use_hessian=True)
+user_cost = srLVMs.SympyCost(n_samples, n_features, use_hessian=True)
 
 # Get the SymPy representations of the model parameters
 X_sp, w_sp, iter_params = user_cost.get_model_parameters()
@@ -149,7 +149,7 @@ res_hess = user_cost.check_hessian(X_, w_, y_,step_size = 1e-4)
 # Contributing
 This package uses [Poetry](https://python-poetry.org/) for dependency management and Python packaging and [git](https://git-scm.com/) for version control. To get started, first install git and Poetry and then clone this repository via
 ```console
-$ git clone git@github.com:RyanBalshaw/spectrally-constrained-LVMs.git
+$ git clone git@github.com:RyanBalshaw/spectrally-regularised-LVMs.git
 $ cd spectrally-constrained-LVMs
 ```
 
@@ -166,4 +166,4 @@ pre-commit installed at .git/hooks/pre-commit
 ```
 
 # License
-This project is licensed under MIT License - see the [LICENSE](https://github.com/RyanBalshaw/spectrally-constrained-LVMs/blob/main/LICENSE) file for details.
+This project is licensed under MIT License - see the [LICENSE](https://github.com/RyanBalshaw/spectrally-regularised-LVMs/blob/main/LICENSE) file for details.
