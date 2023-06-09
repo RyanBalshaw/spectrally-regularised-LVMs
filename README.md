@@ -150,7 +150,7 @@ res_hess = user_cost.check_hessian(X_, w_, y_,step_size = 1e-4)
 This package uses [Poetry](https://python-poetry.org/) for dependency management and Python packaging and [git](https://git-scm.com/) for version control. To get started, first install git and Poetry and then clone this repository via
 ```console
 $ git clone git@github.com:RyanBalshaw/spectrally-regularised-LVMs.git
-$ cd spectrally-constrained-LVMs
+$ cd spectrally-regularised-LVMs
 ```
 
 Then, install the necessary dependencies in a local environment via
