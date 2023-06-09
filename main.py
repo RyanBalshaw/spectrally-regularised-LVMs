@@ -6,7 +6,7 @@ import os
 
 import numpy as np
 
-from spectrally_constrained_LVMs import LinearModel, NegentropyCost, hankel_matrix
+from spectrally_regularised_LVMs import LinearModel, NegentropyCost, hankel_matrix
 
 # from matplotlib import pyplot as plt
 
@@ -42,8 +42,15 @@ if __name__ == "__main__":
     # )
     Fs = 20480
     files = sorted(os.listdir(data_dir))
-    data_dict = np.loadtxt(os.path.join(data_dir, files[637]))
-    x_signal = data_dict[:, 0]
+
+    X_ = []
+    for i in range(1):
+        data_dict = np.loadtxt(os.path.join(data_dir, files[i]))
+        x_signal = data_dict[:, 0]
+
+        X_.append(hankel_matrix(x_signal, Lw, Lsft))
+
+    X = np.vstack(X_)
 
     # Gearbox signal
     # data_dir = os.path.join(
@@ -59,7 +66,6 @@ if __name__ == "__main__":
     # x_signal = x_signal[:len(x_signal) // 2]
 
     #######################################
-    X = hankel_matrix(x_signal, Lw, Lsft)
     # X = X[: X.shape[0] // 12, :]
     # print(X.shape)
 
@@ -158,7 +164,7 @@ if __name__ == "__main__":
     # test_inst.set_gradient(l1_l2_grad)
 
     sICA_inst = LinearModel(
-        n_sources=2,
+        n_sources=20,
         cost_instance=test_inst,
         whiten=True,
         init_type="broadband",
@@ -166,7 +172,7 @@ if __name__ == "__main__":
         batch_size=None,
         var_PCA=None,
         alpha_reg=1,  # 0.0005,
-        sumt_flag=True,
+        sumt_flag=False,
         sumt_parameters={
             "eps_1": 1e-4,
             "alpha_init": 0.1,
@@ -177,10 +183,43 @@ if __name__ == "__main__":
         hessian_update_type="actual",
         use_ls=True,
         use_hessian=True,
-        save_dir=None,  # tmp_dir_path,
+        save_dir=None,
         verbose=True,
     )
 
     print("Fitting the model...")
 
     sICA_inst.fit(X, n_iters=500, learning_rate=1, tol=1e-4, Fs=Fs)
+
+
+# def compute_LHIs(data_dir, files):
+#     LHIs = []
+#     RMSs = []
+#
+#     for i in range(0, len(files), 5):  # len(files):
+#         data_dict = np.loadtxt(os.path.join(data_dir, files[i]))
+#         x_signal = data_dict[:, 0]
+#
+#         X_eval = hankel_matrix(x_signal, Lw, Lsft)
+#
+#         S = sICA_inst.transform(X_eval)
+#
+#         LHI_i = np.sqrt(np.sum(S**2, axis=1))
+#
+#         RMS_i = np.sqrt(1 / len(LHI_i) * np.sum(LHI_i**2))
+#
+#         LHIs.append(LHI_i)
+#         RMSs.append(RMS_i)
+#
+#     return LHIs, RMSs
+#
+#
+# def fft_vis(signal, Fs, Nfft=None):
+#     if Nfft is None:
+#         Nfft = len(signal)
+#
+#     n = len(signal)
+#     freq = np.fft.fftfreq(n, 1 / Fs)[: n // 2]
+#     val = 2 / n * np.abs(np.fft.fft(signal))[: n // 2]
+#
+#     return freq, val
