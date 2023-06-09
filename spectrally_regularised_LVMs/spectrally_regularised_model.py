@@ -1,6 +1,6 @@
 # Copyright 2023-present Ryan Balshaw
 """
-This script defines model parameter estimation process via the linear_model class.
+This script defines model parameter estimation process via the LinearModel class.
 """
 
 import os
@@ -20,7 +20,7 @@ from .helper_methods import (
     DeflationOrthogonalisation,
     QuasiNewton,
 )
-from .spectral_constraint import SpectralObjective
+from .spectral_regulariser import SpectralObjective
 
 
 def initialise_W(n_sources: int, n_features: int, init_type: str):
@@ -128,7 +128,7 @@ class LinearModel(object):
         properties.
 
     spectral_trainer(X, W, n_iters, learning_rate, tol, Lambda, Fs)
-        A method that
+        This method estimates the model parameters for some X and W.
 
     update_params(w_current, lambda_current, delta_w, delta_lambda, W, idx)
         A method which calculates the update to w and lambda based off some global
@@ -217,7 +217,7 @@ class LinearModel(object):
 
         alpha_reg : float (default = 1.0)
             Defines the penalty enforcement parameter applied to the spectral
-            constraint.
+            regularisation term.
 
         sumt_flag : bool (default = False)
             A flag that specifies whether the sequential unconstrained minimisation
@@ -607,7 +607,7 @@ class LinearModel(object):
         else:
             spectral_loss = 0
 
-        # Compute the constraint term
+        # Compute the optimisation constraint term
         h_w = w.T @ w - 1
         constraint = lambda_vector @ h_w
 
@@ -712,8 +712,8 @@ class LinearModel(object):
         jac_lagrange = jac_cost + (2 * lambda_vector[0, 0] * np.eye(w.shape[0]))
         dh_dw = [2 * w]
 
-        if idx > 0:  # Add in the spectral constraint
-            jac_lagrange += self.alpha_reg * self._hessian_constraint
+        if idx > 0:  # Add in the spectral regularisation
+            jac_lagrange += self.alpha_reg * self._hessian_regulariser
 
         J2 = np.hstack(dh_dw).T
 
@@ -909,7 +909,7 @@ class LinearModel(object):
                 ix_grid = np.ix_(np.arange(0, idx, 1), np.arange(W_.shape[1]))
 
                 # Compute the Hessian
-                self._hessian_constraint = np.sum(
+                self._hessian_regulariser = np.sum(
                     self.spectral_obj.spectral_hessian(w_new, W_[ix_grid].copy()),
                     axis=0,
                 )
@@ -1028,7 +1028,7 @@ class LinearModel(object):
                 ax[6].set_title("Update similarity")
                 ax[6].plot(w_similarity[: self.cnt_iter], color="#ffa600")
 
-                ax[7].set_title("Spectral constraint")
+                ax[7].set_title("Spectral regularisation")
                 ax[7].plot(spectral_loss[: self.cnt_iter], color="b")
 
                 for axs in ax:
