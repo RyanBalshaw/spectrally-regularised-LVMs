@@ -90,8 +90,6 @@ class LinearModel(object):
     This class encapsulates the parameter estimation step of linear LVMs by defining
     a class that combines each of the different aspects of this package.
 
-    The objective of this object is
-
     Methods
     -------
     kurtosis(y)

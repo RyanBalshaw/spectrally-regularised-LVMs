@@ -1,17 +1,17 @@
-# Spectrally constrained LVMs
-![GitHub license](https://img.shields.io/github/license/RyanBalshaw/spectrally-constrained-LVMs)
-![GitHub last commit](https://img.shields.io/github/last-commit/RyanBalshaw/spectrally-constrained-LVMs)
-![PyPI](https://img.shields.io/pypi/v/spectrally-constrained-lvms)
-![PyPI - Wheel](https://img.shields.io/pypi/wheel/spectrally-constrained-lvms?color=blueviolet)
-![Read the Docs](https://img.shields.io/readthedocs/spectrally-constrained-lvms?color=informational)
-![GitHub issues](https://img.shields.io/github/issues/RyanBalshaw/spectrally-constrained-LVMs?color=critical)
+# Spectrally regularised LVMs
+![GitHub license](https://img.shields.io/github/license/RyanBalshaw/spectrally-regularised-LVMs)
+![GitHub last commit](https://img.shields.io/github/last-commit/RyanBalshaw/spectrally-regularised-LVMs)
+![PyPI](https://img.shields.io/pypi/v/spectrally-regularised-lvms)
+![PyPI - Wheel](https://img.shields.io/pypi/wheel/spectrally-regularised-lvms?color=blueviolet)
+![Read the Docs](https://img.shields.io/readthedocs/spectrally-regularised-lvms?color=informational)
+![GitHub issues](https://img.shields.io/github/issues/RyanBalshaw/spectrally-regularised-LVMs?color=critical)
 
 *Current version:* 0.1.1
 
-Spectrally-regularised-LVMs is a Python-based package which facilitates the estimation of the linear latent variable model (LVM) parameters with a unique spectral constraint in single-channel time-series applications.
+Spectrally-regularised-LVMs is a Python-based package which facilitates the estimation of the linear latent variable model (LVM) parameters with a unique spectral regularisation term in single channel time-series applications.
 
 ## Purpose
-LVMs are a statistical methodology which tries to capture the underlying structure in some observed data. This package caters to single channel time-series applications and provides a methodology to estimate the LVM parameters. The model parameters are encouraged to be diverse via a spectral constraint which enforces non-duplication of the spectral information captured by the latent sources.
+LVMs are a statistical methodology which tries to capture the underlying structure in some observed data. This package caters to single channel time-series applications and provides a methodology to estimate the LVM parameters. The model parameters are encouraged to be diverse via a spectral regularisation which penalises source duplication of the spectral information captured by the latent sources.
 
 The purpose of this package is to provide a complete methodology that caters to a variety of LVM objective functions.
 
