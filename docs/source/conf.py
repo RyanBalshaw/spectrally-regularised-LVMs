@@ -4,27 +4,33 @@ Configuration file for the Sphinx documentation builder.
 import os
 import sys
 
+sys.path.insert(0, os.path.abspath("."))
 sys.path.insert(0, os.path.abspath("../.."))
 
 # -- Project information
 
 project = "spectrally-regularised-LVMs"
-copyright = "2023, Balshaw"
+copyright = "2023, Ryan Balshaw"
 author = "Ryan Balshaw"
 
 release = "0.1"
-version = "0.1.0"
+version = "0.1.1"
 
 # -- General configuration
 
 extensions = [
     "sphinx.ext.duration",
     "sphinx.ext.doctest",
-    "sphinx.ext.autodoc",
-    "sphinx.ext.mathjax",
+    "sphinx.ext.autodoc",  # To generate autodocs
+    "sphinx.ext.mathjax",  # autodoc with maths
+    "sphinx.ext.napoleon",  # For auto-doc configuration
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
+    "numpydoc",
+    "autodocsumm",
 ]
+
+napoleon_numpy_docstring = True  # Turn on numpydoc strings
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
@@ -40,3 +46,6 @@ html_theme = "sphinx_rtd_theme"
 
 # -- Options for EPUB output
 epub_show_urls = "footnote"
+
+# autodocumentation properties
+autodoc_default_options = {"autosummary": True}

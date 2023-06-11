@@ -6,5 +6,5 @@ API
 
    spectrally_regularised_LVMs
 
-.. automodule:: spectrally_regularised_LVMs
-   :members:
+.. automodule:: spectrally_regularised_LVMs.LinearModel
+   :autosummary:
