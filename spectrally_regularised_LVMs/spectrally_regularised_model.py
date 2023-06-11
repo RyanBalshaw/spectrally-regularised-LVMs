@@ -1233,10 +1233,6 @@ class LinearModel(object):
 
         Parameters
         ----------
-        This method estimates the model parameters for some given X, W, and Lambda.
-
-        Parameters
-        ----------
         X : ndarray
             The data matrix X.
 
