@@ -1,8 +1,9 @@
+=======
 Modules
 =======
 
 Negentropy approximators
-------------------------
+========================
 
 .. automodule:: spectrally_regularised_LVMs.negen_approx
     :members:
@@ -11,7 +12,7 @@ Negentropy approximators
     :show-inheritance:
 
 Cost functions
---------------
+==============
 
 .. automodule:: spectrally_regularised_LVMs.cost_functions
     :members:
@@ -20,7 +21,7 @@ Cost functions
     :show-inheritance:
 
 Spectral regulariser
---------------------
+====================
 
 .. automodule:: spectrally_regularised_LVMs.spectral_regulariser
     :members:
@@ -29,7 +30,7 @@ Spectral regulariser
     :show-inheritance:
 
 Helper methods
---------------
+==============
 
 .. automodule:: spectrally_regularised_LVMs.helper_methods
     :members:
@@ -38,7 +39,7 @@ Helper methods
     :show-inheritance:
 
 Spectrally regularised model
-----------------------------
+============================
 
 .. automodule:: spectrally_regularised_LVMs.spectrally_regularised_model
     :members:
