@@ -26,6 +26,7 @@ extensions = [
     "sphinx.ext.napoleon",  # For auto-doc configuration
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
+    "sphinx.ext.autosectionlabel",
     "numpydoc",
     "autodocsumm",
 ]
@@ -37,6 +38,7 @@ intersphinx_mapping = {
     "sphinx": ("https://www.sphinx-doc.org/en/master/", None),
 }
 intersphinx_disabled_domains = ["std"]
+intersphinx_disabled_reftypes = ["*"]
 
 templates_path = ["_templates"]
 
@@ -49,3 +51,6 @@ epub_show_urls = "footnote"
 
 # autodocumentation properties
 autodoc_default_options = {"autosummary": True}
+
+# Auto-section properties
+autosectionlabel_prefix_document = True
