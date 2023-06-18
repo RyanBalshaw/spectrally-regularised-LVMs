@@ -1,14 +1,13 @@
+============
 Installation
 ============
-
-.. _installation:
 
 The spectrally-regularised-LVMs package has been coded in Python3 and has been tested on Linux and Windows operating systems. The package was originally written on a system that uses Windows, but makes use of the `os.path <https://docs.python.org/3/library/os.path.html#module-os.path>`_ module to ensure that any differences between operating system's is accounted for if anything is stored in a user's directory.
 
 The package can either be installed via the PyPi package installer `pip <https://packaging.python.org/en/latest/tutorials/installing-packages/>`_, or by cloning the repository, creating a local `Poetry <https://python-poetry.org/>`_ environment, and then installing the package in `development mode <https://setuptools.pypa.io/en/latest/userguide/development_mode.html>`_ via Poetry.
 
 Pip installation
-----------------
+================
 
 To use spectrally-regularised-LVMs within a virtual environment, the package can be installed using pip.
 
@@ -17,7 +16,7 @@ To use spectrally-regularised-LVMs within a virtual environment, the package can
    (.venv) $ pip install spectrally-regularised-LVMs
 
 Cloning from Github
--------------------
+===================
 
 You can clone the `GitHub repository <https://github.com/RyanBalshaw/spectrally-regularised-LVMs>`_ using git. It is recommended here that you first create a local Poetry environment
 
