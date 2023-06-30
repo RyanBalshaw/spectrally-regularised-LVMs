@@ -277,13 +277,6 @@ class LinearModel(object):
         self.save_dir = save_dir
         self.verbose = verbose
 
-        # Initialise the processor instance  (could be in base class except for var_PCA)
-        self.processor_inst = DataProcessor(self.whiten, self.var_PCA)
-
-        if self.perform_gso:
-            # Initialise the orthogonalisation instance (could be in base class)
-            self.gs_inst = DeflationOrthogonalisation()
-
         # Sequential unconstrained minimisation technique parameters
         if self.sumt_flag:
             if self.sumt_parameters is None:  # Initialise
@@ -320,7 +313,20 @@ class LinearModel(object):
             raise SystemExit
 
         if not self.whiten:
-            print("Non-whitened version is chosen.")
+            if self.cost_instance.__class__.__name__ == "NegentropyCost":
+                print("As negentropy loss is used, whitening is automatically applied.")
+                # For future implementation, this could be adapted.
+                self.whiten = True
+
+            else:
+                print("Non-whitened version is chosen.")
+
+        # Initialise the processor instance  (could be in base class except for var_PCA)
+        self.processor_inst = DataProcessor(self.whiten, self.var_PCA)
+
+        if self.perform_gso:
+            # Initialise the orthogonalisation instance (could be in base class)
+            self.gs_inst = DeflationOrthogonalisation()
 
     def kurtosis(self, y):
         """
