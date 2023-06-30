@@ -9,7 +9,7 @@ For beginners in programming, it is advised to look at the example applications 
 negen_approx
 ============
 
-This module handles the negentropy approximation functions used for negentropy-based ICA methodologies. There are four approximation functions which are implemented in this module, namely: 1) the :py:class:`cube <spectrally_regularised_LVMs.negen_approx.CubeObject>` objective where :math:`G(u) = u^3`, 2) the :py:class:`exp <spectrally_regularised_LVMs.negen_approx.ExpObject>` objective where :math:`G(u, a_2) = \frac{1}{a_2} \exp \left( -a_2 \cdot \frac{u^2}{2} \right)`, 3) the :py:class:`logcosh <spectrally_regularised_LVMs.negen_approx.LogcoshObject>` objective where :math:`G(u, a_1) = \frac{1}{a_1} \cdot \log \left( \frac{\exp(a_1 \cdot u) + \exp(-a_1 \cdot u)}{2} \right)`, and 4) the :py:class:`quad <spectrally_regularised_LVMs.negen_approx.QuadObject>` objective where :math:`G(u) = \frac{1}{4} \cdot u^4`.
+This module handles the negentropy approximation functions used for negentropy-based ICA methodologies. There are four approximation functions which are implemented in this module, namely: 1) the :py:class:`cube <spectrally_regularised_LVMs.negen_approx.CubeObject>` objective where :math:`G(u) = u^3`, 2) the :py:class:`exp <spectrally_regularised_LVMs.negen_approx.ExpObject>` objective where :math:`G(u, a_2) = - \frac{1}{a_2} \exp \left( -a_2 \cdot \frac{u^2}{2} \right)`, 3) the :py:class:`logcosh <spectrally_regularised_LVMs.negen_approx.LogcoshObject>` objective where :math:`G(u, a_1) = \frac{1}{a_1} \cdot \log \left( \frac{\exp(a_1 \cdot u) + \exp(-a_1 \cdot u)}{2} \right)`, and 4) the :py:class:`quad <spectrally_regularised_LVMs.negen_approx.QuadObject>` objective where :math:`G(u) = \frac{1}{4} \cdot u^4`.
 
 
 cost_functions
