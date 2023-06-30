@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "spectrally-regularised-LVMs"
-version = "0.1.1"
+version = "0.1.2"
 description = "An implementation of linear LVMs with a spectral regulariser."
 authors = ["Ryan Balshaw <ryanbalshaw81@gmail.com>"]
 maintainers = ["Ryan Balshaw <ryanbalshaw81@gmail.com>"]
