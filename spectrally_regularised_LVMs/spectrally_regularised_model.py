@@ -1437,7 +1437,7 @@ class LinearModel(object):
 
         full_inverse : bool
             A flag to specify whether the recovered data matrix X must be
-            returned in standardised form or in the original, un-standardised
+            returned in centered form or in the original, un-centered
             domain.
 
         Returns
@@ -1450,11 +1450,11 @@ class LinearModel(object):
         # Transform back to the training feature space
         X_recon = np.dot(Z_, self.W)
 
-        # Un-process the data (still zero-mean, unit-variance)
+        # Un-process the data (still zero-mean)
         X_recon = self.processor_inst.unprocess_data(X_recon)
 
         if full_inverse:
-            X_recon = (X_recon * self.processor_inst.std_) + self.processor_inst.mean_
+            X_recon = X_recon + self.processor_inst.mean_
 
         return X_recon
 
