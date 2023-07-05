@@ -12,16 +12,19 @@ Check out the :doc:`installation` section for any information on how to install 
 .. note::
    This project is under active development.
 
+Contents
+========
+
 ..  toctree::
     :maxdepth: 2
     :numbered:
-    :caption: Contents:
 
     installation
     getting_started
     tutorials
     guide
     modules
+    parameter_estimation
     acknowledgements
 
 Indices and tables
@@ -29,4 +32,3 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`modindex`
-* :ref:`search`
