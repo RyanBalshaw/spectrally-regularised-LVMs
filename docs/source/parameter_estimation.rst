@@ -11,6 +11,7 @@ Part one: The spectral regularisation term
 The proposed spectral regularisation term uses the Fourier transform of the source vectors to enforce spectral orthogonality. Given some column vector :math:`\mathbf{w} \in \mathbb{R}^{D}`, the Fourier representation of the vector can be computed using
 
 .. math::
+
     \mathcal{F}(\mathbf{w}) = \mathbf{D} \mathbf{w}
 
 where :math:`\mathcal{F}` represents the Fourier operator and :math:`\mathbf{D}` represents the discrete Fourier transform (DFT) matrix. The DFT matrix :math:`\mathbf{D} \in \mathbb{R}^{D \times D}` is given as
@@ -32,7 +33,7 @@ where :math:`\mathcal{F}` represents the Fourier operator and :math:`\mathbf{D}`
 		&= \frac{1}{\sqrt{D}} \left(\mathbf{R} + \sqrt{-1} \cdot \mathbf{I} \right)
 	\end{align}
 
-where :math:`\omega = e^{-2 \cdot \pi \cdot \sqrt{-1} / D} = \sin\left( 2 \cdot \pi / D \right) - \sqrt{-1} \cdot \cos\left( 2 \cdot \pi / D \right)` is the primitive :math:`D^{th}` root of unity, :math:`\sqrt{-1}` defines an imaginary number, and :math:`\mathbf{R}\in \mathbb{R}^{D \times D} = [\mathbf{r}_1, \cdots, \mathbf{r}_D]` and :math:`\mathbf{I}\in \mathbb{R}^{D \times D} = [\mathbf{i}_1, \cdots, \mathbf{i}_D]` represent the real and imaginary components of :math:`\mathbf{B}` respectively. Note that the factor :math:`1/\sqrt{D}` in Equation :eq:`dft-transform` ensures that the DFT transform is unitary. The square of the complex modulus for the :math:`i^{th}` component in :math:`\mathcal{F}(\mathbf{w})` may be represented in index notation as
+where :math:`\omega = e^{-2 \cdot \pi \cdot \sqrt{-1} / D} = \sin\left( 2 \cdot \pi / D \right) - \sqrt{-1} \cdot \cos\left( 2 \cdot \pi / D \right)` is the primitive :math:`D^{th}` root of unity, :math:`\sqrt{-1}` defines an imaginary number, and :math:`\mathbf{R}\in \mathbb{R}^{D \times D} = [\mathbf{r}_1, \cdots, \mathbf{r}_D]` and :math:`\mathbf{I}\in \mathbb{R}^{D \times D} = [\mathbf{i}_1, \cdots, \mathbf{i}_D]` represent the real and imaginary components of :math:`\mathbf{B}` respectively. Note that the factor :math:`1/\sqrt{D}` in Equation :eq:`dft-transform` ensures that the DFT transform is unitary. The square of the complex modulus for the :math:`i^{th}` component in :math:`\mathcal{F}(\mathbf{w})` may be represented using index notation as
 
 .. math::
 
@@ -42,20 +43,26 @@ where :math:`\omega = e^{-2 \cdot \pi \cdot \sqrt{-1} / D} = \sin\left( 2 \cdot 
 		&= \frac{1}{D} \sum_{j} \left[(R_{ij} \cdot w_j)^2 + (I_{ij} \cdot w_j)^2\right],
 	\end{align}
 
-which may be given in vector notation through
+and may be given in vector notation through
 
 .. math::
     \mathbf{b}(\mathbf{w}) = \frac{1}{D} \left( \mathbf{R} \mathbf{w} \odot \mathbf{R} \mathbf{w} + \mathbf{I} \mathbf{w} \odot \mathbf{I} \mathbf{w}  \right),
 
-where :math:`\odot` is the Hadamard product. The square of the complex modulus of the Fourier representation of a component vector :math:`\mathbf{w}` is used to enforce that the component vectors have disjoint spectral support. Given some vector of interest, :math:`\mathbf{w}_i` and the solution vector of a previous iteration :math:`\mathbf{w}_j`, :math:`j < i`, the shared source information captured by each source can be represented via
+where :math:`\odot` is the Hadamard product. The square of the complex modulus of the Fourier representation of a component vector :math:`\mathbf{w}` is used to enforce that the component vectors capture non-duplicate spectral information. Given some vector of interest, :math:`\mathbf{w}_i` and the solution vector of a previous iteration :math:`\mathbf{w}_j`, :math:`j < i`, the shared source information can be represented via
+
+.. math::
+    :label: shared-info
+
+    h(\mathbf{w}_{i}, \mathbf{w}_{j}) = \mathbf{b}(\mathbf{w}_i)^T \mathbf{b}(\mathbf{w}_j),
+
+which then defines the spectral regularisation term as
 
 .. math::
     :label: constraint-local
 
-    h(\mathbf{w}_{i}, \mathbf{w}_{j}) = \mathbf{b}(\mathbf{w}_i)^T \mathbf{b}(\mathbf{w}_j).
+    \mathcal{L}_{sr}(\mathbf{w}_i) = \alpha \sum_{j=1}^{i-1} h(\mathbf{w}_{i}, \mathbf{w}_{j}).
 
-
-To use Equation :eq:`constraint-local` during the parameter estimation process, it is necessary to determine the gradient vector :math:`\nabla_{\mathbf{w}_i} h` and its Jacobian :math:`\mathbf{J}\left(\nabla_{\mathbf{w}_i} h(\mathbf{w}_i)\right)^T`, i.e. the Hessian :math:`\mathbf{H}_{sr}` of Equation :eq:`constraint-local`. For notational simplicity, the second derivative operator is denoted by :math:`\nabla^2`. It is also noted here that :math:`\mathbf{w}_i` and :math:`\mathbf{w}_j` are independent variables, which is necessary to readily simplify the subsequent derivatives with respect to :math:`\mathbf{w}_i`. To enable this derivation, the general Hadamard product for vectors :math:`\mathbf{v}\in\mathbb{R}^{D}` and :math:`\mathbf{u}\in\mathbb{R}^{D}` is defined as
+To use the regularisation term given in Equation :eq:`constraint-local` during the parameter estimation process, it is necessary to determine the gradient vector :math:`\nabla_{\mathbf{w}_i} \mathcal{L}_{sr}(\mathbf{w}_i)` and its Jacobian :math:`\mathbf{J}\left(\nabla_{\mathbf{w}_i} \mathcal{L}_{sr}(\mathbf{w}_i) \right)^T`, i.e. the Hessian :math:`\mathbf{H}_{sr}` of Equation :eq:`constraint-local`. For notational simplicity, the second derivative operator is denoted by :math:`\nabla^2`. It is also noted here that :math:`\mathbf{w}_i` and :math:`\mathbf{w}_j` are independent variables, which is necessary to readily simplify the subsequent derivatives with respect to :math:`\mathbf{w}_i`. To enable this derivation, the general Hadamard product for vectors :math:`\mathbf{v}\in\mathbb{R}^{D}` and :math:`\mathbf{u}\in\mathbb{R}^{D}` is defined as
 
 .. math::
 
@@ -85,28 +92,28 @@ The gradient vector of Equation \eqref{eq:constraint} can be obtained using Equa
     :label: constraint-gradient
 
 	\begin{align}
-	 \nabla_{\mathbf{w}_i} h &= \left( \frac{\partial \mathbf{b}}{\partial \mathbf{w}_i} \right)^T \mathbf{b}(\mathbf{w}_j) \\
-		&= \frac{2}{D}\left[ \text{diag}(\mathbf{R} \mathbf{w}_i)\mathbf{R} +  \text{diag}(\mathbf{I} \mathbf{w}_i)\mathbf{I} \right]^T \mathbf{b}(\mathbf{w}_j).
+	 \nabla_{\mathbf{w}_i} \mathcal{L}_{sr}(\mathbf{w}_i) &= \sum_{j=1}^{i - 1} \left( \frac{\partial \mathbf{b}}{\partial \mathbf{w}_i} \right)^T \mathbf{b}(\mathbf{w}_j) \\
+		&= \sum_{j=1}^{i - 1} \frac{2}{D}\left[ \text{diag}(\mathbf{R} \mathbf{w}_i)\mathbf{R} +  \text{diag}(\mathbf{I} \mathbf{w}_i)\mathbf{I} \right]^T \mathbf{b}(\mathbf{w}_j).
 	\end{align}
 
-To compute the Hessian :math:`\mathbf{H}_{sr}`, it is easier to first consider what the :math:`k^{th}` index in the gradient vector :math:`\nabla_{\mathbf{w}_i} h` represents. This term is given by
+To compute the Hessian :math:`\mathbf{H}_{sr}`, it is easier to first consider what the :math:`k^{th}` index in the gradient vector :math:`\nabla_{\mathbf{w}_i} \mathcal{L}_{sr}(\mathbf{w}_i)` represents for the :math:`j^{th}` summation term. This is is given by
 
 .. math::
 
-	\left(\nabla_{\mathbf{w}_i} h\right)_k = \left( (\mathbf{R} \mathbf{w}) \odot \mathbf{r}_k +  (\mathbf{I} \mathbf{w}) \odot \mathbf{i}_k \right)^T \mathbf{b}(\mathbf{w}_j),
+	\left(\nabla_{\mathbf{w}_i} \mathcal{L}_{sr}(\mathbf{w}_i) \right)^{(j)}_k = \left( (\mathbf{R} \mathbf{w}) \odot \mathbf{r}_k +  (\mathbf{I} \mathbf{w}) \odot \mathbf{i}_k \right)^T \mathbf{b}(\mathbf{w}_j),
 
 where :math:`\mathbf{r}_k` and :math:`\mathbf{i}_k` represent the :math:`k^{th}` column in :math:`\mathbf{R}` and :math:`\mathbf{I}` respectively. Computing the derivative of the :math:`k^{th}` index with respect to :math:`\mathbf{w}` yields
 
 .. math::
 
-	\nabla_{\mathbf{w}_i}^T \left(\nabla_{\mathbf{w}_i} h\right)_k = \mathbf{b}(\mathbf{w}_j)^T \left( \text{diag}\left(\mathbf{r}_{i}\right) \mathbf{R} +  \text{diag}\left(\mathbf{i}_{i}\right) \mathbf{I} \right),
+	\nabla_{\mathbf{w}_i}^T \left(\nabla_{\mathbf{w}_i} \mathcal{L}_{sr}(\mathbf{w}_i) \right)^{(j)}_k = \mathbf{b}(\mathbf{w}_j)^T \left( \text{diag}\left(\mathbf{r}_{i}\right) \mathbf{R} +  \text{diag}\left(\mathbf{i}_{i}\right) \mathbf{I} \right),
 
-which represents the :math:`k^{th}` row in the Hessian matrix. Thus, the full Hessian matrix :math:`\mathbf{H}_{sr} \in \mathbb{R}^{D \times D}` can be represented as
+which represents the contribution of the :math:`j^{th}` term to the :math:`k^{th}` row in the Hessian matrix. Thus, the full Hessian matrix :math:`\mathbf{H}_{sr} \in \mathbb{R}^{D \times D}` can be represented as
 
 .. math::
     :label: constraint-hessian
 
-	\mathbf{H}_{sr} =  \frac{2}{D}
+	\mathbf{H}_{sr} =  \frac{2}{D} \sum_{j=1}^{i - 1}
 	\begin{bmatrix}
 		\mathbf{b}(\mathbf{w}_j)^T \left( \text{diag}\left(\mathbf{r}_{1}\right) \mathbf{R} +  \text{diag}\left(\mathbf{i}_{1}\right) \mathbf{I} \right) \\
 		\vdots \\
@@ -125,7 +132,7 @@ The next step is to detail the optimisation formulation and the methodology for 
 		\text{s.t.} \quad & \mathbf{w}_{i}^{T}\mathbf{w}_{i} = 1,
 	\end{align}
 
-where :math:`\mathcal{L}_{model}(\mathbf{w}_i)` represents the objective function to be minimised, :math:`\mathcal{L}_{sr}(\mathbf{w}_i)` represents the spectral orthogonality term which is an additive regularisation term, and the equality constraint :math:`\mathbf{w}_i^T\mathbf{w}_i=1` is used to ensure that the objective function focuses on the direction of :math:`\mathbf{w}_i` and not its magnitude. In this work, Newton's method is applied to the method of Lagrange multipliers to obtain a solution to the general objective function. This can be seen as an application of constrained Newton's method. The Lagrangian expression used for unconstrained function minimisation may be expressed as
+where :math:`\mathcal{L}_{model}(\mathbf{w}_i)` represents the objective function to be minimised, :math:`\mathcal{L}_{sr}(\mathbf{w}_i)` represents the spectral orthogonality term which is an additive regularisation term, and the equality constraint :math:`\mathbf{w}_i^T\mathbf{w}_i=1` is used to ensure that the objective function focuses on the direction of :math:`\mathbf{w}_i` and not its magnitude. In this work, Newton's method is applied to the Lagrangian to obtain a solution to the general objective function. This can be seen as an application of constrained Newton's method. The Lagrangian expression used for unconstrained function minimisation may be expressed as
 
 .. math::
     :label: Lagrangian-function
@@ -135,19 +142,14 @@ where :math:`\mathcal{L}_{model}(\mathbf{w}_i)` represents the objective functio
 		& + \lambda_{eq} \left( \mathbf{w}_i^T \mathbf{w}_i - 1 \right),
 	\end{align}
 
-where :math:`\lambda_{eq}` represents the Lagrange multiplier. In the derivation that follows, we generalise the objective function, its gradient vector and Hessian to :math:`\mathcal{L}_{model}`, :math:`\nabla_{\mathbf{w}_i} \mathcal{L}_{model}`, and :math:`\nabla_{\mathbf{w}_i}^2 \mathcal{L}_{model}=\mathbf{H}_{model}` respectively. This is done as the *spectrally-regularised-LVM* package caters a general set of user-defined cost functions, each with a unique formulation, and can automatically generate the first and second-order derivatives symbolically, if necessary. The regularisation term is defined as
-
-.. math::
-    :label: constraint_appendix
-
-	\mathcal{L}_{sr}(\mathbf{w}_i) = \alpha \sum_{j=1}^{i -1} h(\mathbf{w}_{i}, \mathbf{w}_{j}), \quad i > 1.
+where :math:`\lambda_{eq}` represents the Lagrange multiplier. Note that :math:`\lambda_{eq}` is an additional parameter that increases the dimensionality of the problem by to :math:`D + 1`. In the derivation that follows, we generalise the objective function, its gradient vector and Hessian to :math:`\mathcal{L}_{model}`, :math:`\nabla_{\mathbf{w}_i} \mathcal{L}_{model}`, and :math:`\nabla_{\mathbf{w}_i}^2 \mathcal{L}_{model}=\mathbf{H}_{model}` respectively. This is done as the *spectrally-regularised-LVM* package caters a general set of user-defined cost functions, each with a unique formulation, and can automatically generate the first and second-order derivatives symbolically, if necessary.
 
 The gradient of the Lagrangian function with respect to :math:`\mathbf{w}_i` can be expressed as
 
 .. math::
     :label: gradient_vector
 
-	\nabla_{\mathbf{w}_i} \mathcal{L} = \nabla_{\mathbf{w}_i} \mathcal{L}_{model} + \alpha \sum_{j=1}^{i - 1} \left. \nabla_{\mathbf{w}_i} h  \right\rvert_{\mathbf{w}_j} + 2 \cdot \lambda_{eq} \cdot \mathbf{w}_i.
+	\nabla_{\mathbf{w}_i} \mathcal{L} = \nabla_{\mathbf{w}_i} \mathcal{L}_{model} + \alpha \cdot \nabla_{\mathbf{w}_i} \mathcal{L}_{sr}(\mathbf{w}_i) + 2 \cdot \lambda_{eq} \cdot \mathbf{w}_i.
 
 The gradient of Equation :eq:`Lagrangian-function` with respect to :math:`\lambda_{eq}` is given as
 
@@ -177,13 +179,13 @@ where :math:`\boldsymbol\phi_i = \left[ \begin{smallmatrix} \mathbf{w}_i \\ \lam
 			\frac{\partial}{\partial \lambda_{eq}} \left( \nabla_{\mathbf{w}_i}^T \mathcal{L} \right) & \nabla^2_{\lambda_{eq}} \mathcal{L}
 		\end{bmatrix}
 
-where each term can be computed in turn. The Jacobian of the gradient vector in Equation \eqref{eq:gradient_vector} is expressed as
+where each term can be computed in turn. The Jacobian of the gradient vector in Equation :eq:`gradient_vector` is expressed as
 
 .. math::
 
 	\begin{align}
-		\nabla^2_{\mathbf{w}_i} \mathcal{L} &= \nabla^2_{\mathbf{w}_i} \mathcal{L}_{model} + \alpha \sum_{j=1}^{i - 1} \left.  \nabla_{\mathbf{w}_i}^2 h  \right\rvert_{\mathbf{w}_j} + 2 \cdot \lambda_{eq} \cdot \mathbf{I} \\
-		&= \mathbf{H}_{model} + \alpha \sum_{j=1}^{i - 1} \left. \mathbf{H}_{sr} \right\rvert_{\mathbf{w}_j} + 2 \cdot \lambda_{eq} \cdot \mathbf{I}.
+		\nabla^2_{\mathbf{w}_i} \mathcal{L} &= \nabla^2_{\mathbf{w}_i} \mathcal{L}_{model} + \alpha \nabla_{\mathbf{w}_i}^2 \mathcal{L}_{sr} + 2 \cdot \lambda_{eq} \cdot \mathbf{I} \\
+		&= \mathbf{H}_{model} + \alpha \cdot \mathbf{H}_{sr} + 2 \cdot \lambda_{eq} \cdot \mathbf{I}.
 	\end{align}
 
 The second term in the Hessian is the derivative of :math:`\partial \mathcal{L} / \partial \mathbf{\lambda_{eq}}` with respect to :math:`\mathbf{w}_i`. This can be obtained through
@@ -205,7 +207,7 @@ These terms complete the Hessian matrix given in Equation :eq:`Lagrangian-functi
 
 	\mathbf{H}_{\mathcal{L}}(\boldsymbol{\phi}_i^{(k)}) \Delta \boldsymbol{\phi}_i = - \nabla_{\boldsymbol\phi_i}\mathcal{L}(\boldsymbol{\phi}_i^{(k)}),
 
-where :math:`\Delta \boldsymbol{\phi}_i = \left[\begin{smallmatrix} \Delta \mathbf{w}_i \\ \Delta \lambda_{eq} \end{smallmatrix}\right]` represents the parameter update vector that is solved through the square system of equations. The respective parameters can then be updated through
+where :math:`\Delta \boldsymbol{\phi}_i \in \mathbb{R}^{D + 1} = \left[\begin{smallmatrix} \Delta \mathbf{w}_i \\ \Delta \lambda_{eq} \end{smallmatrix}\right]` represents the parameter update vector that is solved through the square system of equations. The respective parameters can then be updated through
 
 .. math::
     :label: update_w
@@ -251,9 +253,9 @@ where :math:`\boldsymbol\mu \in \mathbb{R}^{L_w}` is a column vector of the feat
 
 	\tilde{\mathbf{x}} = \mathbf{U} \mathbf{L}^{-1/2} \mathbf{U}^T \overline{\mathbf{x}},
 
-where :math:`\tilde{\mathbf{x}}` is the transformed variable, :math:`\mathbf{U} \in \mathbb{R}^{L_w \times L_w}` is a matrix that represents the eigenvectors of the data covariance matrix :math:`\mathbf{C} = \mathbb{E} \{  \overline{\mathbf{x}} \, \overline{\mathbf{x}}^T \}`, and :math:`\mathbf{L}  \in \mathbb{R}^{L_w \times L_w}` is a diagonal matrix which contains the eigenvalues of :math:`\mathbf{C}`.
+where :math:`\tilde{\mathbf{x}}` is the transformed variable, :math:`\mathbf{U} \in \mathbb{R}^{L_w \times L_w}` is a matrix that represents the eigenvectors of the data covariance matrix :math:`\mathbf{C} = \mathbb{E} \{  \overline{\mathbf{x}} \, \overline{\mathbf{x}}^T \}`, and :math:`\mathbf{L}^{-1/2}  \in \mathbb{R}^{L_w \times L_w} = \text{diag}\left( 1/\sqrt{\lambda_1} , \cdots, 1 / \sqrt{\lambda_{L_w}}  \right)` is a diagonal matrix which contains the reciprocal of the square root of the eigenvalues of :math:`\mathbf{C}`.
 
-To provide users with the flexibility to choose between the prescribed update strategy, which uses Newton's method to obtain a stationary point of the Lagrangian expression, a \texttt{use\_hessian} flag, as described in Table \ref{tab:model_parameters}, is used to specify whether the Hessian matrix is computed or replaced with an identity matrix, :math:`H_{\mathcal{L}} = \mathbf{I} \in \mathbb{R}^{D + 1 \times D + 1}`. This allows users to choose between the prescribed optimisation strategy and standard gradient descent with a fixed learning rate.
+To provide users with the flexibility to choose between the prescribed update strategy, which uses Newton's method to obtain a stationary point of the Lagrangian expression, a ``second_order`` flag is used in the :py:class:`LinearModel <spectrally_regularised_LVMs.spectrally_regularised_model.LinearModel>` class to specify whether the Hessian matrix is computed or replaced with an identity matrix, :math:`H_{\mathcal{L}} = \mathbf{I} \in \mathbb{R}^{D + 1 \times D + 1}`. This allows users to choose between the prescribed optimisation strategy and standard gradient descent with a fixed learning rate.
 
 Thus, the general optimisation algorithm used by the *spectrally-regularised-LVMs* package is given as
 

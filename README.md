@@ -29,15 +29,16 @@ $ pip install spectrally-regularised-LVMs
 This package used Python ≥ 3.10 or later to run. For other python dependencies, please check the `pyproject.toml`
 [file](https://github.com/RyanBalshaw/spectrally-regularised-LVMs/blob/main/pyproject.toml) included in this repository. The dependencies of this package are as follows:
 
-|          Package                   	           | Version 	  |
-|:----------------------------------------------:|:----------:|
-|    [Python](https://www.python.org/)      	    | ≥ 3.10  	  |
-|     [Numpy](https://numpy.org/)         	      | ≥ 1.23.1 	 |
-|   [Matplotlib](https://matplotlib.org/)    	   | ≥ 3.5.2 	  |
-|     [SciPy](https://scipy.org/)         	      | ≥ 1.8.1 	  |
-|  [scikit-learn](https://scikit-learn.org/)  	  | ≥ 1.1.2 	  |
-|   [tqdm](https://github.com/tqdm/tqdm)     	   | ≥ 4.64.1 	 |
-| [SymPy](https://www.sympy.org/en/index.html) 	 | ≥ 1.1.1 	  |
+|           Package                   	           | Version 	  |
+|:-----------------------------------------------:|:----------:|
+|    [Python](https://www.python.org/)      	     | ≥ 3.10  	  |
+|      [Numpy](https://numpy.org/)         	      | ≥ 1.23.1 	 |
+|   [Matplotlib](https://matplotlib.org/)    	    | ≥ 3.5.2 	  |
+|      [SciPy](https://scipy.org/)         	      | ≥ 1.8.1 	  |
+|  [scikit-learn](https://scikit-learn.org/)  	   | ≥ 1.1.2 	  |
+|   [tqdm](https://github.com/tqdm/tqdm)     	    | ≥ 4.64.1 	 |
+| [SymPy](https://www.sympy.org/en/index.html) 	  | ≥ 1.1.1 	  |
+| [Poetry](https://python-poetry.org/) 	 | ≥ 1.4 	  |
 
 # API usage
 Please visit [the docs](http://spectrally-regularised-lvms.readthedocs.io/) for all supporting API documentation for this package.

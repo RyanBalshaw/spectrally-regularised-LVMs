@@ -25,7 +25,6 @@ Contents
     guide
     modules
     parameter_estimation
-    acknowledgements
 
 Indices and tables
 ==================
