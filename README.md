@@ -6,17 +6,15 @@
 ![Read the Docs](https://img.shields.io/readthedocs/spectrally-regularised-lvms?color=informational)
 ![GitHub issues](https://img.shields.io/github/issues/RyanBalshaw/spectrally-regularised-LVMs?color=critical)
 
-*Current version:* 0.1.2
-
-Spectrally-regularised-LVMs is a Python-based package which facilitates the estimation of the linear latent variable model (LVM) parameters with a unique spectral regularisation term in single channel time-series applications.
+*Spectrally-regularised-LVMs* is a Python-based package which facilitates the estimation of the linear latent variable model (LVM) parameters with a unique spectral regularisation term in single channel time-series applications.
 
 ## Purpose
-LVMs are a statistical methodology which tries to capture the underlying structure in some observed data. This package caters to single channel time-series applications and provides a methodology to estimate the LVM parameters. The model parameters are encouraged to be diverse via a spectral regularisation term which penalises source duplication of the spectral information captured by the latent sources.
+LVMs are a statistical methodology which tries to capture the underlying structure in some observed data. This package caters to single channel time-series applications and provides a methodology to estimate the LVM parameters. The model parameters are encouraged to capture non-duplicate information via a spectral regularisation term which penalises source duplication of the spectral information captured by the latent sources.
 
-The purpose of this package is to provide a complete methodology that caters to a variety of LVM objective functions.
+The purpose of this package is to provide a complete framework for LVMs with spectral regularisation that caters to a variety of LVM objective functions.
 
 # Documentation
-Please visit [the docs](http://spectrally-regularised-lvms.readthedocs.io/) for all supporting documentation for this package.
+Please visit the [documentation](http://spectrally-regularised-lvms.readthedocs.io/) page for all supporting documentation for this package.
 
 # Installation
 The package is designed to be used through the Python API, and  can be installed using [pip](https://pypi.org/project/pip/):
@@ -24,26 +22,29 @@ The package is designed to be used through the Python API, and  can be installed
 $ pip install spectrally-regularised-LVMs
 ```
 
+A more detailed discussion regarding installation is given in the [documentation](http://spectrally-regularised-lvms.readthedocs.io/).
+
 # Requirements
 
 This package used Python ≥ 3.10 or later to run. For other python dependencies, please check the `pyproject.toml`
 [file](https://github.com/RyanBalshaw/spectrally-regularised-LVMs/blob/main/pyproject.toml) included in this repository. The dependencies of this package are as follows:
 
-|          Package                   	           | Version 	  |
-|:----------------------------------------------:|:----------:|
-|    [Python](https://www.python.org/)      	    | ≥ 3.10  	  |
-|     [Numpy](https://numpy.org/)         	      | ≥ 1.23.1 	 |
-|   [Matplotlib](https://matplotlib.org/)    	   | ≥ 3.5.2 	  |
-|     [SciPy](https://scipy.org/)         	      | ≥ 1.8.1 	  |
-|  [scikit-learn](https://scikit-learn.org/)  	  | ≥ 1.1.2 	  |
-|   [tqdm](https://github.com/tqdm/tqdm)     	   | ≥ 4.64.1 	 |
-| [SymPy](https://www.sympy.org/en/index.html) 	 | ≥ 1.1.1 	  |
+|           Package                   	           | Version 	  |
+|:-----------------------------------------------:|:----------:|
+|    [Python](https://www.python.org/)      	     | ≥ 3.10  	  |
+|      [Numpy](https://numpy.org/)         	      | ≥ 1.23.1 	 |
+|   [Matplotlib](https://matplotlib.org/)    	    | ≥ 3.5.2 	  |
+|      [SciPy](https://scipy.org/)         	      | ≥ 1.8.1 	  |
+|  [scikit-learn](https://scikit-learn.org/)  	   | ≥ 1.1.2 	  |
+|   [tqdm](https://github.com/tqdm/tqdm)     	    | ≥ 4.64.1 	 |
+| [SymPy](https://www.sympy.org/en/index.html) 	  | ≥ 1.1.1 	  |
+| [Poetry](https://python-poetry.org/) 	 | ≥ 1.4 	  |
 
 # API usage
 Please visit [the docs](http://spectrally-regularised-lvms.readthedocs.io/) for all supporting API documentation for this package.
 
 # Contributing
-This package uses [Poetry](https://python-poetry.org/) for dependency management and Python packaging and [git](https://git-scm.com/) for version control. To get started, first install git and Poetry and then clone this repository via
+This package uses [Poetry](https://python-poetry.org/) for dependency management and Python packaging and [git](https://git-scm.com/) for version control. To get started, first install git and Poetry. Then one may clone this repository via
 ```console
 $ git clone git@github.com:RyanBalshaw/spectrally-regularised-LVMs.git
 $ cd spectrally-regularised-LVMs

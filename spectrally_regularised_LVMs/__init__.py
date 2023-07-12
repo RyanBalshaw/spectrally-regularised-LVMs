@@ -1,7 +1,7 @@
 # Copyright 2023-present Ryan Balshaw
 """Spectrally-regularised-LVMs. Train linear LVMs with the addition
  of a spectral regularisation term with minimal effort."""
-from .cost_functions import NegentropyCost, SympyCost, UserCost, VarianceCost
+from .cost_functions import ExplicitCost, NegentropyCost, SymbolicCost, VarianceCost
 from .helper_methods import (
     BatchSampler,
     DataProcessor,
@@ -24,8 +24,8 @@ __uri__ = "http://spectrally-regularised-lvms.readthedocs.io/"
 __all__ = [
     "SpectralObjective",
     "NegentropyCost",
-    "SympyCost",
-    "UserCost",
+    "SymbolicCost",
+    "ExplicitCost",
     "VarianceCost",
     "hankel_matrix",
     "LinearModel",

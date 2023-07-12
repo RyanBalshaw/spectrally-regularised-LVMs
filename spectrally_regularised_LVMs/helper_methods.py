@@ -3,7 +3,7 @@
 The helper methods for the solver.
 
 Method 1: data_processor
-    This method implements the pre-processing steps applied to X (standardisation
+    This method implements the pre-processing steps applied to X (centering
     and/or whitening).
 
 Method 2: batch_sampler
@@ -32,11 +32,11 @@ class DataProcessor(object):
     -------
     initialise_preprocessing(X)
         A method that initialises all the processing attributes
-        for the pre-processing (standardising with whitening). Solves
+        for the pre-processing (centering with whitening). Solves
         for the whitening transform parameters.
 
-    standardise_data(X)
-        Standardises the columns of X to be zero-mean and unit-variance.
+    center_data(X)
+        Centers the columns of X to be zero-mean.
 
     preprocess_data(X)
         Transforms the X matrix to the whitened space (if required).
@@ -78,17 +78,14 @@ class DataProcessor(object):
         # Extract Nsamples and Nfeatures
         Ns, Nf = X.shape
 
-        # Get the mean and standard deviation (always automatically z-score)
+        # Get the feature-wise means
         self.mean_ = np.mean(X, axis=0, keepdims=True)
-        self.std_ = np.std(X, axis=0, keepdims=True)
 
         if self.whiten:
             # Decompose X
             # rows of Vh are the eigenvectors of A^H A (i.e., Vh = U^T)
             # Columns of U are eigenvectors of A A^H
-            U, s, Vh = np.linalg.svd(
-                (copy.deepcopy(X) - self.mean_) / self.std_, full_matrices=False
-            )
+            U, s, Vh = np.linalg.svd(copy.deepcopy(X) - self.mean_, full_matrices=False)
 
             eigenvalues = s**2 / (Ns - 1)
 
@@ -120,9 +117,9 @@ class DataProcessor(object):
 
         return self
 
-    def standardise_data(self, X):
+    def center_data(self, X):
         """
-        A method that standardises the row of the data matrix X
+        A method that centers the rows of the data matrix X
 
         Parameters
         ----------
@@ -131,13 +128,13 @@ class DataProcessor(object):
 
         Returns
         -------
-        X_standardised: ndarray
-            Zero-mean, unit variance feature matrix.
+        X_centered: ndarray
+            Zero-mean feature matrix.
         """
 
-        X_standardised = (X - self.mean_) / self.std_
+        X_centered = X - self.mean_
 
-        return X_standardised
+        return X_centered
 
     def preprocess_data(self, X):
         """
@@ -153,10 +150,10 @@ class DataProcessor(object):
         X_whitened: ndarray
             The whitened feature matrix.
         """
-        X_standardised = self.standardise_data(X)
+        X_centered = self.center_data(X)
 
-        X_whitened = (X_standardised @ self.latent_transform.T) @ self.Vh
-        # X_whitened = np.dot(X_standardised, self.latent_transform.T)
+        X_whitened = (X_centered @ self.latent_transform.T) @ self.Vh
+        # X_whitened = np.dot(X_centered, self.latent_transform.T)
 
         return X_whitened
 
@@ -175,7 +172,6 @@ class DataProcessor(object):
             The un-whitened feature matrix
         """
         X_unwhitened = np.dot(np.dot(X, self.recover_transform.T), self.Vh)
-        # X_unwhitened = np.dot(X, self.recover_transform.T)
 
         return X_unwhitened
 

@@ -9,7 +9,7 @@ The package can either be installed via the PyPi package installer `pip <https:/
 Pip installation
 ================
 
-To use spectrally-regularised-LVMs within a virtual environment, the package can be installed using pip.
+To use *spectrally-regularised-LVMs* within your local environment, the package can be installed using pip.
 
 .. code-block:: console
 
@@ -40,7 +40,13 @@ The repository can then be installed in the Poetry environment by using Poetry's
 Equivalently, the git clone step can be bypassed by directly referencing the Github repository when adding the dependency to the Poetry environment.
 
 .. code-block:: console
+
     $ poetry add git+ssh://github.com/RyanBalshaw/spectrally-regularised-LVMs.git
     $ poetry add --editable git+ssh://github.com/RyanBalshaw/spectrally-regularised-LVMs.git
 
-The ``--editable`` option can be used if you wish to install the package in editable mode.
+The ``--editable`` option can be used if you wish to install the package in editable mode. Alternatively, you can specify the dependency in the ``pyproject.toml`` file for your project.
+
+.. code-block::
+
+    [tool.poetry.dependencies]
+    my-package = {path = "../my/path", develop = true}
