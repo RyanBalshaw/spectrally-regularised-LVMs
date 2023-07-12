@@ -19,6 +19,7 @@ from .helper_methods import (
     DataProcessor,
     DeflationOrthogonalisation,
     QuasiNewton,
+    hankel_matrix,
 )
 from .spectral_regulariser import SpectralObjective
 
@@ -167,6 +168,8 @@ class LinearModel(object):
         self,
         n_sources: int,  # keep
         cost_instance: cost_inst,
+        Lw: int,
+        Lsft: int,
         whiten: bool = True,  # keep
         init_type: str = "broadband",
         perform_gso: bool = True,
@@ -178,7 +181,7 @@ class LinearModel(object):
         organise_by_kurt: bool = False,
         hessian_update_type: str = "actual",
         use_ls: bool = True,
-        use_hessian: bool = True,
+        second_order: bool = True,
         save_dir: str | None = None,
         verbose: bool = False,
     ):
@@ -192,6 +195,12 @@ class LinearModel(object):
 
         cost_instance : instance which inherits from CostClass
             The objective function instance that the user chooses.
+
+        Lw : int
+            The window length of the hankel matrix signal segments
+
+        Lsft : int
+            The shift parameter for the hankel matrix.
 
         whiten : bool (default = True)
             Specifies whether the data matrix X is to be whitened. By default, all X
@@ -242,9 +251,9 @@ class LinearModel(object):
             A flag that specifies whether a linear line search is to be performed
             on the .
 
-        use_hessian : bool (default = True)
+        second_order : bool (default = True)
             This flag specifies whether a second or first order optimisation method
-            is used. If use_hessian = False then the method defaults to gradient
+            is used. If second_order = False then the method defaults to gradient
             descent.
 
         save_dir : str | None (default = None)
@@ -257,7 +266,9 @@ class LinearModel(object):
         """
         # Initialise instances
         self.n_sources = n_sources
-        self.cost_instance = cost_instance  # ({'source_name':'exp', 'alpha':1})
+        self.cost_instance = cost_instance
+        self.Lw = Lw
+        self.Lsft = Lsft
         self.whiten = whiten
         self.var_PCA = var_PCA
         self.init_type = init_type.lower()
@@ -273,9 +284,12 @@ class LinearModel(object):
             hessian_update_type.lower()
         )  # Type of jacobian update
         self.use_ls = use_ls
-        self.use_hessian = use_hessian
+        self.second_order = second_order
         self.save_dir = save_dir
         self.verbose = verbose
+
+        # Turn off the cost instance verbosity
+        self.cost_instance.verbose = False
 
         # Sequential unconstrained minimisation technique parameters
         if self.sumt_flag:
@@ -295,18 +309,18 @@ class LinearModel(object):
             self.alpha_cnt = 0
 
         # Quasi-Newton solvers
-        if self.hessian_update_type != "actual":
+        if self.hessian_update_type != "actual" and self.second_order:
             self.quasi_newton_inst = QuasiNewton(
                 self.hessian_update_type, use_inverse=True
             )
             print("Using a quasi-Newton iteration scheme.")
 
-        if self.hessian_update_type != "actual" and self.use_hessian:
-            print(
-                "Selected quasi-Newton scheme but opted to "
-                "not use hessian in update step."
-                "\nDefaulting to quasi-Newton scheme."
-            )
+        # Adjust second order flag in cost instance
+        if self.second_order:
+            self.cost_instance.use_hessian = True
+
+        else:
+            self.cost_instance.use_hessian = False
 
         if type(self.n_sources) != int:
             print("Please enter in a valid number of sources.")
@@ -327,6 +341,9 @@ class LinearModel(object):
         if self.perform_gso:
             # Initialise the orthogonalisation instance (could be in base class)
             self.gs_inst = DeflationOrthogonalisation()
+
+    def get_hankel(self, x_signal):
+        return hankel_matrix(x_signal.squeeze(), self.Lw, self.Lsft)
 
     def kurtosis(self, y):
         """
@@ -776,7 +793,7 @@ class LinearModel(object):
         # Calculate the gradient
         gradient = self.lagrange_gradient(X, w, y, W, idx, lambda_vector)
 
-        if self.use_hessian:
+        if self.second_order:
             if self.hessian_update_type == "actual":
                 jacobian = self.lagrange_hessian(X, w, y, W, idx, lambda_vector)
 
@@ -812,7 +829,7 @@ class LinearModel(object):
         delta_w, delta_lambda = delta[: w.shape[0], [0]], delta[w.shape[0] :, [0]]
 
         # Compute quasi-Newton updates, if required
-        if self.hessian_update_type != "actual" and self.use_hessian:
+        if self.hessian_update_type != "actual" and self.second_order:
             if conv_flag:  # Compute quasi-Newton updates.
                 # Compute the new parameters
                 w_new, lambda_new = self.update_params(
@@ -841,7 +858,7 @@ class LinearModel(object):
 
         return delta_w, delta_lambda, gradient
 
-    def spectral_trainer(self, X, W, n_iters, learning_rate, tol, Lambda, Fs):
+    def spectral_trainer(self, X, W, n_iters, learning_rate, tol, use_tol, Lambda, Fs):
         """
         This method estimates the model parameters for some X and W.
 
@@ -863,6 +880,10 @@ class LinearModel(object):
         tol : float
                 The tolerance on the convergence error, error =| w_new^T @ w_prev - 1|.
                 Used to stop the solver if it converges.
+
+        use_tol : bool
+                A flag to specify if the convergence tolerance must be used.
+                If use_tol = False, the process will run for n_iters each time.
 
         Lambda : ndarray
                 A vector of lambda parameters for the Lagrange expressions.
@@ -998,10 +1019,9 @@ class LinearModel(object):
                 # Update counter
                 self.cnt_iter += 1
 
-                if self._reinit_flag:
-                    error = (
-                        np.inf
-                    )  # Stops solver from terminating on quasi-Newton re-initialisation
+                if self._reinit_flag or not use_tol:
+                    # Stops solver from terminating on quasi-Newton re-initialisation
+                    error = np.inf
 
             if self.save_dir is not None:
                 fig, ax = plt.subplots(4, 2, figsize=(8, 12))
@@ -1135,6 +1155,7 @@ class LinearModel(object):
         n_iters=1,
         learning_rate=0.1,
         tol=1e-3,
+        use_tol=True,
         Lambda=None,
         Fs: float | int = 25e3,
     ):
@@ -1160,6 +1181,10 @@ class LinearModel(object):
                 The tolerance on the convergence error, error =| w_new^T @ w_prev - 1|.
                 Used to stop the solver if it converges.
 
+        use_tol : bool
+                A flag to specify if the convergence tolerance must be used.
+                If use_tol = False, the process will run for n_iters each time.
+
         Lambda : ndarray
                 A vector of lambda parameters for the Lagrange expressions.
 
@@ -1178,7 +1203,7 @@ class LinearModel(object):
         """
         # Call the spectral trainer
         W_update, Lambda_update = self.spectral_trainer(
-            X, W, n_iters, learning_rate, tol, Lambda, Fs
+            X, W, n_iters, learning_rate, tol, use_tol, Lambda, Fs
         )
 
         # Calculate the excess kurtosis
@@ -1227,11 +1252,12 @@ class LinearModel(object):
 
     def fit(
         self,
-        X,
-        n_iters=100,
-        learning_rate=1,
-        tol=1e-4,
-        Fs: int | float = 25e3,
+        x_signal,
+        n_iters: int = 500,
+        learning_rate: float = 1.0,
+        tol: float = 1e-4,
+        use_tol: bool = True,
+        Fs: float = 1.0,
     ):
         """
         This method follows the scikit-learn API call and estimates the model parameters
@@ -1239,21 +1265,25 @@ class LinearModel(object):
 
         Parameters
         ----------
-        X : ndarray
-            The data matrix X.
+        x_signal : ndarray
+                        The single channel vibration data signal.
 
         n_iters : int
                         The max number of iterations that are to be performed for each
                         source.
 
         learning_rate : float
-                        A learning rate. This is only used if required by the user, and
-                        will only appear if use_ls is not activated.
+                        The learning rate. This is only used if required by the user,
+                        and will only appear if use_ls is not activated.
 
         tol : float
                         The tolerance on the convergence error,
                         error =| w_new^T @ w_prev - 1|. Used to stop the solver
                         if it converges.
+
+        use_tol : bool
+                        A flag to specify if the convergence tolerance must be used.
+                        If use_tol = False, the process will run for n_iters each time.
 
         Fs : float
                         The sampling frequency of the observed signal. Only used if
@@ -1267,6 +1297,9 @@ class LinearModel(object):
                         model_inst = LinearModel(...).fit(...).
 
         """
+        # Hankelise data
+        X = self.get_hankel(x_signal)
+
         # Initialise pre-processing
         self.processor_inst.initialise_preprocessing(X)
 
@@ -1310,6 +1343,7 @@ class LinearModel(object):
                     n_iters,
                     learning_rate,
                     tol,
+                    use_tol,
                     lambda_iters[-1],
                     Fs,
                 )
@@ -1391,6 +1425,7 @@ class LinearModel(object):
                 n_iters,
                 learning_rate,
                 tol,
+                use_tol,
                 Lambda,
                 Fs,
             )
@@ -1407,28 +1442,31 @@ class LinearModel(object):
 
         return self
 
-    def transform(self, X):
+    def transform(self, x_signal):
         """
         This method transforms a data matrix X to the latent space.
 
         Parameters
         ----------
-        X : ndarray
-            The data matrix X.
+        x_signal : ndarray
+            The single channel vibration data signal.
 
         Returns
         -------
         Z : ndarray
             The projection of X to the latent space.
         """
+        # Hankelise data
+        X = self.get_hankel(x_signal)
 
+        # Transform the latent space
         Z = self.processor_inst.preprocess_data(X) @ self.W.T
 
         return Z
 
-    def inverse_transform(self, Z, full_inverse: bool = False):
+    def inverse_transform(self, Z, full_inverse: bool = True):
         """
-        This method transforms a latent matrix X to the latent space.
+        This method transforms a latent matrix Z to the data space.
 
         Parameters
         ----------
@@ -1448,12 +1486,22 @@ class LinearModel(object):
         Z_ = Z.copy()
 
         # Transform back to the training feature space
-        X_recon = np.dot(Z_, self.W)
+
+        # Compute the (Moore-Penrose) pseudo-inverse of a matrix.
+        # For the orthonormal case, the inverse is just equal to W^T.
+        # See: https://w.wiki/72DE
+        if self.perform_gso:
+            X_recon = np.dot(Z_, self.W)
+
+        else:
+            pinv = np.linalg.pinv(self.W)
+
+            X_recon = Z_ @ pinv.T
 
         # Un-process the data (still zero-mean)
         X_recon = self.processor_inst.unprocess_data(X_recon)
 
-        if full_inverse:
+        if full_inverse:  # Recover the mean
             X_recon = X_recon + self.processor_inst.mean_
 
         return X_recon
@@ -1530,7 +1578,7 @@ class LinearModel(object):
 
         return dict_params
 
-    def set_model_parameters(self, X, dict_params: dict):
+    def set_model_parameters(self, x_signal, dict_params: dict):
         """
         This method takes the X matrix and a parameter dictionary, initialises the
         pre-processing components and then creates the necessary class attributes
@@ -1552,6 +1600,8 @@ class LinearModel(object):
                 initialisation of the class via
                 model_inst = LinearModel(...).set_model_parameters(...).
         """
+        # Hankelise data
+        X = self.get_hankel(x_signal)
 
         # Initialise pre-processing
         self.processor_inst.initialise_preprocessing(X)
