@@ -14,7 +14,7 @@ from .spectral_regulariser import SpectralObjective
 from .spectrally_regularised_model import LinearModel
 
 __author__ = "Ryan Balshaw"
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 __email__ = "ryanbalshaw81@gmail.com"
 __description__ = (
     "Train linear LVMs with the addition "
