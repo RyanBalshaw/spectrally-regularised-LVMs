@@ -16,10 +16,7 @@ from .spectrally_regularised_model import LinearModel
 __author__ = "Ryan Balshaw"
 __version__ = "0.1.3"
 __email__ = "ryanbalshaw81@gmail.com"
-__description__ = (
-    "Train linear LVMs with the addition "
-    "of a spectral regularisation term with minimal effort."
-)
+__description__ = "A framework of linear LVMs with spectral regularisation."
 __uri__ = "http://spectrally-regularised-lvms.readthedocs.io/"
 __all__ = [
     "SpectralObjective",
