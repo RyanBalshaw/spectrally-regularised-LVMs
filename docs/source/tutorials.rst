@@ -4,10 +4,10 @@ Tutorials
 
 In this section, different tutorials are provided on how to best make use of the package.
 
-Tutorial 1: Using an LVM
-========================
+Tutorial 1: Using a LVM
+=======================
 
-To use spectrally-regularised-LVMs, users will need to perform each of the seven steps given in the code block below.
+To use spectrally-regularised-LVMs, users will need to perform each of the six steps given in the code block below.
 
 .. code-block:: python
 
@@ -17,7 +17,7 @@ To use spectrally-regularised-LVMs, users will need to perform each of the seven
     np.random.seed(0)
 
     # Step 1: Load in the time series signal
-    data_dict = np.loadtxt("./2004.02.16.04.32.39") # This is the IMS dataset signal stored in the '/Examples/' directory on the Github page
+    data_dict = np.loadtxt("./2004.02.17.07.12.39") # This is the IMS dataset signal stored in the '/Examples/' directory on the Github page
     signal_data = data_dict[:, 0]
     Fs = 20480
 
@@ -25,7 +25,7 @@ To use spectrally-regularised-LVMs, users will need to perform each of the seven
     cost_inst = srLVMs.NegentropyCost("exp", {"alpha":1}) # negentropy objective
 
     # Step 3: Define the model
-    model_inst = srLVMs.LinearModel(n_sources = 5,
+    model_inst = srLVMs.LinearModel(n_sources = 10,
                                     cost_instance = cost_inst,
                                     Lw = 256,
                                     Lsft = 1,
