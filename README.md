@@ -39,7 +39,7 @@ This package used Python ≥ 3.10 or later to run. For other python dependencies
 |  [scikit-learn](https://scikit-learn.org/)  	   | ≥ 1.1.2 	  |
 |   [tqdm](https://github.com/tqdm/tqdm)     	    | ≥ 4.64.1 	 |
 | [SymPy](https://www.sympy.org/en/index.html) 	  | ≥ 1.1.1 	  |
-| [Poetry](https://python-poetry.org/) 	 | ≥ 1.4 	  |
+| [Poetry](https://python-poetry.org/) 	 | ≥ 2.0 	  |
 
 # API usage
 Please visit [the docs](http://spectrally-regularised-lvms.readthedocs.io/) for all supporting API documentation for this package.
