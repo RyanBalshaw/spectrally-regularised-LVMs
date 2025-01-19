@@ -1,5 +1,25 @@
+# Copyright 2023-present Ryan Balshaw under the MIT License
 """
-A script that makes matplotlib figures look awesome.
+A utility script for enhancing the appearance and consistency of matplotlib figures.
+
+This script provides functionality to improve the visual quality and formatting of
+matplotlib plots by addressing common rendering issues and inconsistencies. The main
+function 'fix()' handles:
+
+- Removal of '\mathdefault' from tick labels
+- Proper handling of mathematical text and symbols
+- Support for both 2D and 3D plots
+- Configuration of minor and major tick labels
+- Suppression of common matplotlib warnings during rendering
+
+Dependencies:
+    - matplotlib
+    - logging
+    - warnings
+
+The script is particularly useful when creating publication-quality figures that
+require consistent formatting and proper rendering of mathematical notation.
+See the example in the fix() function docstring for typical usage.
 """
 
 import logging

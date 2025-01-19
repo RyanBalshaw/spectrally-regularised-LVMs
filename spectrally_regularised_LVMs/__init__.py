@@ -1,6 +1,7 @@
-# Copyright 2023-present Ryan Balshaw
-"""Spectrally-regularised-LVMs. Train linear LVMs with the addition
- of a spectral regularisation term with minimal effort."""
+# Copyright 2023-present Ryan Balshaw under the MIT License
+"""
+Spectrally-regularised-LVMs. Train linear LVMs with the addition of a spectral regularisation term with minimal effort.
+"""
 from .cost_functions import ExplicitCost, NegentropyCost, SymbolicCost, VarianceCost
 from .helper_methods import (
     BatchSampler,

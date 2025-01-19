@@ -1,4 +1,4 @@
-# Copyright 2023-present Ryan Balshaw
+# Copyright 2023-present Ryan Balshaw under the MIT License
 """
 The helper methods for the solver.
 
