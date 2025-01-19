@@ -1,4 +1,4 @@
-# Copyright 2023-present Ryan Balshaw
+# Copyright 2023-present Ryan Balshaw Under the MIT License
 """
 This set of methods that define general cost functions that
 one can use, using user-defined analytical functions based off
