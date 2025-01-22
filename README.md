@@ -5,6 +5,7 @@
 ![PyPI - Wheel](https://img.shields.io/pypi/wheel/spectrally-regularised-lvms?color=blueviolet)
 ![Read the Docs](https://img.shields.io/readthedocs/spectrally-regularised-lvms?color=informational)
 ![GitHub issues](https://img.shields.io/github/issues/RyanBalshaw/spectrally-regularised-LVMs?color=critical)
+[![DOI](https://zenodo.org/badge/633742820.svg)](https://doi.org/10.5281/zenodo.14717880)
 
 *Spectrally-regularised-LVMs* is a Python-based [package](https://pypi.org/project/spectrally-regularised-lvms/) which facilitates the estimation of the linear latent variable model (LVM) parameters with a unique spectral regularisation term in single channel time-series applications.
 
