@@ -10,7 +10,7 @@ maintainers = [
 ]
 license = "MIT"
 readme = "README.md"
-requires-python = ">=3.10,<4.0"
+requires-python = ">=3.11,<4.0"
 homepage = "https://github.com/RyanBalshaw/spectrally-regularised-LVMs"
 repository = "https://github.com/RyanBalshaw/spectrally-regularised-LVMs"
 documentation = "https://spectrally-regularised-lvms.readthedocs.io/en/latest/"

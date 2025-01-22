@@ -27,12 +27,12 @@ A more detailed discussion regarding installation is given in the [documentation
 
 # Requirements
 
-This package used Python ≥ 3.10 or later to run. For other python dependencies, please check the `pyproject.toml`
+This package used Python ≥ 3.11 or later to run. For other python dependencies, please check the `pyproject.toml`
 [file](https://github.com/RyanBalshaw/spectrally-regularised-LVMs/blob/main/pyproject.toml) included in this repository. The dependencies of this package are as follows:
 
 |           Package                   	           | Version 	  |
 |:-----------------------------------------------:|:----------:|
-|    [Python](https://www.python.org/)      	     | ≥ 3.10  	  |
+|    [Python](https://www.python.org/)      	     | ≥ 3.11  	  |
 |      [Numpy](https://numpy.org/)         	      | ≥ 1.23.1 	 |
 |   [Matplotlib](https://matplotlib.org/)    	    | ≥ 3.5.2 	  |
 |      [SciPy](https://scipy.org/)         	      | ≥ 1.8.1 	  |
