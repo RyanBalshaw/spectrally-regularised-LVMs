@@ -343,6 +343,20 @@ class LinearModel(object):
             self.gs_inst = DeflationOrthogonalisation()
 
     def get_hankel(self, x_signal):
+        """
+        A method that gets the hankel matrix of a signal.
+
+        Parameters
+        ----------
+        x_signal : ndarray
+            The single channel vibration data signal.
+
+        Returns
+        -------
+        Hmat: ndarray
+            A no_of_samples x Lw array of sliding window segments.
+
+        """
         return hankel_matrix(x_signal.squeeze(), self.Lw, self.Lsft)
 
     def kurtosis(self, y):
@@ -1586,8 +1600,8 @@ class LinearModel(object):
 
         Parameters
         ----------
-        X : ndarray
-            The data matrix X.
+        x_signal : ndarray
+            The single channel vibration data signal.
 
         dict_params : dict
                 The parameter dictionary that is returned by the .get_model_parameters()
