@@ -24,12 +24,12 @@ classifiers = [
     "Topic :: Scientific/Engineering",
 ]
 dependencies = [
-    "numpy>=1.23.1",
+    "numpy>=1.23.1,<2.0",
     "matplotlib>=3.5.2",
     "scipy>=1.8.1",
     "scikit-learn>=1.1.2",
     "tqdm>=4.64.1",
-    "sympy>=1.11.1"
+    "sympy>=1.11.1,<1.13"
 ]
 dynamic = ["version"]
 
