@@ -8,11 +8,10 @@ build:
     post_create_environment:
       # Install poetry
       - pip install "poetry==2.0.1"
-      # Tell poetry to not use a virtual environment
-      - poetry config virtualenvs.create false
-    post_install:
-      # Install dependencies
-      - poetry install --with docs
+      # Export the requirements.txt file
+      - poetry export --with docs -f requirements.txt --output requirements.txt
+      # Install from requirements.txt
+      - pip install -r requirements.txt
 
 sphinx:
   configuration: docs/source/conf.py
