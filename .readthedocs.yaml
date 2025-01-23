@@ -8,6 +8,8 @@ build:
     post_create_environment:
       # Install poetry
       - pip install "poetry==2.0.1"
+      # Add the export plugin
+      - poetry self add poetry-plugin-export
       # Export the requirements.txt file
       - poetry export --with docs -f requirements.txt --output requirements.txt
       # Install from requirements.txt
