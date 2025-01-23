@@ -9,12 +9,13 @@ Additionally, there are two specific methods implemented here:
 - negentropy-based independent component analysis.
 """
 import warnings
-from typing import Any, Callable, Optional, Tuple, Union
+from typing import Callable, Optional, Tuple
 
 import numpy as np
 import sympy as sp
 
 from .negen_approx import initialise_sources
+
 
 class CostClass(object):
     """
@@ -161,7 +162,9 @@ class CostClass(object):
         else:
             return np.eye(w.shape[0])
 
-    def finite_difference_grad(self, X: np.ndarray, w: np.ndarray, y: np.ndarray, step_size: float) -> np.ndarray:
+    def finite_difference_grad(
+        self, X: np.ndarray, w: np.ndarray, y: np.ndarray, step_size: float
+    ) -> np.ndarray:
         """
         Finite difference gradient approximation (central difference)
 
@@ -207,7 +210,9 @@ class CostClass(object):
 
         return grad_fd
 
-    def finite_difference_hess(self, X: np.ndarray, w: np.ndarray, y: np.ndarray, step_size: float) -> np.ndarray:
+    def finite_difference_hess(
+        self, X: np.ndarray, w: np.ndarray, y: np.ndarray, step_size: float
+    ) -> np.ndarray:
         """
         Finite difference Hessian approximation (central difference)
 
@@ -264,7 +269,9 @@ class CostClass(object):
 
         return hess_fd
 
-    def check_gradient(self, X: np.ndarray, w: np.ndarray, y: np.ndarray, step_size: float = 1e-4) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def check_gradient(
+        self, X: np.ndarray, w: np.ndarray, y: np.ndarray, step_size: float = 1e-4
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         This method checks the self._cost_gradient function to determine
         whether the gradient implementation is correct based off the
@@ -323,7 +330,9 @@ class CostClass(object):
 
         return grad_current, grad_fd, grad_norm
 
-    def check_hessian(self, X: np.ndarray, w: np.ndarray, y: np.ndarray, step_size: float = 1e-4) -> Tuple[np.ndarray, np.ndarray, float]:
+    def check_hessian(
+        self, X: np.ndarray, w: np.ndarray, y: np.ndarray, step_size: float = 1e-4
+    ) -> Tuple[np.ndarray, np.ndarray, float]:
         """
         This method checks the self._cost_hessian function to determine
         whether the hessian implementation is correct based off the
@@ -461,7 +470,9 @@ class ExplicitCost(CostClass):
         """
         self._cost = cost_func
 
-    def set_gradient(self, cost_gradient: Callable[[np.ndarray, np.ndarray, np.ndarray], np.ndarray]) -> None:
+    def set_gradient(
+        self, cost_gradient: Callable[[np.ndarray, np.ndarray, np.ndarray], np.ndarray]
+    ) -> None:
         """
         This method allows one to set their gradient vector.
 
@@ -478,7 +489,9 @@ class ExplicitCost(CostClass):
         """
         self._cost_gradient = cost_gradient
 
-    def set_hessian(self, cost_hessian: Callable[[np.ndarray, np.ndarray, np.ndarray], np.ndarray]) -> None:
+    def set_hessian(
+        self, cost_hessian: Callable[[np.ndarray, np.ndarray, np.ndarray], np.ndarray]
+    ) -> None:
         """
         This method allows one to set their objective Hessian (optional).
 
@@ -494,7 +507,9 @@ class ExplicitCost(CostClass):
         """
         self._cost_hessian = cost_hessian
 
-    def get_cost(self) -> Optional[Callable[[np.ndarray, np.ndarray, np.ndarray], float]]:
+    def get_cost(
+        self,
+    ) -> Optional[Callable[[np.ndarray, np.ndarray, np.ndarray], float]]:
         """
         Method to return the cost function to the user.
 
@@ -507,7 +522,9 @@ class ExplicitCost(CostClass):
         else:
             return None
 
-    def get_gradient(self) -> Optional[Callable[[np.ndarray, np.ndarray, np.ndarray], np.ndarray]]:
+    def get_gradient(
+        self,
+    ) -> Optional[Callable[[np.ndarray, np.ndarray, np.ndarray], np.ndarray]]:
         """
         Method to return the derivative function to the user.
 
@@ -520,7 +537,9 @@ class ExplicitCost(CostClass):
         else:
             return None
 
-    def get_hessian(self) -> Optional[Callable[[np.ndarray, np.ndarray, np.ndarray], np.ndarray]]:
+    def get_hessian(
+        self,
+    ) -> Optional[Callable[[np.ndarray, np.ndarray, np.ndarray], np.ndarray]]:
         """
         A method to return the hessian function to the user.
 
@@ -929,7 +948,9 @@ class NegentropyCost(CostClass):
         # self.set_gradient(self.cost_gradient)
         # self.set_hessian(self.cost_hessian)
 
-    def _cost(self, X: np.ndarray, w: np.ndarray, y: np.ndarray) -> float:  # Important to negentropy-based ICA
+    def _cost(
+        self, X: np.ndarray, w: np.ndarray, y: np.ndarray
+    ) -> float:  # Important to negentropy-based ICA
         """
         Negentropy-estimate calculation for the objective function.
 

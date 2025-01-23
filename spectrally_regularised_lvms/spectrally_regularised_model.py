@@ -5,12 +5,12 @@ This script defines model parameter estimation process via the LinearModel class
 
 import os
 import time
-from typing import TypeVar, Any, Literal, Optional, Dict, List, Tuple, Union, Self
+from typing import Any, Dict, Self, Tuple, TypeVar, Union
 
 import numpy as np
-from scipy.optimize._linesearch import line_search_armijo
 import scipy.stats as scistats
 from matplotlib import pyplot as plt
+from scipy.optimize._linesearch import line_search_armijo
 from tqdm import tqdm
 
 from .cost_functions import CostClass
@@ -71,7 +71,7 @@ def initialise_lambda(n_sources: int) -> np.ndarray:
     A method that initialises the lambda terms for lagrange expression.
 
     This is initialised to be a vector of ones.
-    
+
     Parameters
     ----------
     n_sources : int
@@ -633,7 +633,15 @@ class LinearModel(object):
 
         return alpha_val, conv_flag
 
-    def lagrange_function(self, X: np.ndarray, w: np.ndarray, y: np.ndarray, W: np.ndarray, idx: int, lambda_vector: np.ndarray) -> float:
+    def lagrange_function(
+        self,
+        X: np.ndarray,
+        w: np.ndarray,
+        y: np.ndarray,
+        W: np.ndarray,
+        idx: int,
+        lambda_vector: np.ndarray,
+    ) -> float:
         """
         This method calculates the lagrangian expression.
 
@@ -683,7 +691,15 @@ class LinearModel(object):
 
         return objective_loss + spectral_loss + constraint[0, 0]
 
-    def lagrange_gradient(self, X: np.ndarray, w: np.ndarray, y: np.ndarray, W: np.ndarray, idx: int, lambda_vector: np.ndarray) -> np.ndarray:
+    def lagrange_gradient(
+        self,
+        X: np.ndarray,
+        w: np.ndarray,
+        y: np.ndarray,
+        W: np.ndarray,
+        idx: int,
+        lambda_vector: np.ndarray,
+    ) -> np.ndarray:
         """
         This method calculates the gradient of the lagrangian expression.
         Parameters
@@ -745,7 +761,15 @@ class LinearModel(object):
 
         return grad_vector
 
-    def lagrange_hessian(self, X: np.ndarray, w: np.ndarray, y: np.ndarray, W: np.ndarray, idx: int, lambda_vector: np.ndarray) -> np.ndarray:
+    def lagrange_hessian(
+        self,
+        X: np.ndarray,
+        w: np.ndarray,
+        y: np.ndarray,
+        W: np.ndarray,
+        idx: int,
+        lambda_vector: np.ndarray,
+    ) -> np.ndarray:
         """
         This method calculates the Hessian of the lagrangian expression.
         Parameters
@@ -793,7 +817,15 @@ class LinearModel(object):
 
         return jacobian
 
-    def parameter_update(self, X: np.ndarray, w: np.ndarray, y: np.ndarray, W: np.ndarray, idx: int, lambda_vector: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def parameter_update(
+        self,
+        X: np.ndarray,
+        w: np.ndarray,
+        y: np.ndarray,
+        W: np.ndarray,
+        idx: int,
+        lambda_vector: np.ndarray,
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         The method get an updated estimate of the parameters. Combines all the
         user choices into one simple step. It accounts for standard gradient descent,
@@ -905,7 +937,17 @@ class LinearModel(object):
 
         return delta_w, delta_lambda, gradient
 
-    def spectral_trainer(self, X: np.ndarray, W: np.ndarray, n_iters: int, learning_rate: float, tol: float, use_tol: bool, Lambda: np.ndarray, Fs: float) -> Tuple[np.ndarray, np.ndarray]:
+    def spectral_trainer(
+        self,
+        X: np.ndarray,
+        W: np.ndarray,
+        n_iters: int,
+        learning_rate: float,
+        tol: float,
+        use_tol: bool,
+        Lambda: np.ndarray,
+        Fs: float,
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """
         This method estimates the model parameters for some X and W.
 
@@ -1144,7 +1186,15 @@ class LinearModel(object):
         # Return the updated matrices
         return W_, Lambda_
 
-    def update_params(self, w_current: np.ndarray, lambda_current: np.ndarray, delta_w: np.ndarray, delta_lambda: np.ndarray, W: np.ndarray, idx: int) -> Tuple[np.ndarray, np.ndarray]:
+    def update_params(
+        self,
+        w_current: np.ndarray,
+        lambda_current: np.ndarray,
+        delta_w: np.ndarray,
+        delta_lambda: np.ndarray,
+        W: np.ndarray,
+        idx: int,
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """
         A method that computes the update to the w and lambda parameters, performs GSO
         if required by the user and ensures that w is a unit vector.
@@ -1200,10 +1250,10 @@ class LinearModel(object):
         X: np.ndarray,
         W: np.ndarray,
         Lambda: np.ndarray,
-        n_iters: int =1,
-        learning_rate: float =0.1,
-        tol: float=1e-3,
-        use_tol: bool=True,
+        n_iters: int = 1,
+        learning_rate: float = 0.1,
+        tol: float = 1e-3,
+        use_tol: bool = True,
         Fs: float | int = 25e3,
     ):
         """
@@ -1216,7 +1266,7 @@ class LinearModel(object):
 
         W : ndarray
             The source vector matrix W.
-        
+
         Lambda : ndarray
             A vector of lambda parameters for the Lagrange expressions.
 
@@ -1625,7 +1675,9 @@ class LinearModel(object):
 
         return dict_params
 
-    def set_model_parameters(self, x_signal: np.ndarray, dict_params: Dict[str, Any]) -> Self:
+    def set_model_parameters(
+        self, x_signal: np.ndarray, dict_params: Dict[str, Any]
+    ) -> Self:
         """
         This method takes the X matrix and a parameter dictionary, initialises the
         pre-processing components and then creates the necessary class attributes

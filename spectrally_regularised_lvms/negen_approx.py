@@ -3,6 +3,7 @@
 The negentropy approximation functions for the negentropy-based ICA methods.
 """
 from typing import Optional, Union
+
 import numpy as np
 
 
@@ -96,7 +97,9 @@ class LogcoshObject(object):
         # (e_au - e_n_au) / (
         # e_au + e_n_au)
 
-    def second_derivative(self, u: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+    def second_derivative(
+        self, u: Union[float, np.ndarray]
+    ) -> Union[float, np.ndarray]:
         """
         This method implements the second derivative of G(.) for g'(u)
 
@@ -230,7 +233,9 @@ class ExpObject(object):
         """
         return u * np.exp(-self.a2 * u * u / 2)
 
-    def second_derivative(self, u: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+    def second_derivative(
+        self, u: Union[float, np.ndarray]
+    ) -> Union[float, np.ndarray]:
         """
         This method implements the second derivative of G(.) for g'(u)
 

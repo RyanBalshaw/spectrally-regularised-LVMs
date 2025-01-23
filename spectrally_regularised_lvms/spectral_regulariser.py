@@ -2,8 +2,9 @@
 """
 The spectral regularisation class used for LVM parameter estimation.
 """
+from typing import Tuple, Union
+
 import numpy as np
-from typing import Union, Tuple
 
 
 class SpectralObjective(object):
@@ -55,7 +56,13 @@ class SpectralObjective(object):
             of a MxNxN matrix of M Hessians.
     """
 
-    def __init__(self, N: int | float, save_hessian_flag: bool = True, inv_hessian_flag: bool = True, verbose: bool = False) -> None:
+    def __init__(
+        self,
+        N: int | float,
+        save_hessian_flag: bool = True,
+        inv_hessian_flag: bool = True,
+        verbose: bool = False,
+    ) -> None:
         """
         This method initialises the spectral constraint. It allows the user to
         define whether they wish to save the Hessian matrix in the instance,
@@ -147,7 +154,9 @@ class SpectralObjective(object):
         return Re, Im
 
     @staticmethod
-    def Hadamard_product(A: np.ndarray, x: np.ndarray, vectorised_flag: bool = False) -> np.ndarray:
+    def Hadamard_product(
+        A: np.ndarray, x: np.ndarray, vectorised_flag: bool = False
+    ) -> np.ndarray:
         """
         A method that computes the Hadamard product of v = A @ x.
 
@@ -402,7 +411,9 @@ class SpectralObjective(object):
 
             return gradient.T  # See note in docstring
 
-    def spectral_hessian(self, w: np.ndarray, w1: np.ndarray) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
+    def spectral_hessian(
+        self, w: np.ndarray, w1: np.ndarray
+    ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
         """
         This method computes the second derivative of the spectral constraint
         loss function w.r.t w.
