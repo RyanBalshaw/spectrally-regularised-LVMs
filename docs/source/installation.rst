@@ -13,7 +13,7 @@ To use *spectrally-regularised-LVMs* within your local environment, the package 
 
 .. code-block:: console
 
-   (.venv) $ pip install spectrally-regularised-LVMs
+   (.venv) $ pip install spectrally-regularised-lvms
 
 Cloning from Github
 ===================

@@ -23,7 +23,7 @@ where :math:`L_w` is the window length, :math:`L_{sft}` is the shift parameter, 
 .. code-block:: python
     :linenos:
 
-    import spectrally_regularised_LVMs as srLVMs
+    import spectrally_regularised_lvms as srLVMs
     import numpy as np
 
     Fs = 1000 # Sampling frequency
@@ -61,7 +61,7 @@ For the symbolic implementation of an objective function, `SymPy <https://www.sy
     :linenos:
 
     import sympy as sp
-    import spectrally_regularised_LVMs as srLVMs
+    import spectrally_regularised_lvms as srLVMs
 
     # Symbolic cost function implementation
     cost_inst = srLVMs.SymbolicCost(use_hessian = True,
@@ -91,7 +91,7 @@ Alternatively, users can provide an explicit version of an objective function vi
     :linenos:
 
     import numpy as np
-    import spectrally_regularised_LVMs as srLVMs
+    import spectrally_regularised_lvms as srLVMs
 
     # Explicit cost function implementation
     cost_inst = srLVMs.ExplicitCost(use_hessian = True,

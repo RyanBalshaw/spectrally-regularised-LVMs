@@ -20,7 +20,7 @@ Please visit the [documentation](http://spectrally-regularised-lvms.readthedocs.
 # Installation
 The package is designed to be used through the Python API, and  can be installed using [pip](https://pypi.org/project/pip/):
 ```console
-$ pip install spectrally-regularised-LVMs
+$ pip install spectrally-regularised-lvms
 ```
 
 A more detailed discussion regarding installation is given in the [documentation](http://spectrally-regularised-lvms.readthedocs.io/).
@@ -30,16 +30,16 @@ A more detailed discussion regarding installation is given in the [documentation
 This package used Python ≥ 3.11 or later to run. For other python dependencies, please check the `pyproject.toml`
 [file](https://github.com/RyanBalshaw/spectrally-regularised-LVMs/blob/main/pyproject.toml) included in this repository. The dependencies of this package are as follows:
 
-|           Package                   	           | Version 	  |
-|:-----------------------------------------------:|:----------:|
-|    [Python](https://www.python.org/)      	     | ≥ 3.11  	  |
-|      [Numpy](https://numpy.org/)         	      | ≥ 1.23.1 	 |
-|   [Matplotlib](https://matplotlib.org/)    	    | ≥ 3.5.2 	  |
-|      [SciPy](https://scipy.org/)         	      | ≥ 1.8.1 	  |
-|  [scikit-learn](https://scikit-learn.org/)  	   | ≥ 1.1.2 	  |
-|   [tqdm](https://github.com/tqdm/tqdm)     	    | ≥ 4.64.1 	 |
-| [SymPy](https://www.sympy.org/en/index.html) 	  | ≥ 1.1.1 	  |
-| [Poetry](https://python-poetry.org/) 	 | ≥ 2.0 	  |
+|           Package                   	           |     Version 	     |
+|:-----------------------------------------------:|:-----------------:|
+|    [Python](https://www.python.org/)      	     |     ≥ 3.11  	     |
+|      [Numpy](https://numpy.org/)         	      | ≥ 1.23.1, < 2.0	  |
+|   [Matplotlib](https://matplotlib.org/)    	    |     ≥ 3.5.2 	     |
+|      [SciPy](https://scipy.org/)         	      |     ≥ 1.8.1 	     |
+|  [scikit-learn](https://scikit-learn.org/)  	   |     ≥ 1.1.2 	     |
+|   [tqdm](https://github.com/tqdm/tqdm)     	    |    ≥ 4.64.1 	     |
+| [SymPy](https://www.sympy.org/en/index.html) 	  | ≥ 1.1.1, < 1.13 	 |
+| [Poetry](https://python-poetry.org/) 	 |      ≥ 2.0 	      |
 
 # API usage
 Please visit [the docs](http://spectrally-regularised-lvms.readthedocs.io/) for all supporting API documentation for this package.
@@ -57,9 +57,11 @@ $ poetry install --with dev,docs
 $ poetry shell
 ```
 
+If you obtain an error with the `poetry shell` command, please make sure to see this [release note](https://python-poetry.org/blog/announcing-poetry-2.0.0/#poetry-export-and-poetry-shell-only-available-via-plugins) for Poetry version 2. You can check your poetry version with `poetry --version`.
+
 This will install all necessary package dependencies and activate the virtual environment. You can then set up the [pre-commit](https://pre-commit.com/) hooks via
 ```console
-$ pre-commit install
+$ pre-commit install -t pre-push
 pre-commit installed at .git/hooks/pre-commit
 ```
 

@@ -1,5 +1,6 @@
-# Copyright 2023-present Ryan Balshaw under the MIT License
 """
+Copyright 2023-present Ryan Balshaw under the MIT License
+
 A utility script for enhancing the appearance and consistency of matplotlib figures.
 
 This script provides functionality to improve the visual quality and formatting of
@@ -26,7 +27,6 @@ import logging
 import warnings
 
 from matplotlib import pyplot as plt
-from matplotlib.mathtext import MathTextWarning
 
 
 def fix(ax, minor_flag: bool = True, flag_3d: bool = False):
@@ -111,9 +111,8 @@ def fix(ax, minor_flag: bool = True, flag_3d: bool = False):
     logger = logging.getLogger("matplotlib.mathtext")
     original_level = logger.getEffectiveLevel()
     logger.setLevel(logging.ERROR)
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", category=MathTextWarning)
-        fig.canvas.draw()
+    
+    fig.canvas.draw()
     logger.setLevel(original_level)
 
     # Remove '\mathdefault' from all minor tick labels
