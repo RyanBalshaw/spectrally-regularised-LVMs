@@ -20,7 +20,7 @@ Method 5: Hankel_matrix
 """
 
 import copy
-from typing import Optional, Iterator, Any, Self
+from typing import Any, Iterator, Optional, Self
 
 import numpy as np
 
@@ -190,7 +190,9 @@ class BatchSampler(object):
         Xi = next(data_sampler)
     """
 
-    def __init__(self, batch_size: int, random_sampler: bool = True, include_end: bool = False):
+    def __init__(
+        self, batch_size: int, random_sampler: bool = True, include_end: bool = False
+    ):
         """
         Parameters
         ----------
@@ -233,7 +235,9 @@ class BatchSampler(object):
 
         """
         if hasattr(data, "copy"):
-            self._data = data.copy()  # Implicity requires the data to have a copy method
+            self._data = (
+                data.copy()
+            )  # Implicity requires the data to have a copy method
 
         else:
             print(
@@ -366,7 +370,9 @@ class QuasiNewton(object):
         self.use_inverse = use_inverse
         self.iter_index = 0
 
-    def symmetric_rank_one(self, delta_params_k: np.ndarray, grad_diff_k: np.ndarray) -> np.ndarray:
+    def symmetric_rank_one(
+        self, delta_params_k: np.ndarray, grad_diff_k: np.ndarray
+    ) -> np.ndarray:
         """
         The SR1 update step
 
@@ -396,7 +402,9 @@ class QuasiNewton(object):
 
         return update_term
 
-    def davidson_fletcher_powell(self, delta_params_k: np.ndarray, grad_diff_k: np.ndarray) -> np.ndarray:
+    def davidson_fletcher_powell(
+        self, delta_params_k: np.ndarray, grad_diff_k: np.ndarray
+    ) -> np.ndarray:
         """
         The DFP update step
 
@@ -442,7 +450,9 @@ class QuasiNewton(object):
 
         return update_term
 
-    def boyden_fletcher_goldfarb_shanno(self, delta_params_k: np.ndarray, grad_diff_k: np.ndarray) -> np.ndarray:
+    def boyden_fletcher_goldfarb_shanno(
+        self, delta_params_k: np.ndarray, grad_diff_k: np.ndarray
+    ) -> np.ndarray:
         """
         The BFGS update step
 
@@ -533,7 +543,9 @@ class QuasiNewton(object):
 
         return update
 
-    def update_jacobian(self, delta_params_k: np.ndarray, grad_diff_k: np.ndarray) -> None:
+    def update_jacobian(
+        self, delta_params_k: np.ndarray, grad_diff_k: np.ndarray
+    ) -> None:
         """
         A method that updates the jacobian_mat_iter attribute.
 

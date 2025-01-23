@@ -24,7 +24,6 @@ See the example in the fix() function docstring for typical usage.
 """
 
 import logging
-import warnings
 
 from matplotlib import pyplot as plt
 
@@ -111,7 +110,7 @@ def fix(ax, minor_flag: bool = True, flag_3d: bool = False):
     logger = logging.getLogger("matplotlib.mathtext")
     original_level = logger.getEffectiveLevel()
     logger.setLevel(logging.ERROR)
-    
+
     fig.canvas.draw()
     logger.setLevel(original_level)
 
