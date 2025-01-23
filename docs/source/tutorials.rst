@@ -13,7 +13,7 @@ To use spectrally-regularised-LVMs, users will need to perform each of the six s
 
     # Define imports
     import numpy as np
-    import spectrally_regularised_LVMs as srLVMs
+    import spectrally_regularised_lvms as srLVMs
     np.random.seed(0)
 
     # Step 1: Load in the time series signal
@@ -54,7 +54,7 @@ Users can use `Sympy <https://www.sympy.org/en/index.html>`_ to implement their 
 .. code-block:: python
 
     # Define imports
-    import spectrally_regularised_LVMs as srLVMs
+    import spectrally_regularised_lvms as srLVMs
     import numpy as np
     import sympy as sp
     np.random.seed(0)
@@ -89,7 +89,7 @@ This method allows users to implement their objective function and all required 
 .. code-block:: python
 
     # Define imports
-    import spectrally_regularised_LVMs as srLVMs
+    import spectrally_regularised_lvms as srLVMs
     import numpy as np
     np.random.seed(0)
 
@@ -134,7 +134,7 @@ Variance objective function:
 .. code-block:: python
 
     # Define imports
-    import spectrally_regularised_LVMs as srLVMs
+    import spectrally_regularised_lvms as srLVMs
     import numpy as np
     np.random.seed(0)
 
@@ -159,7 +159,7 @@ Negentropy objective function:
 .. code-block:: python
 
     # Define imports
-    import spectrally_regularised_LVMs as srLVMs
+    import spectrally_regularised_lvms as srLVMs
     import numpy as np
     np.random.seed(0)
 

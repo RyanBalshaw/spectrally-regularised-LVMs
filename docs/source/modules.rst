@@ -5,7 +5,7 @@ Modules
 Negentropy approximators
 ========================
 
-.. automodule:: spectrally_regularised_LVMs.negen_approx
+.. automodule:: spectrally_regularised_lvms.negen_approx
     :members:
     :autosummary:
     :undoc-members:
@@ -14,7 +14,7 @@ Negentropy approximators
 Cost functions
 ==============
 
-.. automodule:: spectrally_regularised_LVMs.cost_functions
+.. automodule:: spectrally_regularised_lvms.cost_functions
     :members:
     :autosummary:
     :undoc-members:
@@ -23,7 +23,7 @@ Cost functions
 Spectral regulariser
 ====================
 
-.. automodule:: spectrally_regularised_LVMs.spectral_regulariser
+.. automodule:: spectrally_regularised_lvms.spectral_regulariser
     :members:
     :autosummary:
     :undoc-members:
@@ -32,7 +32,7 @@ Spectral regulariser
 Helper methods
 ==============
 
-.. automodule:: spectrally_regularised_LVMs.helper_methods
+.. automodule:: spectrally_regularised_lvms.helper_methods
     :members:
     :autosummary:
     :undoc-members:
@@ -41,7 +41,7 @@ Helper methods
 Spectrally regularised model
 ============================
 
-.. automodule:: spectrally_regularised_LVMs.spectrally_regularised_model
+.. automodule:: spectrally_regularised_lvms.spectrally_regularised_model
     :members:
     :autosummary:
     :undoc-members:
