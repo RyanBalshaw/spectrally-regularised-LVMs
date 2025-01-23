@@ -3,6 +3,7 @@
 The spectral regularisation class used for LVM parameter estimation.
 """
 import numpy as np
+from typing import Union, Tuple
 
 
 class SpectralObjective(object):
@@ -54,7 +55,7 @@ class SpectralObjective(object):
             of a MxNxN matrix of M Hessians.
     """
 
-    def __init__(self, N, save_hessian_flag=True, inv_hessian_flag=True, verbose=False):
+    def __init__(self, N: int | float, save_hessian_flag: bool = True, inv_hessian_flag: bool = True, verbose: bool = False) -> None:
         """
         This method initialises the spectral constraint. It allows the user to
         define whether they wish to save the Hessian matrix in the instance,
@@ -95,7 +96,7 @@ class SpectralObjective(object):
         # Get R and I
         self.R, self.I = self.decompose_DFT()
 
-    def dftmtx(self):
+    def dftmtx(self) -> np.ndarray:
         """
         Computes the DFT matrix.
 
@@ -124,7 +125,7 @@ class SpectralObjective(object):
 
         return DFT_matrix
 
-    def decompose_DFT(self):
+    def decompose_DFT(self) -> Tuple[np.ndarray, np.ndarray]:
         """
         Splits the complex DFT matrix into its real and imaginary components.
 
@@ -146,7 +147,7 @@ class SpectralObjective(object):
         return Re, Im
 
     @staticmethod
-    def Hadamard_product(A, x, vectorised_flag=False):
+    def Hadamard_product(A: np.ndarray, x: np.ndarray, vectorised_flag: bool = False) -> np.ndarray:
         """
         A method that computes the Hadamard product of v = A @ x.
 
@@ -179,7 +180,7 @@ class SpectralObjective(object):
         return v**2  # (Ax) * (Ax) #
 
     @staticmethod
-    def Hadamard_derivative(A, x):
+    def Hadamard_derivative(A: np.ndarray, x: np.ndarray) -> np.ndarray:
         """
         A method that computes the derivative of Hadamard product of
         v = A @ x w.r.t x.
@@ -208,7 +209,7 @@ class SpectralObjective(object):
 
         return 2 * v * A  # 2 * np.diag(Ax[:, 0]) @ A
 
-    def check_w_want(self, w1):
+    def check_w_want(self, w1: np.ndarray) -> bool:
         """
         A method that checks the shape of the vector w1.
 
@@ -234,7 +235,7 @@ class SpectralObjective(object):
         else:
             return False
 
-    def Xw(self, Re, Im, w):
+    def Xw(self, Re: np.ndarray, Im: np.ndarray, w: np.ndarray) -> np.ndarray:
         """
         This method computes the squared modulus of the Fourier representation of
         a vector or matrix w. Instead of using a vectorised_flag (haramard_product is
@@ -275,7 +276,7 @@ class SpectralObjective(object):
 
         return spectral_representation
 
-    def spectral_loss(self, w, w1):
+    def spectral_loss(self, w: np.ndarray, w1: np.ndarray) -> Union[float, np.ndarray]:
         """
         This method computes the spectral constraint loss function.
 
@@ -331,7 +332,7 @@ class SpectralObjective(object):
             loss = Xw_want @ Xw_current
             return loss
 
-    def spectral_derivative(self, w, w1):
+    def spectral_derivative(self, w: np.ndarray, w1: np.ndarray) -> np.ndarray:
         """
         This method computes the first derivative of the spectral constraint
         loss function w.r.t w.
@@ -401,7 +402,7 @@ class SpectralObjective(object):
 
             return gradient.T  # See note in docstring
 
-    def spectral_hessian(self, w, w1):
+    def spectral_hessian(self, w: np.ndarray, w1: np.ndarray) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
         """
         This method computes the second derivative of the spectral constraint
         loss function w.r.t w.

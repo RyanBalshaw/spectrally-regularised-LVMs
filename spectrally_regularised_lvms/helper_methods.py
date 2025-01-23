@@ -20,6 +20,7 @@ Method 5: Hankel_matrix
 """
 
 import copy
+from typing import Optional, Iterator, Any, Self
 
 import numpy as np
 
@@ -45,7 +46,7 @@ class DataProcessor(object):
         Transforms an X matrix from the whitened space to the data space.
     """
 
-    def __init__(self, whiten: bool = True, var_PCA: float | None = None):
+    def __init__(self, whiten: bool = True, var_PCA: Optional[float] = None):
         """
         Parameters
         ----------
@@ -60,7 +61,7 @@ class DataProcessor(object):
         self.whiten = whiten
         self.var_PCA = var_PCA
 
-    def initialise_preprocessing(self, X):
+    def initialise_preprocessing(self, X: np.ndarray) -> Self:
         """
         A method that initialises the aspects of the data pre-processing stage.
 
@@ -117,7 +118,7 @@ class DataProcessor(object):
 
         return self
 
-    def center_data(self, X):
+    def center_data(self, X: np.ndarray) -> np.ndarray:
         """
         A method that centers the rows of the data matrix X
 
@@ -136,7 +137,7 @@ class DataProcessor(object):
 
         return X_centered
 
-    def preprocess_data(self, X):
+    def preprocess_data(self, X: np.ndarray) -> np.ndarray:
         """
         A method that pre-processes the data matrix X
 
@@ -157,7 +158,7 @@ class DataProcessor(object):
 
         return X_whitened
 
-    def unprocess_data(self, X):
+    def unprocess_data(self, X: np.ndarray) -> np.ndarray:
         """
         A method that un-whitens the whitened data matrix X
 
@@ -189,7 +190,7 @@ class BatchSampler(object):
         Xi = next(data_sampler)
     """
 
-    def __init__(self, batch_size, random_sampler=True, include_end=False):
+    def __init__(self, batch_size: int, random_sampler: bool = True, include_end: bool = False):
         """
         Parameters
         ----------
@@ -209,7 +210,7 @@ class BatchSampler(object):
         self.random_sampler = random_sampler
         self.include_end = include_end
 
-    def __call__(self, data, iter_idx=0):
+    def __call__(self, data: np.ndarray, iter_idx: int = 0) -> Self:
         """
         The method used when the sampler instance is called (like a function).
 
@@ -232,9 +233,7 @@ class BatchSampler(object):
 
         """
         if hasattr(data, "copy"):
-            self._data = (
-                data.copy()
-            )  # Implicity requires the data to have a copy method
+            self._data = data.copy()  # Implicity requires the data to have a copy method
 
         else:
             print(
@@ -267,7 +266,7 @@ class BatchSampler(object):
 
         return self
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Any]:
         """
         Initialises the iteration counter when iter() is applied to the sampler
         instance.
@@ -280,7 +279,7 @@ class BatchSampler(object):
 
         return self
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int) -> int:
         """
         I cannot remember what this is for.
         Perhaps it is redundant?
@@ -296,7 +295,7 @@ class BatchSampler(object):
         """
         return self._iter_range[idx]
 
-    def __next__(self):
+    def __next__(self) -> np.ndarray:
         """
         This is called during for looping over the iterator or using next(iterator).
 
@@ -367,7 +366,7 @@ class QuasiNewton(object):
         self.use_inverse = use_inverse
         self.iter_index = 0
 
-    def symmetric_rank_one(self, delta_params_k, grad_diff_k):
+    def symmetric_rank_one(self, delta_params_k: np.ndarray, grad_diff_k: np.ndarray) -> np.ndarray:
         """
         The SR1 update step
 
@@ -397,7 +396,7 @@ class QuasiNewton(object):
 
         return update_term
 
-    def davidson_fletcher_powell(self, delta_params_k, grad_diff_k):
+    def davidson_fletcher_powell(self, delta_params_k: np.ndarray, grad_diff_k: np.ndarray) -> np.ndarray:
         """
         The DFP update step
 
@@ -443,7 +442,7 @@ class QuasiNewton(object):
 
         return update_term
 
-    def boyden_fletcher_goldfarb_shanno(self, delta_params_k, grad_diff_k):
+    def boyden_fletcher_goldfarb_shanno(self, delta_params_k: np.ndarray, grad_diff_k: np.ndarray) -> np.ndarray:
         """
         The BFGS update step
 
@@ -491,7 +490,7 @@ class QuasiNewton(object):
 
         return update_term
 
-    def initialise_jacobian(self, n_features):
+    def initialise_jacobian(self, n_features: int) -> None:
         """
         A method that initialises the Jacobian matrix.
         Assumes that
@@ -508,7 +507,7 @@ class QuasiNewton(object):
 
         self.jacobian_mat_iter = np.eye(n_features)
 
-    def compute_update(self, gradient_vector):
+    def compute_update(self, gradient_vector: np.ndarray) -> np.ndarray:
         """
         A method used to compute the parameter update
         based on the gradient vector at time t.
@@ -534,7 +533,7 @@ class QuasiNewton(object):
 
         return update
 
-    def update_jacobian(self, delta_params_k, grad_diff_k):
+    def update_jacobian(self, delta_params_k: np.ndarray, grad_diff_k: np.ndarray) -> None:
         """
         A method that updates the jacobian_mat_iter attribute.
 
@@ -585,7 +584,7 @@ class DeflationOrthogonalisation(object):
     """
 
     @staticmethod
-    def projection_operator(u, v):
+    def projection_operator(u: np.ndarray, v: np.ndarray) -> np.ndarray:
         """
         Calculates projection of v onto u (equivalent to outer product map).
 
@@ -594,18 +593,19 @@ class DeflationOrthogonalisation(object):
         u: ndarray
             A Nx1 array that we wish to orthogalise against (remains unchanged)
         v: ndarray
-            A Nx1 array that we wish to orthogonalise (changes)
+            A Nx1 array that we wish to orthogalise (changes)
 
         Returns
         -------
-
+        ndarray
+            The projection of v onto u
         """
 
         return u.T @ v / (u.T @ u) * u
 
     def gram_schmidt_orthogonalisation(
-        self, w, W, idx
-    ):  # Important to negentropy-based ICA
+        self, w: np.ndarray, W: np.ndarray, idx: int
+    ) -> np.ndarray:
         """
 
         Parameters
@@ -656,7 +656,7 @@ class DeflationOrthogonalisation(object):
 
         return w_orth
 
-    def global_gso(self, W):  # Important to negentropy-based ICA
+    def global_gso(self, W: np.ndarray) -> np.ndarray:
         """
         A method that orthogonalises a set of Nx1 vectors
         stores in some W matrix of shape MxN.
@@ -685,7 +685,7 @@ class DeflationOrthogonalisation(object):
         return W_orth
 
 
-def hankel_matrix(signal, Lw=512, Lsft=1):
+def hankel_matrix(signal: np.ndarray, Lw: int = 512, Lsft: int = 1) -> np.ndarray:
     """
     A method that performs hankelisation for the user.
 

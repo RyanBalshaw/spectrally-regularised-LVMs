@@ -5,10 +5,10 @@ This script defines model parameter estimation process via the LinearModel class
 
 import os
 import time
-from typing import TypeVar
+from typing import TypeVar, Any, Literal, Optional, Dict, List, Tuple, Union, Self
 
 import numpy as np
-import scipy.optimize as sciopt
+from scipy.optimize._linesearch import line_search_armijo
 import scipy.stats as scistats
 from matplotlib import pyplot as plt
 from tqdm import tqdm
@@ -24,7 +24,7 @@ from .helper_methods import (
 from .spectral_regulariser import SpectralObjective
 
 
-def initialise_W(n_sources: int, n_features: int, init_type: str):
+def initialise_W(n_sources: int, n_features: int, init_type: str) -> np.ndarray:
     """
     A method that initialises the W matrix.
 
@@ -66,11 +66,17 @@ def initialise_W(n_sources: int, n_features: int, init_type: str):
     return W
 
 
-def initialise_lambda(n_sources):
+def initialise_lambda(n_sources: int) -> np.ndarray:
     """
     A method that initialises the lambda terms for lagrange expression.
 
     This is initialised to be a vector of ones.
+    
+    Parameters
+    ----------
+    n_sources : int
+        The number of source vectors to initialise.
+
 
     Returns
     -------
@@ -135,7 +141,7 @@ class LinearModel(object):
         A method which calculates the update to w and lambda based off some global
         delta Phi vector, normalises w and performs GSO is requested.
 
-    spectral_fit(X, W, n_iters = 1, learning_rate, tol, Lambda, Fs)
+    spectral_fit(X, W, Lambda, n_iters = 1, learning_rate, tol, Fs)
         A method that estimates the model parameters.
 
     fit(self, X, n_iters, learning_rate, tol, Fs)
@@ -184,7 +190,7 @@ class LinearModel(object):
         second_order: bool = True,
         save_dir: str | None = None,
         verbose: bool = False,
-    ):
+    ) -> None:
         """
         The initialisation of the linear_model class.
 
@@ -342,7 +348,7 @@ class LinearModel(object):
             # Initialise the orthogonalisation instance (could be in base class)
             self.gs_inst = DeflationOrthogonalisation()
 
-    def get_hankel(self, x_signal):
+    def get_hankel(self, x_signal: np.ndarray) -> np.ndarray:
         """
         A method that gets the hankel matrix of a signal.
 
@@ -359,9 +365,8 @@ class LinearModel(object):
         """
         return hankel_matrix(x_signal.squeeze(), self.Lw, self.Lsft)
 
-    def kurtosis(self, y):
+    def kurtosis(self, y: np.ndarray) -> Union[float, np.ndarray]:
         """
-
         Parameters
         ----------
         y : ndarray
@@ -371,7 +376,8 @@ class LinearModel(object):
 
         Returns
         -------
-        kurtosis of the samples.
+        float | ndarray
+            kurtosis of the samples.
         """
         if self.whiten:  # y is zero-mean unit-variance
             if y.shape[1] == 1:
@@ -387,7 +393,13 @@ class LinearModel(object):
                 return scistats.kurtosis(y, axis=0, fisher=True)
 
     @staticmethod
-    def _function(param_vector, self_inst, W, X, idx):
+    def _function(
+        param_vector: np.ndarray,
+        self_inst: Self,
+        W: np.ndarray,
+        X: np.ndarray,
+        idx: int,
+    ) -> float:
         """
         A static method that calculates the langrange expression. It is typeset so that
         it can interface with scipy.optimize.minimize methods.
@@ -431,7 +443,13 @@ class LinearModel(object):
         return self_inst.lagrange_function(X, w, y, W, idx, lambda_vector)
 
     @staticmethod
-    def _gradient(param_vector, self_inst, W, X, idx):
+    def _gradient(
+        param_vector: np.ndarray,
+        self_inst: Self,
+        W: np.ndarray,
+        X: np.ndarray,
+        idx: int,
+    ) -> np.ndarray:
         """
         A static method that calculates the gradient of the langrange expression.
         It is typeset so that it can interface with scipy.optimize.minimize methods.
@@ -477,7 +495,13 @@ class LinearModel(object):
         return self_inst.lagrange_gradient(X, w, y, W, idx, lambda_vector)[:, 0]
 
     @staticmethod
-    def _hessian(param_vector, self_inst, W, X, idx):
+    def _hessian(
+        param_vector: np.ndarray,
+        self_inst: Self,
+        W: np.ndarray,
+        X: np.ndarray,
+        idx: int,
+    ) -> np.ndarray:
         """
         A static method that calculates the Hessian of the langrange expression.
         It is typeset so that it can interface with scipy.optimize.minimize methods.
@@ -521,7 +545,16 @@ class LinearModel(object):
 
         return self_inst.lagrange_hessian(X, w, y, W, idx, lambda_vector)
 
-    def line_search(self, delta, gradient, w, lambda_vector, W, X, idx):
+    def line_search(
+        self,
+        delta: np.ndarray,
+        gradient: np.ndarray,
+        w: np.ndarray,
+        lambda_vector: np.ndarray,
+        W: np.ndarray,
+        X: np.ndarray,
+        idx: int,
+    ) -> Tuple[float, bool]:
         """
         Performs a 1D line search on the delta vector to find a step size that satisfies
         the Armijo condition. Uses scipy.optimize.minimize routines.
@@ -563,7 +596,7 @@ class LinearModel(object):
         # c2 = 0.9
         # c3 = 0.9
 
-        ls_dict = sciopt.linesearch.line_search_armijo(
+        ls_dict = line_search_armijo(
             self._function,
             x0,
             delta[:, 0].copy(),
@@ -600,7 +633,7 @@ class LinearModel(object):
 
         return alpha_val, conv_flag
 
-    def lagrange_function(self, X, w, y, W, idx, lambda_vector):
+    def lagrange_function(self, X: np.ndarray, w: np.ndarray, y: np.ndarray, W: np.ndarray, idx: int, lambda_vector: np.ndarray) -> float:
         """
         This method calculates the lagrangian expression.
 
@@ -650,7 +683,7 @@ class LinearModel(object):
 
         return objective_loss + spectral_loss + constraint[0, 0]
 
-    def lagrange_gradient(self, X, w, y, W, idx, lambda_vector):
+    def lagrange_gradient(self, X: np.ndarray, w: np.ndarray, y: np.ndarray, W: np.ndarray, idx: int, lambda_vector: np.ndarray) -> np.ndarray:
         """
         This method calculates the gradient of the lagrangian expression.
         Parameters
@@ -712,7 +745,7 @@ class LinearModel(object):
 
         return grad_vector
 
-    def lagrange_hessian(self, X, w, y, W, idx, lambda_vector):
+    def lagrange_hessian(self, X: np.ndarray, w: np.ndarray, y: np.ndarray, W: np.ndarray, idx: int, lambda_vector: np.ndarray) -> np.ndarray:
         """
         This method calculates the Hessian of the lagrangian expression.
         Parameters
@@ -760,7 +793,7 @@ class LinearModel(object):
 
         return jacobian
 
-    def parameter_update(self, X, w, y, W, idx, lambda_vector):
+    def parameter_update(self, X: np.ndarray, w: np.ndarray, y: np.ndarray, W: np.ndarray, idx: int, lambda_vector: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         The method get an updated estimate of the parameters. Combines all the
         user choices into one simple step. It accounts for standard gradient descent,
@@ -872,7 +905,7 @@ class LinearModel(object):
 
         return delta_w, delta_lambda, gradient
 
-    def spectral_trainer(self, X, W, n_iters, learning_rate, tol, use_tol, Lambda, Fs):
+    def spectral_trainer(self, X: np.ndarray, W: np.ndarray, n_iters: int, learning_rate: float, tol: float, use_tol: bool, Lambda: np.ndarray, Fs: float) -> Tuple[np.ndarray, np.ndarray]:
         """
         This method estimates the model parameters for some X and W.
 
@@ -1111,7 +1144,7 @@ class LinearModel(object):
         # Return the updated matrices
         return W_, Lambda_
 
-    def update_params(self, w_current, lambda_current, delta_w, delta_lambda, W, idx):
+    def update_params(self, w_current: np.ndarray, lambda_current: np.ndarray, delta_w: np.ndarray, delta_lambda: np.ndarray, W: np.ndarray, idx: int) -> Tuple[np.ndarray, np.ndarray]:
         """
         A method that computes the update to the w and lambda parameters, performs GSO
         if required by the user and ensures that w is a unit vector.
@@ -1164,13 +1197,13 @@ class LinearModel(object):
 
     def spectral_fit(
         self,
-        X,
-        W,
-        n_iters=1,
-        learning_rate=0.1,
-        tol=1e-3,
-        use_tol=True,
-        Lambda=None,
+        X: np.ndarray,
+        W: np.ndarray,
+        Lambda: np.ndarray,
+        n_iters: int =1,
+        learning_rate: float =0.1,
+        tol: float=1e-3,
+        use_tol: bool=True,
         Fs: float | int = 25e3,
     ):
         """
@@ -1182,37 +1215,37 @@ class LinearModel(object):
             The data matrix X.
 
         W : ndarray
-                The source vector matrix W.
+            The source vector matrix W.
+        
+        Lambda : ndarray
+            A vector of lambda parameters for the Lagrange expressions.
 
         n_iters : int
-                The max number of iterations that are to be performed for each source.
+            The max number of iterations that are to be performed for each source.
 
         learning_rate : float
-                A learning rate. This is only used if required by the user, and will
-                only appear if use_ls is not activated.
+            A learning rate. This is only used if required by the user, and will
+            only appear if use_ls is not activated.
 
         tol : float
-                The tolerance on the convergence error, error =| w_new^T @ w_prev - 1|.
-                Used to stop the solver if it converges.
+            The tolerance on the convergence error, error =| w_new^T @ w_prev - 1|.
+            Used to stop the solver if it converges.
 
         use_tol : bool
-                A flag to specify if the convergence tolerance must be used.
-                If use_tol = False, the process will run for n_iters each time.
-
-        Lambda : ndarray
-                A vector of lambda parameters for the Lagrange expressions.
+            A flag to specify if the convergence tolerance must be used.
+            If use_tol = False, the process will run for n_iters each time.
 
         Fs : float
-                The sampling frequency of the observed signal. Only used if the user
-                wants to store visualisations of the solution vectors.
+            The sampling frequency of the observed signal. Only used if the user
+            wants to store visualisations of the solution vectors.
 
         Returns
         -------
         W_update : ndarray
-                The estimated W matrix.
+            The estimated W matrix.
 
         Lambda_update : ndarray
-                The estimated Lambda values.
+            The estimated Lambda values.
 
         """
         # Call the spectral trainer
@@ -1266,13 +1299,13 @@ class LinearModel(object):
 
     def fit(
         self,
-        x_signal,
+        x_signal: np.ndarray,
         n_iters: int = 500,
         learning_rate: float = 1.0,
         tol: float = 1e-4,
         use_tol: bool = True,
         Fs: float = 1.0,
-    ):
+    ) -> Self:
         """
         This method follows the scikit-learn API call and estimates the model parameters
         based off the users initialisation choices.
@@ -1354,11 +1387,11 @@ class LinearModel(object):
                 W_update, Lambda_update = self.spectral_fit(
                     X_preprocess,
                     W_iters[-1],
+                    lambda_iters[-1],
                     n_iters,
                     learning_rate,
                     tol,
                     use_tol,
-                    lambda_iters[-1],
                     Fs,
                 )
 
@@ -1436,11 +1469,11 @@ class LinearModel(object):
             W_update, Lambda_update = self.spectral_fit(
                 X_preprocess,
                 W,
+                Lambda,
                 n_iters,
                 learning_rate,
                 tol,
                 use_tol,
-                Lambda,
                 Fs,
             )
 
@@ -1456,7 +1489,7 @@ class LinearModel(object):
 
         return self
 
-    def transform(self, x_signal):
+    def transform(self, x_signal: np.ndarray) -> np.ndarray:
         """
         This method transforms a data matrix X to the latent space.
 
@@ -1478,7 +1511,7 @@ class LinearModel(object):
 
         return Z
 
-    def inverse_transform(self, Z, full_inverse: bool = True):
+    def inverse_transform(self, Z: np.ndarray, full_inverse: bool = True) -> np.ndarray:
         """
         This method transforms a latent matrix Z to the data space.
 
@@ -1521,7 +1554,7 @@ class LinearModel(object):
         return X_recon
 
     @staticmethod
-    def compute_spectral_W(W):
+    def compute_spectral_W(W: np.ndarray) -> np.ndarray:
         """
         This method computes the spectral representation of the vectors in the W
         matrix.
@@ -1554,7 +1587,7 @@ class LinearModel(object):
 
         return spectral_W
 
-    def get_model_parameters(self):
+    def get_model_parameters(self) -> Dict[str, Any]:
         """
         This method gets all the important model parameters and .
 
@@ -1592,7 +1625,7 @@ class LinearModel(object):
 
         return dict_params
 
-    def set_model_parameters(self, x_signal, dict_params: dict):
+    def set_model_parameters(self, x_signal: np.ndarray, dict_params: Dict[str, Any]) -> Self:
         """
         This method takes the X matrix and a parameter dictionary, initialises the
         pre-processing components and then creates the necessary class attributes
