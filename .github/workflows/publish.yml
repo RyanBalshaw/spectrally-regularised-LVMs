@@ -19,7 +19,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: "3.10"
+          python-version: "3.11"
 
       - name: Install Poetry
         run: |
@@ -35,7 +35,7 @@ jobs:
         run: poetry install
 
       - name: Build and publish
-        run: poetry publish --build --dry-run
+        run: poetry publish --build
 
   release:
     needs: publish # This ensures release only runs after successful publish
@@ -45,9 +45,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
-        run: echo "Published $tag"
-        # run: |
-        #   gh release create "$tag" \
-        #       --repo="$GITHUB_REPOSITORY" \
-        #       --title="${tag#v}" \
-        #       --generate-notes
+        run: |
+           gh release create "$tag" \
+               --repo="$GITHUB_REPOSITORY" \
+               --title="${tag#v}" \
+               --generate-notes
