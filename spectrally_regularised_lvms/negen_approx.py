@@ -2,6 +2,7 @@
 """
 The negentropy approximation functions for the negentropy-based ICA methods.
 """
+from typing import Optional, Union
 import numpy as np
 
 
@@ -28,7 +29,7 @@ class LogcoshObject(object):
             Return the function form of ratio g'(u)/g(u) for the logcosh function
     """
 
-    def __init__(self, a1=None):
+    def __init__(self, a1: Optional[float] = None) -> None:
         """
 
         Parameters
@@ -42,7 +43,7 @@ class LogcoshObject(object):
                 If the a1 value is outside the recommended domain of [1, 2]
         """
         if a1 is None:
-            self.a1 = [1]  # [a1 = 1]
+            self.a1 = 1  # [a1 = 1]
 
         else:
             if a1 < 1 or a1 > 2:
@@ -53,13 +54,13 @@ class LogcoshObject(object):
 
             self.a1 = a1  # [a1]
 
-    def function(self, u):
+    def function(self, u: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """
         This method implements the functional form of G(u)
 
         Parameters
         ----------
-        u: float
+        u: float or np.ndarray
                 The input value to be fed through G(u)
 
         Returns
@@ -74,13 +75,13 @@ class LogcoshObject(object):
             * np.log((np.exp(self.a1 * u) + np.exp(-self.a1 * u)) / 2 + 1e-12)
         )  # 1e-12 for stability
 
-    def first_derivative(self, u):
+    def first_derivative(self, u: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """
         This method implements the first derivative of G(.) for g(u)
 
         Parameters
         ----------
-        u: (float):
+        u: float or np.ndarray
                 The input value to be fed through g(u)
 
         Returns
@@ -95,13 +96,13 @@ class LogcoshObject(object):
         # (e_au - e_n_au) / (
         # e_au + e_n_au)
 
-    def second_derivative(self, u):
+    def second_derivative(self, u: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """
         This method implements the second derivative of G(.) for g'(u)
 
         Parameters
         ----------
-        u: (float):
+        u: float or np.ndarray
                 The input value to be fed through g'(u)
 
         Returns
@@ -112,14 +113,14 @@ class LogcoshObject(object):
 
         return 1 - self.a1 * d1 * d1
 
-    def gamma(self, u):
+    def gamma(self, u: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """
         This method implements the ratio of the second derivative to
         the first derivative (gamma(u) = g'(u) / g(u))
 
         Parameters
         ----------
-        u: (float):
+        u: float or np.ndarray
                 The input value to be fed through gamma(u)
 
         Returns
@@ -174,7 +175,7 @@ class ExpObject(object):
             Return the function form of ratio g'(u)/g(u) for the exp function
     """
 
-    def __init__(self, a2=None):
+    def __init__(self, a2: Optional[float] = None) -> None:
         """
         Parameters
         ----------
@@ -187,7 +188,7 @@ class ExpObject(object):
                 If the a2 value is outside the recommended domain of [0, 2]
         """
         if a2 is None:
-            self.a2 = [1]  # [a2 = 1]
+            self.a2 = 1  # [a2 = 1]
 
         else:
             if a2 < 0 or a2 > 2:
@@ -199,13 +200,13 @@ class ExpObject(object):
 
             self.a2 = a2  # [a2]
 
-    def function(self, u):
+    def function(self, u: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """
         This method implements the functional form of G(u)
 
         Parameters
         ----------
-        u: (float):
+        u: float or np.ndarray
                 The input value to be fed through G(u)
 
         Returns
@@ -214,13 +215,13 @@ class ExpObject(object):
         """
         return -1 / self.a2 * np.exp(-self.a2 / 2 * u**2)
 
-    def first_derivative(self, u):
+    def first_derivative(self, u: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """
         This method implements the first derivative of G(.) for g(u)
 
         Parameters
         ----------
-        u: (float):
+        u: float or np.ndarray
                 The input value to be fed through g(u)
 
         Returns
@@ -229,13 +230,13 @@ class ExpObject(object):
         """
         return u * np.exp(-self.a2 * u * u / 2)
 
-    def second_derivative(self, u):
+    def second_derivative(self, u: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """
         This method implements the second derivative of G(.) for g'(u)
 
         Parameters
         ----------
-        u: (float):
+        u: float or np.ndarray
                 The input value to be fed through g'(u)
 
         Returns
@@ -244,14 +245,14 @@ class ExpObject(object):
         """
         return np.exp(-self.a2 * u * u / 2) * (1 - self.a2 * u * u)
 
-    def gamma(self, u):
+    def gamma(self, u: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """
         This method implements the ratio of the second derivative to
         the first derivative (gamma(u) = g'(u) / g(u))
 
         Parameters
         ----------
-        u: (float):
+        u: float or np.ndarray
                 The input value to be fed through gamma(u)
 
         Returns
@@ -285,13 +286,13 @@ class QuadObject(object):
     """
 
     @staticmethod
-    def function(u):
+    def function(u: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """
         This method implements the functional form of G(u)
 
         Parameters
         ----------
-        u: (float):
+        u: float or np.ndarray
                 The input value to be fed through G(u)
 
         Returns
@@ -301,13 +302,13 @@ class QuadObject(object):
         return 1 / 4 * u**4
 
     @staticmethod
-    def first_derivative(u):
+    def first_derivative(u: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """
         This method implements the first derivative of G(.) for g(u)
 
         Parameters
         ----------
-        u: (float):
+        u: float or np.ndarray
                 The input value to be fed through g(u)
 
         Returns
@@ -317,13 +318,13 @@ class QuadObject(object):
         return u**3
 
     @staticmethod
-    def second_derivative(u):
+    def second_derivative(u: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """
         This method implements the second derivative of G(.) for g'(u)
 
         Parameters
         ----------
-        u: (float):
+        u: float or np.ndarray
                 The input value to be fed through g'(u)
 
         Returns
@@ -333,14 +334,14 @@ class QuadObject(object):
         return 3 * u**2
 
     @staticmethod
-    def gamma(u):
+    def gamma(u: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """
         This method implements the ratio of the second derivative to
         the first derivative (gamma(u) = g'(u) / g(u))
 
         Parameters
         ----------
-        u: (float):
+        u: float or np.ndarray
                 The input value to be fed through gamma(u)
 
         Returns
@@ -374,13 +375,13 @@ class CubeObject(object):
     """
 
     @staticmethod
-    def function(u):
+    def function(u: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """
         This method implements the functional form of G(u)
 
         Parameters
         ----------
-        u: (float):
+        u: float or np.ndarray
                 The input value to be fed through G(u)
 
         Returns
@@ -390,13 +391,13 @@ class CubeObject(object):
         return u**3
 
     @staticmethod
-    def first_derivative(u):
+    def first_derivative(u: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """
         This method implements the first derivative of G(.) for g(u)
 
         Parameters
         ----------
-        u: (float):
+        u: float or np.ndarray
                 The input value to be fed through g(u)
 
         Returns
@@ -406,13 +407,13 @@ class CubeObject(object):
         return 3 * u**2
 
     @staticmethod
-    def second_derivative(u):
+    def second_derivative(u: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """
         This method implements the second derivative of G(.) for g'(u)
 
         Parameters
         ----------
-        u: (float):
+        u: float or np.ndarray
                 The input value to be fed through g'(u)
 
         Returns
@@ -422,14 +423,14 @@ class CubeObject(object):
         return 6 * u
 
     @staticmethod
-    def gamma(u):
+    def gamma(u: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """
         This method implements the ratio of the second derivative to
         the first derivative (gamma(u) = g'(u) / g(u))
 
         Parameters
         ----------
-        u: (float):
+        u: float or np.ndarray
                 The input value to be fed through gamma(u)
 
         Returns
@@ -441,8 +442,8 @@ class CubeObject(object):
 
 def initialise_sources(
     source_name: str = "logcosh",
-    source_params: dict | None = None,
-):
+    source_params: Optional[dict] = None,
+) -> tuple[Union[LogcoshObject, ExpObject, QuadObject, CubeObject], float]:
     """
     A function that takes in the source name and its associated parameters
     and returns the source instance and the E{G(nu)} value
@@ -489,6 +490,6 @@ def initialise_sources(
 
     source_expectation = np.mean(
         source_instance.function(np.random.randn(100000))
-    )  # 1 hundred thousand samples... hot damn
+    )  # 1 hundred thousand samples.
 
     return source_instance, source_expectation
