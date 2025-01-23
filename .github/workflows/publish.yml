@@ -35,7 +35,7 @@ jobs:
         run: poetry install
 
       - name: Build and publish
-        run: echo "ran build and publish step!" # TODO: poetry publish --build
+        run: poetry publish --build --dry-run
 
   release:
     needs: publish # This ensures release only runs after successful publish
