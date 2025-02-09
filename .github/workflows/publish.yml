@@ -3,7 +3,7 @@ name: Publish and Release
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+.*" # Trigger on version tags that approximately adhere to a semantic versioning tag.
+      - "v[0-9]+\.[0-9]+\.[0-9]+.*" # Trigger on version tags that approximately adhere to a semantic versioning tag.
 
 permissions:
   contents: write
