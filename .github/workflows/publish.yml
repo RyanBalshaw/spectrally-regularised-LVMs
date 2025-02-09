@@ -3,7 +3,7 @@ name: Publish and Release
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+" # Trigger on version tags that adhere to a specific semantic versioning pattern
+      - "^v(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$" # Trigger on version tags that adhere to a valid semantic versioning pattern (https://semver.org/)
 
 permissions:
   contents: write
@@ -35,7 +35,7 @@ jobs:
         run: poetry install
 
       - name: Build and publish
-        run: poetry publish --build
+        run: echo "Valid tag" # poetry publish --build
 
   release:
     needs: publish # This ensures release only runs after successful publish
@@ -45,8 +45,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
-        run: |
-           gh release create "$tag" \
-               --repo="$GITHUB_REPOSITORY" \
-               --title="${tag#v}" \
-               --generate-notes
+	run: echo "Valid release"
+        # run: |
+        #    gh release create "$tag" \
+        #        --repo="$GITHUB_REPOSITORY" \
+        #        --title="${tag#v}" \
+        #        --generate-notes
