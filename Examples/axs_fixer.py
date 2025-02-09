@@ -24,12 +24,12 @@ SOFTWARE.
 
 --------------------------------------------------------
 
-This is a utility script for enhancing the appearance and consistency of matplotlib 
-figures.
+This is a utility script for enhancing the appearance and consistency of matplotlib
+ figures.
 
 This script provides functionality to improve the visual quality and formatting of
-matplotlib plots by addressing common rendering issues and inconsistencies. The main
-function 'fix()' handles:
+ matplotlib plots by addressing common rendering issues and inconsistencies. The main
+ function 'fix()' handles:
 
 - Removal of '\mathdefault' from tick labels
 - Proper handling of mathematical text and symbols
